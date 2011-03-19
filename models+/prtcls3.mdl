@@ -1,0 +1,7 @@
+Standard Model
+ Particles 
+ Full  name  |A  |A+ | number |2*spin| mass |width |color|aux|>LaTex(A)    <|>LaTeX(A+)       <|
+electron     |e  |E  |11      |1     |0     |0     |1    |   |e^-           |e^+
+s_electron   |~eL|~EL|1000011 |0     |MSeL  |0     |1    |   |\tilda{e)_L   |\bar{\tilda{e}_L}
+gravitono    |~G |~G |1000039 |3     |Mgr   |0     |1    |   |\tilda{G}     |\tilda{G}
+================================================================================================

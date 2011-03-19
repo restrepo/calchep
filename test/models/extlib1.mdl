@@ -1,0 +1,10 @@
+Standard Model(CKM=1)
+Libraries
+External libraries  and citation                                   <|
+$CALCHEP/lib/model_aux.a
+%/home/pukhov/Packages/lhapdf-5.7.1/install/lib/libLHAPDF.a
+%/usr/lib/gcc/i386-redhat-linux/4.1.1/libgfortran.so
+% To switch on CERN PDFLIB uncomment the line below,
+% improving path to CERNLIB if it needs
+%   -L/cern/pro/lib -lpdflib804 -lmathlib -lpacklib $lFort
+=====================================================================

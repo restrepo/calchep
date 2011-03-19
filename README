@@ -1,0 +1,195 @@
+Instructions:
+-------------
+1) Place calchep_batch in bin directory of the CalcHEP
+	installation directory.
+2) Place batch_file into your work directory where
+	'calchep' script is located.
+3) Make sure event_mixer is in bin directory of the
+	CalcHEP installation directory.
+	You can also place nt_maker in bin directory.
+	If so, it will create nt when plain is requested.
+4) Edit batch_file.
+5) run bin/calchep_batch from your work directory.
+	or run bin/calchep_batch -f file_name if file_name is
+	your batch file.
+	The batch script will update every "sleep time"
+	seconds while waiting for processes to finish.  
+	"sleep time" is set in the batch file.
+6) Open html/index.html in your web browser to see the
+	details of batch run.  
+	The html files will be updated whenever the script
+	updates (every "sleep time" seconds).
+
+
+
+
+Unresolved cosmetic issues:
+---------------------------
+1) The PID that shows in the html files is only correct on a pbs cluster.  It is not quite right on a single machine.  I think the reason is that it gets the PID of the nice program which then starts the calchep process.  I am not sure how to fix this.  
+2) On a mac, the html displays "-11" for the number of events even though it produces the requested number.  I think it is an issue with "wc -l" on the mac.
+
+
+
+Features for the future:
+------------------------
+() Determine the  number of decays to generate in an intelligent way.  Determine how many times the decay is applied in the process.
+() Give more information about the progress of the symbolic and numerical calculations.  Sasha P. is going to write out some information about the symbolic calculation to a txt file that can be used for this.
+() Allow old sessions to be reused.  This way, time spent improving the grid will not be lost.  Only restart the grid when parameters, cuts etc. are changed.
+() Add uncertainty to cross sections and widths.
+() Give more indication of how far numerical sessions have gone.
+() Allow user to remove particles from diagrams.  More importantly, allow user to request diagrams with 2->n and final particles decayed at the diagram level.
+() Have CH output tex output for diagrams and tex it.  Link in html.
+() Automatically generate decay chains all the way to stable particles.  Produce a library of all possible decays of all particles.  Use this to determine chains on the fly.
+() Allow cuts in event_mixer (both event signature and kinematic).  Determine the fraction of events produced after the cuts compared to the number requested.  Rerun the event generation requesting the number required to finish producing the requested number of events.
+() For the next major version: Update for grid.
+	a) Allow for multiple cluster urls.  Access them via ssh/sftp.
+	b) Keep a library of symbolic codes.  Send them tarred up to clusters to be compiled on cluster.
+	c) Send jobs to the cluster as each parameter value is set up.  
+		Don't wait for all parameter values to be set up before sending to the cluster.
+	d) Have each job send back updates on progress.
+	e) Set up job queue where when jobs are ready to be run, they are added to the queue.
+		When cpus are available, submit jobs from the queue.
+		Have multiple queue's.  One for compilation, one for cross section,
+		one for event generation, one for event mixing and so on.
+		If all the cross sections finish for a run parameter value, immediately submit
+		the event generation instead of waiting for the entire run of cs's to finish (and so on).
+	f) Update to allow use on Condor clusters.
+() For the next major version.  Allow two models to be run at once and compared.  For example, allow the 3-Site model and SM to be run over MWP and signal over background to be compared.  Generate a significance plot on the fly.  Allow user to choose where to cut a distribution to determine signal and background in batch_file.  
+() Improve event library.  Use directories like process library.  Inside model directory, have directories for each process.  
+() Allow for some aspects of the batch file to be changed on the fly.  For example, the user may decide to increase the number of vegas calls after seeing that the distributions are too noisy.  Or, he/she may decide the cuts are not optimized...  Reread the batch-file regularly and act accordingly.
+() Set the comments in a <!--       --> block following <LesHouchesEvents version="1.0">.  (Thanks to Arnaud Gay.)
+() Create help html files.
+
+Version Notes:
+--------------
+0.62 : Added memory specification for pbs job script.
+0.61 : Added output for CH errors.  Set to exit if CH error
+			encountered.
+		 Started help files.
+		 Set default CH_PATH to working dir (if shell variable
+		 	CALCHEP is not set.)
+0.60 : Finished update to use s_calchep rather than calchep.
+0.59 : Updated the batch details in event file.
+			Only print pdf info relevant to pdf.
+0.58 : Fixed the cuts and distributions so that if they have more
+			than 2 parameters, duplicate parameters are allowed
+			if there are the same number or more duplicates
+			in the process.  This finishes the fix begun in 
+			v0.52.
+0.57 : Changed to read batch file name as argument without flag.
+			The shell script in user directory needs to be updated.
+		 Changed to use calchep environment variable for bin
+		 	directory location.
+0.56 : Changed the name to calchep_batch.
+0.55 : Added text output when batch file is not found.
+		 Added text output specifying where to find progress
+		 	and Events.
+		 Made change so events are generated without recalculating
+		 	the cross section.
+		 Modified the progress reports to split production, decays
+		 	and widths and emphasize that the cross section is a 
+		 	production cross section.
+		 Added decay partial widths to the progress reports.
+		 Updated final cs with final cs from event_mixer.
+0.54 : Changed "Estimating Cross Section" to "Calculating Cross
+		   Section".
+		 Changed decaySLHA1.txt to decaySLHA.txt.
+0.53 : Allowed allNew! as particle name.
+       Updated to use results/list_prc.txt for subprocess list.
+       Added widths in decaySLHA1.txt to event generation.
+         This is to enable the cross section to be updated with the
+         branching ratios of the decays.
+         This file is linked to Events/tmp where event_mixer works.
+         event_mixer needs to be updated now.
+       Updated progress to state "Done!" when 0 events are requested.
+         Just the cross section is being computed or just distributions
+         are being generated.
+0.52 : Fixed bug in cuts where J(u,u) would not be written since the script
+			only wrote nonidentical particles.  It appears that there is also
+			a problem in CH with identical particles here.  (When CH is fixed
+			I need to also fix this for cuts with 3 and 4 parameters.)
+			CH has been fixed.
+0.51 : Added photon pdfs.  Needs to be tested.
+       Added 1*x and 3*x to possible final states.  Needs to be tested.
+0.50 : Fixed bug where run parameters were not being written to the gnuplot
+			instruction file correctly.
+0.49 : Fixed a minor bug where the number of bins for the distribution was
+			not always being chosen correctly.
+0.48 : Passes user defined observable names (Uxxx) without modification.
+		 Made more improvements to the distribution functionality.
+		 	Plots are automatically shown in numerical html.
+0.47 : Fixed bugs in distribution production.
+0.46 : Fixed bug in v0.45 where the {par} were being replaced in the wrong order.
+0.45 : Improved the cuts and distribution values to allow for run parameters
+			that are not part of the model.  This could be useful when calculating
+			the SM and want to place cuts that correspond with those set in
+			the new model calculation.  For example, if the new model has a Z',
+			then it may be convenient to set a cut on M(le,le) that depends on 
+			MZP.  This is straight forward in the new model, but in the SM, it 
+			was not possible.  Now, if run parameter are placed inside curly
+			brackets in the min or max values, they will be replaced with the value.
+			For example, Cut min: {MZP}/10, will be replaced with (1000)/10 if
+			the value of MZP is 1000.  Only the run parameters can be used in this
+			way.  The parameters of the model (including those in the run) can 
+			still be used directly and will not be replaced.  So,
+			Cut min: MZP/10 will remain MZP/10.
+0.44 : Updated script to work with 2.5.o.  Use -n switch to work with 2.5.n.
+			Cut and distribution names are determined on the fly.
+			Duplicates are removed.
+0.43 : Added basic 1 parameter distribution functionality.
+			Much still to be done on this.
+		 Stopped the script after calculating the cross section if 0 events were
+			requested.
+		 Made the html menu fixed, so that it does not scroll off the screen.
+		 	User needs to remove html/style.css to have this take effect.
+			This might not work in IE, but it does in Firefox.
+0.42 : Fixed 2.5.o issue where parantheses were ignored in cuts.
+0.41 : Improved specification of process for cuts etc.  Now, :n: means the nth
+			process and : means to apply it to all processes.
+0.40 : Fixed bug where it complained when it couldn't remove events_1.txt.
+			This happened when the cross section or decay rate was too small to produce
+			any events. 
+			(Thanks to Ismail Turan for pointing out the problem.)
+0.39 : Fixed problem with pbs server dropping jobs.  If a jobid of 0 is returned, 
+			the script simply reruns it.
+0.38 : Fixed bug in 0.37 improvement.
+0.37 : Improved the regexp identification of the cs during the cs estimation phase.
+0.36 : Added version number to header of run_batch.
+0.35 : Allowed real walltimes to be specified, thus allowing minutes.  E.g. a walltime of 
+			1.25 means 1hr 15min.
+0.34 : Fixed bug with determination of subprocesses.  Changed =~ to eq when comparing particle
+			strings.
+0.33 : Set the default Beamstrahlung parameters to be the same as in CH (~ILC).
+0.32 : Put the cross section in scientific notation in html and txt progress files.
+0.31 : Added ISR and Beam parameters to event file details.
+0.30 : Added ISR and Beamstrahlung for electron positron colliders.
+0.29 : Added cleanup parameter.  If set to True of Yes, the individual event files will
+         be removed after they are combined.
+       Updated batch details printed in combined events file.
+0.28 : Fixed bug where combine_events would get ahead of itself and think it was combining a
+         run parameter ahead of where it really was.
+0.27 : Fixed cosmetic bug where the number of events produced was incorrectly reported in html.
+         wc -l only gives an estimate.  Now, the final N events is taken from CH output.
+0.26 : Fixed bug where sometimes cuts, etc were not being renumbered correctly.
+0.25 : Fixed a bug with the pbs job_script files not being completed.
+       Fixed bug with numbering of process library directories.  Duplicates were being created.
+         New process numbers are now being created by finding the highest number used and adding one.
+0.24 : Added new nt_maker.  Now automatically splits nt's into 50K increments.
+     	 Improved the event library.
+     	 Commented out link to Batch Request.  (Was this really useful?  If so, I should update it.)
+0.23 : Incremented random number seed for each subprocess and decay.
+       	Previously, the random seed was the same for all subprocesses and decays.
+       	This caused strong correlations between diferrent decay modes and erroneous results.
+       Uppercased random number seed.
+       Padded beginning of random number seed with 1's instead of 0's.
+       Fixed maxN bug.  It was writing it as an integer.  Now, as a real.
+0.22 : Updated the vegas and generate events parameters in decays.
+       	Previously, they were left at the default values.
+       Wrapped the number of events to produce in int().
+       niced event_mixer and nt_maker.
+0.21 : Added nice level specification to batch file.  Defaults to 19.
+       Added nt_maker if present.  (Creates nt on the fly.)
+0.20 : Fixed issue where the .a files were not being linked.
+       Also linked the EXTLIB and extern.h, although I don't know if
+       	either was necessary.  (I don't see a difference in the results.)
+0.19 : Fixed issue with alphaPDF defaulting to 0.

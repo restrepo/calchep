@@ -1,0 +1,16 @@
+
+if(test -r cproclib_0.a) then
+   FCPROCLIB="fproclib_*.a  cproclib_*.a"
+else 
+  if(test -r cproclib_0.so) then
+    FCPROCLIB="fproclib_*.a  ./cproclib_*.so"  
+  else 
+    FCPROCLIB=
+  fi
+fi
+
+cLib=$CALCHEP/lib
+
+
+$CC $CFLAGS  -o n_calchep   $cLib/n_calchep.o  $cLib/num_c.a $cLib/sqme_aux.o \
+$cLib/serv.a  dproclib_*.a $FCPROCLIB  $cLib/libSLHAplus.a  $EXTLIB    $cLib/dummy.a   $LX11 -lm

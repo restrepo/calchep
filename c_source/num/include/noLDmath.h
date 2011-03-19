@@ -1,0 +1,12 @@
+#undef sin   
+#undef cos   
+#undef tan   
+#undef asin  
+#undef acos  
+#undef atan  
+#undef atan2 
+#undef exp   
+#undef log   
+#undef paw   
+#undef sqrt  
+#undef fabs  

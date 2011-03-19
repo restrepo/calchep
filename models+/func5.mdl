@@ -1,0 +1,1061 @@
+_LARGE_XD
+ Constraints 
+ Name |> Expression                                                                                                <|> Comment                      <|
+pi    |4*atan(1)                                                                                                    |                                 
+CW    |sqrt(1-SW^2)                                                                                                 |cos of the Weinberg angle        
+S2W   |2*SW*CW                                                                                                      |                                 
+C2W   |CW^2-SW^2                                                                                                    |                                 
+MW    |MZ*CW                                                                                                        |W mass                           
+c12   |sqrt(1-s12^2)                                                                                                |parameter  of C-K-M matrix       
+c23   |sqrt(1-s23^2)                                                                                                |parameter  of C-K-M matrix       
+c13   |sqrt(1-s13^2)                                                                                                |parameter  of C-K-M matrix       
+Vud   |c12                                                                                                          |C-K-M matrix element             
+Vus   |s12                                                                                                          |C-K-M matrix element             
+Vcs   |Vud                                                                                                          |C-K-M matrix element             
+Vcd   |-Vus                                                                                                         |C-K-M matrix element             
+sb    |tb/sqrt(1+tb^2)                                                                                              |Sinus beta                       
+cb    |sqrt(1-sb^2)                                                                                                 |Cosine beta                      
+t2b   |2*tb/(1-tb^2)                                                                                                |                                 
+c2b   |cb^2-sb^2                                                                                                    |cos(2b)                          
+s2b   |2*sb*cb                                                                                                      |sin(2b)                          
+Zcsx  |(MG2^2+mu^2)/2+MW^2                                                                                          |                                 
+Zctx  |(MG2^2-mu^2)^2/4+MW^4*c2b^2+MW^2*(MG2^2+mu^2+2*mu*MG2*s2b)                                                   |                                 
+MC01  |sqrt(Zcsx-sqrt(Zctx))                                                                                        |                                 
+MC02  |sqrt(Zcsx+sqrt(Zctx))                                                                                        |                                 
+Zcc2u |-(MG2^2-mu^2-2*MW^2*c2b)/(MC02^2-MC01^2)                                                                     |                                 
+Zcc2v |-(MG2^2-mu^2+2*MW^2*c2b)/(MC02^2-MC01^2)                                                                     |                                 
+Zcsigu|-(MG2*cb+mu*sb)/sqrt((MG2*cb+mu*sb)^2)                                                                       |                                 
+Zcsigv|-(MG2*sb+mu*cb)/sqrt((MG2*sb+mu*cb)^2)                                                                       |                                 
+Zccu  |sqrt((1+Zcc2u)/2)                                                                                            |                                 
+Zcsu  |sqrt((1-Zcc2u)/2)*Zcsigu                                                                                     |                                 
+Zccv  |sqrt((1+Zcc2v)/2)                                                                                            |                                 
+Zcsv  |sqrt((1-Zcc2v)/2)*Zcsigv                                                                                     |                                 
+Zcsig1|(mu*MG2-MW^2*s2b)/sqrt((mu*MG2-MW^2*s2b)^2)                                                                  |                                 
+Zcsig2|MW*Sqrt2*(cb*Zcsu*Zccv+sb*Zccu*Zcsv)+mu*Zcsv*Zcsu+MG2*Zccu*Zccv                                              |                                 
+Zcsig3|Zcsig1*Zcsig2/sqrt(Zcsig2^2)                                                                                 |                                 
+Zcsig4|-MW*Sqrt2*(cb*Zccu*Zcsv+sb*Zcsu*Zccv)+mu*Zccv*Zccu+MG2*Zcsu*Zcsv                                             |                                 
+MC1   |Zcsig2^2/sqrt(Zcsig2^2)                                                                                      |1st chargino mass                
+MC2   |Zcsig4^2/sqrt(Zcsig4^2)                                                                                      |2nd chargino mass                
+Zm11  |Zccu*Zcsig1*Zcsig3                                                                                           |                                 
+Zm12  |-Zcsu*Zcsig3                                                                                                 |                                 
+Zm21  |Zcsu*Zcsig1*Zcsig3                                                                                           |                                 
+Zm22  |Zccu*Zcsig3                                                                                                  |                                 
+Zp11  |Zccv                                                                                                         |                                 
+Zp12  |-Zcsv                                                                                                        |                                 
+Zp21  |Zcsv                                                                                                         |                                 
+Zp22  |Zccv                                                                                                         |                                 
+Znx0  |(MG1+MG2)/4                                                                                                  |                                 
+Znxc2 |MG1*MG2-MZ^2-mu^2-3/8*(MG1+MG2)^2                                                                            |                                 
+Znxc3a|-1/8*(MG1+MG2)^3+1/2*(MG1+MG2)*(MG1*MG2-MZ^2-mu^2)                                                           |                                 
+Znxc3 |Znxc3a+(MG1+MG2)*mu^2+(MG1*CW^2+MG2*SW^2)*MZ^2-mu*MZ^2*s2b                                                   |                                 
+Znxc4b|(MG1*CW^2+MG2*SW^2)*mu*MZ^2*s2b-MG1*MG2*mu^2                                                                 |                                 
+Znxc4a|Znxc4b+Znx0^2*(MG1*MG2-MZ^2-mu^2)-3/256*(MG1+MG2)^4                                                          |                                 
+Znxc4 |Znxc4a+Znx0*((MG1+MG2)*mu^2+(MG1*CW^2+MG2*SW^2)*MZ^2-mu*MZ^2*s2b)                                            |                                 
+Znxs  |-Znxc3^2-2/27*Znxc2^3+8/3*Znxc2*Znxc4                                                                        |                                 
+Znxu  |-1/3*Znxc2^2-4*Znxc4                                                                                         |                                 
+Zncxd |-4*Znxu^3-27*Znxs^2                                                                                          |                                 
+Zncua |atan2(sqrt(Zncxd/27)/2, -Znxs/2)/3                                                                           |                                 
+Zncxa |(Zncxd/108+Znxs^2/4)^(1/6)*cos(Zncua)                                                                        |                                 
+Zncxb |8*Zncxa-8/3*Znxc2                                                                                            |                                 
+Zncx1 |Zncxa/2-Znxc2/6                                                                                              |                                 
+Zncx2 |-Zncxa/2-Znxc2/3                                                                                             |                                 
+Zncx3 |Znxc3/sqrt(Zncxb)                                                                                            |                                 
+MNE1a |Znx0-sqrt(Zncx1)+sqrt(Zncx2+Zncx3)                                                                           |1st neutralino mass              
+MNE2a |Znx0+sqrt(Zncx1)-sqrt(Zncx2-Zncx3)                                                                           |2nd neutralino mass              
+MNE3a |Znx0-sqrt(Zncx1)-sqrt(Zncx2+Zncx3)                                                                           |3rd neutralino mass              
+MNE4a |Znx0+sqrt(Zncx1)+sqrt(Zncx2-Zncx3)                                                                           |4th neutralino mass              
+MNE1  |sort4(MNE1a, MNE2a, MNE3a, MNE4a, 1)                                                                         |                                 
+MNE2  |sort4(MNE1a, MNE2a, MNE3a, MNE4a, 2)                                                                         |                                 
+MNE3  |sort4(MNE1a, MNE2a, MNE3a, MNE4a, 3)                                                                         |                                 
+MNE4  |sort4(MNE1a, MNE2a, MNE3a, MNE4a, 4)                                                                         |                                 
+Znx12 |-CW/SW*(MG1-MNE1)/(MG2-MNE1)                                                                                 |                                 
+Znx1x |MZ*(MG2-MNE1)*SW*(mu*cb+MNE1*sb)                                                                             |                                 
+Znx13 |(mu*(MG2-MNE1)*(MG1-MNE1)-MZ^2*sb*cb*((MG1-MG2)*CW^2+MG2-MNE1))/Znx1x                                        |                                 
+Znx14 |(-MNE1*(MG2-MNE1)*(MG1-MNE1)-MZ^2*cb*cb*((MG1-MG2)*CW^2+MG2-MNE1))/Znx1x                                     |                                 
+Zn11  |1/sqrt(1+Znx12^2+Znx13^2+Znx14^2)                                                                            |                                 
+Zn21  |Zn11*Znx12                                                                                                   |                                 
+Zn31  |Zn11*Znx13                                                                                                   |                                 
+Zn41  |Zn11*Znx14                                                                                                   |                                 
+Znx22 |-CW/SW*(MG1-MNE2)/(MG2-MNE2)                                                                                 |                                 
+Znx2x |MZ*(MG2-MNE2)*SW*(mu*cb+MNE2*sb)                                                                             |                                 
+Znx23 |(mu*(MG2-MNE2)*(MG1-MNE2)-MZ^2*sb*cb*((MG1-MG2)*CW^2+MG2-MNE2))/Znx2x                                        |                                 
+Znx24 |(-MNE2*(MG2-MNE2)*(MG1-MNE2)-MZ^2*cb*cb*((MG1-MG2)*CW^2+MG2-MNE2))/Znx2x                                     |                                 
+Zn12  |1/sqrt(1+Znx22^2+Znx23^2+Znx24^2)                                                                            |                                 
+Zn22  |Zn12*Znx22                                                                                                   |                                 
+Zn32  |Zn12*Znx23                                                                                                   |                                 
+Zn42  |Zn12*Znx24                                                                                                   |                                 
+Znx32 |-CW/SW*(MG1-MNE3)/(MG2-MNE3)                                                                                 |                                 
+Znx3x |MZ*(MG2-MNE3)*SW*(mu*cb+MNE3*sb)                                                                             |                                 
+Znx33 |(mu*(MG2-MNE3)*(MG1-MNE3)-MZ^2*sb*cb*((MG1-MG2)*CW^2+MG2-MNE3))/Znx3x                                        |                                 
+Znx34 |(-MNE3*(MG2-MNE3)*(MG1-MNE3)-MZ^2*cb*cb*((MG1-MG2)*CW^2+MG2-MNE3))/Znx3x                                     |                                 
+Zn13  |1/sqrt(1+Znx32^2+Znx33^2+Znx34^2)                                                                            |                                 
+Zn23  |Zn13*Znx32                                                                                                   |                                 
+Zn33  |Zn13*Znx33                                                                                                   |                                 
+Zn43  |Zn13*Znx34                                                                                                   |                                 
+Znx42 |-CW/SW*(MG1-MNE4)/(MG2-MNE4)                                                                                 |                                 
+Znx4x |MZ*(MG2-MNE4)*SW*(mu*cb+MNE4*sb)                                                                             |                                 
+Znx43 |(mu*(MG2-MNE4)*(MG1-MNE4)-MZ^2*sb*cb*((MG1-MG2)*CW^2+MG2-MNE4))/Znx4x                                        |                                 
+Znx44 |(-MNE4*(MG2-MNE4)*(MG1-MNE4)-MZ^2*cb*cb*((MG1-MG2)*CW^2+MG2-MNE4))/Znx4x                                     |                                 
+Zn14  |1/sqrt(1+Znx42^2+Znx43^2+Znx44^2)                                                                            |                                 
+Zn24  |Zn14*Znx42                                                                                                   |                                 
+Zn34  |Zn14*Znx43                                                                                                   |                                 
+Zn44  |Zn14*Znx44                                                                                                   |                                 
+MSG   |MG3                                                                                                          |mass of gluino                   
+ls3   |Mtau*Atau/Sqrt2*EE/SW/MW/cb                                                                                  |Tau soft coupling (Rosiek notati 
+MSne  |sqrt(c2b*MW^2/2+CW^2*Ml2^2)/CW                                                                               |e-sneutrino mass                 
+MSnmu |sqrt(c2b*MW^2/2+CW^2*Ml2^2)/CW                                                                               |mu-sneutrino mass                
+MSntau|sqrt(c2b*MW^2/2+CW^2*Ml3^2)/CW                                                                               |tau-sneutrino mass               
+MSeL  |sqrt(-c2b*(CW^2-SW^2)*MW^2/2+CW^2*Ml2^2)/CW                                                                  |left selectron mass              
+MSeR  |sqrt(-SW^2*c2b*MW^2+CW^2*Mr2^2)/CW                                                                           |right selectron mass             
+MSmuL |sqrt(-c2b*(CW^2-SW^2)*MW^2/2+CW^2*Ml2^2)/CW                                                                  |left smuon mass                  
+MSmuR |sqrt(-SW^2*c2b*MW^2+CW^2*Mr2^2)/CW                                                                           |right smuon mass                 
+MSlLL |Ml3^2+Mtau^2-MW^2/CW^2*(1/2-SW^2)*c2b                                                                        |                                 
+MSlLR |MW*SW*Sqrt2*cb*ls3/EE-Mtau*mu*tb                                                                             |                                 
+MSlRR |Mr3^2+Mtau^2-MW^2/CW^2*SW^2*c2b                                                                              |                                 
+MStau1|sqrt((MSlLL+MSlRR-sqrt((MSlLL-MSlRR)^2+4*MSlLR^2))/2)                                                        |light stau mass                  
+MStau2|sqrt((MSlLL+MSlRR+sqrt((MSlLL-MSlRR)^2+4*MSlLR^2))/2)                                                        |heavy stau mass                  
+MSlth |atan2(-2*MSlLR, -MSlLL+MSlRR)/2                                                                              |stau mixing angle                
+Zl33  |cos(MSlth)                                                                                                   |                                 
+Zl36  |-sin(MSlth)                                                                                                  |                                 
+Zl63  |-Zl36                                                                                                        |                                 
+Zl66  |Zl33                                                                                                         |                                 
+Zual4 |177/1000                                                                                                     |                                 
+Zuas4 |1092363/10000000                                                                                             |                                 
+Zur0  |1+4*Zuas4/3/pi+(1611/100-104/100*(5-663/Mtop/100))*(Zuas4/pi)^2                                              |                                 
+ZuQMt |if(sqrt(Mq3*Mu3)-MZ, sqrt(Mq3*Mu3), MZ)                                                                      |                                 
+Zur1  |(log(2*Mtop/Zual4)/log(2*Mb/Zual4))^(12/25)                                                                  |                                 
+Zulam5|exp((25*log(Zual4)-log(4*Mb^2))/23)                                                                          |                                 
+Zur2  |(log(2*Mb/Zulam5)/log(2*Mtop/Zulam5))^(12/23)                                                                |                                 
+Zur3  |(log(2*Mb/Zulam5)/log(ZuQMt/Zulam5))^(12/23)                                                                 |                                 
+Zulam6|exp((25*log(Zual4)-log(4*Mb^2)-log(4*Mtop^2))/21)                                                            |                                 
+Zur4  |(log(2*Mtop/Zulam6)/log(ZuQMt/Zulam6))^(12/21)                                                               |                                 
+MtopS |Mtop*if(ZuQMt-2*Mtop, Zur1*Zur2*Zur4, Zur1*Zur3)/Zur0                                                        |                                 
+ds3   |Mb*Ab*EE/SW/MW/Sqrt2/cb                                                                                      |d3 soft breaking parameter (RN)  
+us3   |-Atop*MtopS*EE/SW/MW/Sqrt2/sb                                                                                |u3 soft breaking parameter (RN)  
+MSuL  |sqrt(Mq2^2+MW^2/CW^2*(1/2-2/3*SW^2)*c2b)                                                                     |                                 
+MSuR  |sqrt(Mu2^2+MW^2/CW^2*(2/3*SW^2)*c2b)                                                                         |                                 
+MScL  |sqrt(Mq2^2+MW^2/CW^2*(1/2-2/3*SW^2)*c2b)                                                                     |                                 
+MScR  |sqrt(Mu2^2+MW^2/CW^2*(2/3*SW^2)*c2b)                                                                         |                                 
+MStLL |Mq3^2+MtopS^2+MW^2/CW^2*(1/2-2/3*SW^2)*c2b                                                                   |                                 
+MStLR |-MW*SW*Sqrt2*sb*us3/EE-MtopS*mu/tb                                                                           |                                 
+MStRR |Mu3^2+MtopS^2+2/3*MW^2/CW^2*SW^2*c2b                                                                         |                                 
+MStop1|sqrt((MStLL+MStRR-sqrt((MStLL-MStRR)^2+4*MStLR^2))/2)                                                        |                                 
+MStop2|sqrt((MStLL+MStRR+sqrt((MStLL-MStRR)^2+4*MStLR^2))/2)                                                        |                                 
+MStth |atan2(-2*MStLR, -MStLL+MStRR)/2                                                                              |                                 
+Zu33  |cos(MStth)                                                                                                   |                                 
+Zu36  |-sin(MStth)                                                                                                  |                                 
+Zu63  |-Zu36                                                                                                        |                                 
+Zu66  |Zu33                                                                                                         |                                 
+MSdL  |sqrt(Mq2^2-MW^2/CW^2*(1/2-1/3*SW^2)*c2b)                                                                     |                                 
+MSdR  |sqrt(Md2^2+MW^2/CW^2*(-1/3*SW^2)*c2b)                                                                        |                                 
+MSsL  |sqrt(Mq2^2-MW^2/CW^2*(1/2-1/3*SW^2)*c2b)                                                                     |                                 
+MSsR  |sqrt(Md2^2+MW^2/CW^2*(-1/3*SW^2)*c2b)                                                                        |                                 
+MSbLL |Mq3^2+Mb^2-MW^2/CW^2*(1/2-1/3*SW^2)*c2b                                                                      |                                 
+MSbLR |MW*SW*Sqrt2*cb*ds3/EE-Mb*mu*tb                                                                               |                                 
+MSbRR |Md3^2+Mb^2-1/3*MW^2/CW^2*SW^2*c2b                                                                            |                                 
+MSbot1|sqrt((MSbLL+MSbRR-sqrt((MSbLL-MSbRR)^2+4*MSbLR^2))/2)                                                        |                                 
+MSbot2|sqrt((MSbLL+MSbRR+sqrt((MSbLL-MSbRR)^2+4*MSbLR^2))/2)                                                        |                                 
+MSbth |atan2(-2*MSbLR, -MSbLL+MSbRR)/2                                                                              |                                 
+Zd33  |cos(MSbth)                                                                                                   |                                 
+Zd36  |-sin(MSbth)                                                                                                  |                                 
+Zd63  |-Zd36                                                                                                        |                                 
+Zd66  |Zd33                                                                                                         |                                 
+ca    |fhf2(tb, mu, Mq3, Mu3, Md3, Atop-mu/tb, Ab-mu*tb, MG2, MG3, MH3, Mtop, Mb, 4)                                |                                 
+sa    |-sqrt(1-ca^2)                                                                                                |                                 
+vevv  |2*MW^2*SW^2/EE^2                                                                                             |                                 
+s2a   |2*sa*ca                                                                                                      |sin(2a)                          
+c2a   |ca^2-sa^2                                                                                                    |                                 
+sapb  |sa*cb+ca*sb                                                                                                  |sin(a+b)                         
+samb  |sa*cb-ca*sb                                                                                                  |sin(a-b)                         
+capb  |ca*cb-sa*sb                                                                                                  |cos(a+b)                         
+camb  |ca*cb+sa*sb                                                                                                  |cos(a-b)                         
+Mh    |fhf2(tb, mu, Mq3, Mu3, Md3, Atop-mu/tb, Ab-mu*tb, MG2, MG3, MH3, Mtop, Mb, 1)                                |                                 
+MHH   |fhf2(tb, mu, Mq3, Mu3, Md3, Atop-mu/tb, Ab-mu*tb, MG2, MG3, MH3, Mtop, Mb, 2)                                |                                 
+MHc   |fhf2(tb, mu, Mq3, Mu3, Md3, Atop-mu/tb, Ab-mu*tb, MG2, MG3, MH3, Mtop, Mb, 5)                                |Mass of charged Higgs            
+alpha |atan2(sa, ca)                                                                                                |                                 
+B00000|s2b*MW*Zp11*Zu33-cb*Mtop*Sqrt2*Zp21*Zu63                                                                     |                                 
+B00001|B00000                                                                                                       |                                 
+B00002|s2b*MW*Zp11*Zu36-cb*Mtop*Sqrt2*Zp21*Zu66                                                                     |                                 
+B00003|B00002                                                                                                       |                                 
+B00004|s2b*MW*Zp12*Zu33-cb*Mtop*Sqrt2*Zp22*Zu63                                                                     |                                 
+B00005|B00004                                                                                                       |                                 
+B00006|s2b*MW*Zp12*Zu36-cb*Mtop*Sqrt2*Zp22*Zu66                                                                     |                                 
+B00007|B00006                                                                                                       |                                 
+B00008|3*CW*cb*MW*Zd33*Zn21-SW*cb*MW*Zd33*Zn11-3*CW*Mb*Zd63*Zn31                                                    |                                 
+B00009|B00008                                                                                                       |                                 
+B00010|-2*SW*cb*MW*Zd63*Zn11-3*CW*Mb*Zd33*Zn31                                                                      |                                 
+B00011|B00010                                                                                                       |                                 
+B00012|3*CW*cb*MW*Zd36*Zn21-SW*cb*MW*Zd36*Zn11-3*CW*Mb*Zd66*Zn31                                                    |                                 
+B00013|B00012                                                                                                       |                                 
+B00014|-2*SW*cb*MW*Zd66*Zn11-3*CW*Mb*Zd36*Zn31                                                                      |                                 
+B00015|B00014                                                                                                       |                                 
+B00016|3*CW*cb*MW*Zd33*Zn22-SW*cb*MW*Zd33*Zn12-3*CW*Mb*Zd63*Zn32                                                    |                                 
+B00017|B00016                                                                                                       |                                 
+B00018|-2*SW*cb*MW*Zd63*Zn12-3*CW*Mb*Zd33*Zn32                                                                      |                                 
+B00019|B00018                                                                                                       |                                 
+B00020|3*CW*cb*MW*Zd36*Zn22-SW*cb*MW*Zd36*Zn12-3*CW*Mb*Zd66*Zn32                                                    |                                 
+B00021|B00020                                                                                                       |                                 
+B00022|-2*SW*cb*MW*Zd66*Zn12-3*CW*Mb*Zd36*Zn32                                                                      |                                 
+B00023|B00022                                                                                                       |                                 
+B00024|3*CW*cb*MW*Zd33*Zn23-SW*cb*MW*Zd33*Zn13-3*CW*Mb*Zd63*Zn33                                                    |                                 
+B00025|B00024                                                                                                       |                                 
+B00026|-2*SW*cb*MW*Zd63*Zn13-3*CW*Mb*Zd33*Zn33                                                                      |                                 
+B00027|B00026                                                                                                       |                                 
+B00028|3*CW*cb*MW*Zd36*Zn23-SW*cb*MW*Zd36*Zn13-3*CW*Mb*Zd66*Zn33                                                    |                                 
+B00029|B00028                                                                                                       |                                 
+B00030|-2*SW*cb*MW*Zd66*Zn13-3*CW*Mb*Zd36*Zn33                                                                      |                                 
+B00031|B00030                                                                                                       |                                 
+B00032|3*CW*cb*MW*Zd33*Zn24-SW*cb*MW*Zd33*Zn14-3*CW*Mb*Zd63*Zn34                                                    |                                 
+B00033|B00032                                                                                                       |                                 
+B00034|-2*SW*cb*MW*Zd63*Zn14-3*CW*Mb*Zd33*Zn34                                                                      |                                 
+B00035|B00034                                                                                                       |                                 
+B00036|3*CW*cb*MW*Zd36*Zn24-SW*cb*MW*Zd36*Zn14-3*CW*Mb*Zd66*Zn34                                                    |                                 
+B00037|B00036                                                                                                       |                                 
+B00038|-2*SW*cb*MW*Zd66*Zn14-3*CW*Mb*Zd36*Zn34                                                                      |                                 
+B00039|B00038                                                                                                       |                                 
+B00040|3*CW*Zn21+SW*Zn11                                                                                            |                                 
+B00041|(-EE/S2W*Sqrt2/6)*B00040                                                                                     |                                 
+B00042|3*CW*Zn22+SW*Zn12                                                                                            |                                 
+B00043|(-EE/S2W*Sqrt2/6)*B00042                                                                                     |                                 
+B00044|3*CW*Zn23+SW*Zn13                                                                                            |                                 
+B00045|(-EE/S2W*Sqrt2/6)*B00044                                                                                     |                                 
+B00046|3*CW*Zn24+SW*Zn14                                                                                            |                                 
+B00047|(-EE/S2W*Sqrt2/6)*B00046                                                                                     |                                 
+B00048|3*CW*Zn21-SW*Zn11                                                                                            |                                 
+B00049|EE/S2W*Sqrt2/6*B00048                                                                                        |                                 
+B00050|3*CW*Zn22-SW*Zn12                                                                                            |                                 
+B00051|EE/S2W*Sqrt2/6*B00050                                                                                        |                                 
+B00052|3*CW*Zn23-SW*Zn13                                                                                            |                                 
+B00053|EE/S2W*Sqrt2/6*B00052                                                                                        |                                 
+B00054|3*CW*Zn24-SW*Zn14                                                                                            |                                 
+B00055|EE/S2W*Sqrt2/6*B00054                                                                                        |                                 
+B00056|CW*Zn21+SW*Zn11                                                                                              |                                 
+B00057|EE/S2W*Sqrt2/2*B00056                                                                                        |                                 
+B00058|CW*Zn22+SW*Zn12                                                                                              |                                 
+B00059|EE/S2W*Sqrt2/2*B00058                                                                                        |                                 
+B00060|CW*Zn23+SW*Zn13                                                                                              |                                 
+B00061|EE/S2W*Sqrt2/2*B00060                                                                                        |                                 
+B00062|CW*Zn24+SW*Zn14                                                                                              |                                 
+B00063|EE/S2W*Sqrt2/2*B00062                                                                                        |                                 
+B00064|(sb*ca^3+cb*sa^3)*CW^2*EE^2*MHH^2-CW^2*samb^2*sapb*EE^2*MH3^2                                                |                                 
+B00065|-S2W^2*samb^2*sapb*MW^2*dlh5+S2W^2*ca*cb*samb^2*MW^2*dlh6                                                    |                                 
+B00066|S2W^2*sa*samb^2*sb*MW^2*dlh7                                                                                 |                                 
+B00067|(-3/CW^2/EE/MW/SW/s2b)*(B00064+B00065+B00066)                                                                |                                 
+B00068|CW^2*EE^2*Mh^2*s2a+2*CW^2*EE^2*MHH^2*s2a                                                                     |                                 
+B00069|-6*CW^2*EE^2*MH3^2*ca*sa-2*CW^2*EE^2*MH3^2*cb*sb                                                             |                                 
+B00070|-6*MW^2*S2W^2*ca*dlh5*sa-2*MW^2*S2W^2*cb*dlh5*sb                                                             |                                 
+B00071|6*MW^2*S2W^2*ca*camb*cb*dlh6-2*MW^2*S2W^2*cb^2*dlh6                                                          |                                 
+B00072|6*MW^2*S2W^2*camb*dlh7*sa*sb-2*MW^2*S2W^2*dlh7*sb^2                                                          |                                 
+B00073|(-samb/CW^2/EE/MW/SW/s2b/2)*(B00068+B00069+B00070+B00071+B00072)                                             |                                 
+B00074|2*CW^2*camb*s2b*EE^2*MW^2*vevv+2*(sa*cb^3+ca*sb^3)*CW^2*EE^2*MHH^2*vevv                                      |                                 
+B00075|-2*CW^2*c2b*samb*EE^2*MH3^2*vevv-2*S2W^2*sapb*MW^2*dlh5*vevv                                                 |                                 
+B00076|8*CW^2*SW^2*sa*sb*MW^2*dlh7*vevv-S2W^2*camb*s2b*MH3^2*MW^2                                                   |                                 
+B00077|-S2W^2*camb*s2b*MW^4+S2W^2*camb*s2b*MHc^2*MW^2                                                               |                                 
+B00078|8*CW^2*SW^2*ca*cb*MW^2*dlh6*vevv                                                                             |                                 
+B00079|(-1/CW^2/EE/MW/SW/s2b/vevv/2)*(B00074+B00075+B00076+B00077+B00078)                                           |                                 
+B00080|(sa*cb^3+ca*sb^3)*CW^2*EE^2*MHH^2-CW^2*c2b*samb*EE^2*MH3^2                                                   |                                 
+B00081|-S2W^2*sapb*MW^2*dlh5+4*CW^2*SW^2*sa*sb*MW^2*dlh7                                                            |                                 
+B00082|4*CW^2*SW^2*ca*cb*MW^2*dlh6                                                                                  |                                 
+B00083|(-1/CW^2/EE/MW/SW/s2b)*(B00080+B00081+B00082)                                                                |                                 
+B00084|CW^2*EE^2*MHH^2*s2a+6*MW^2*S2W^2*ca*camb*cb*dlh6                                                             |                                 
+B00085|-4*MW^2*S2W^2*cb^2*dlh6+2*CW^2*EE^2*Mh^2*s2a                                                                 |                                 
+B00086|-6*CW^2*EE^2*MH3^2*ca*sa+2*CW^2*EE^2*MH3^2*cb*sb                                                             |                                 
+B00087|-6*MW^2*S2W^2*ca*dlh5*sa+2*MW^2*S2W^2*cb*dlh5*sb                                                             |                                 
+B00088|6*MW^2*S2W^2*camb*dlh7*sa*sb-4*MW^2*S2W^2*dlh7*sb^2                                                          |                                 
+B00089|(-camb/CW^2/EE/MW/SW/s2b/2)*(B00084+B00085+B00086+B00087+B00088)                                             |                                 
+B00090|3*capb*cb*EE*MW^2*Zd33^2-2*SW^2*capb*cb*EE*MW^2*Zd33^2                                                       |                                 
+B00091|2*SW^2*capb*cb*EE*MW^2*Zd63^2+6*CW^2*sa*EE*Mb*Zd33*Zd63*mu                                                   |                                 
+B00092|-6*CW^2*SW*ca*cb*MW*Sqrt2*Zd33*Zd63*ds3-6*CW^2*ca*EE*Mb^2                                                    |                                 
+B00093|1/CW^2/MW/SW/cb/6*(B00090+B00091+B00092)                                                                     |                                 
+B00094|3*capb*cb*EE*MW^2*Zd33*Zd36-2*SW^2*capb*cb*EE*MW^2*Zd33*Zd36                                                 |                                 
+B00095|2*SW^2*capb*cb*EE*MW^2*Zd63*Zd66+3*CW^2*sa*EE*Mb*Zd33*Zd66*mu                                                |                                 
+B00096|3*CW^2*sa*EE*Mb*Zd36*Zd63*mu-3*CW^2*SW*ca*cb*MW*Sqrt2*Zd36*Zd63*ds3                                          |                                 
+B00097|-3*CW^2*SW*ca*cb*MW*Sqrt2*Zd33*Zd66*ds3                                                                      |                                 
+B00098|1/CW^2/MW/SW/cb/6*(B00094+B00095+B00096+B00097)                                                              |                                 
+B00100|2*SW^2*capb*cb*EE*MW^2*Zd63*Zd66+3*CW^2*sa*EE*Mb*Zd36*Zd63*mu                                                |                                 
+B00101|3*CW^2*sa*EE*Mb*Zd33*Zd66*mu-3*CW^2*SW*ca*cb*MW*Sqrt2*Zd33*Zd66*ds3                                          |                                 
+B00102|-3*CW^2*SW*ca*cb*MW*Sqrt2*Zd36*Zd63*ds3                                                                      |                                 
+B00103|1/CW^2/MW/SW/cb/6*(B00094+B00100+B00101+B00102)                                                              |                                 
+B00104|3*capb*cb*EE*MW^2*Zd36^2-2*SW^2*capb*cb*EE*MW^2*Zd36^2                                                       |                                 
+B00105|2*SW^2*capb*cb*EE*MW^2*Zd66^2+6*CW^2*sa*EE*Mb*Zd36*Zd66*mu                                                   |                                 
+B00106|-6*CW^2*SW*ca*cb*MW*Sqrt2*Zd36*Zd66*ds3-6*CW^2*ca*EE*Mb^2                                                    |                                 
+B00107|1/CW^2/MW/SW/cb/6*(B00104+B00105+B00106)                                                                     |                                 
+B00108|3-4*SW^2                                                                                                     |                                 
+B00109|(-EE/CW^2*MW/SW*capb/6)*B00108                                                                               |                                 
+B00110|3-2*SW^2                                                                                                     |                                 
+B00111|EE/CW^2*MW/SW*capb/6*B00110                                                                                  |                                 
+B00112|C2W*capb*cb*EE*MW^2*Zl33^2+2*SW^2*capb*cb*EE*MW^2*Zl63^2                                                     |                                 
+B00113|2*CW^2*sa*EE*Mtau*Zl33*Zl63*mu-2*CW^2*SW*ca*cb*MW*Sqrt2*Zl33*Zl63*ls3                                        |                                 
+B00114|-2*CW^2*ca*EE*Mtau^2                                                                                         |                                 
+B00115|1/CW^2/MW/SW/cb/2*(B00112+B00113+B00114)                                                                     |                                 
+B00116|C2W*capb*cb*EE*MW^2*Zl33*Zl36+2*SW^2*capb*cb*EE*MW^2*Zl63*Zl66                                               |                                 
+B00117|CW^2*sa*EE*Mtau*Zl33*Zl66*mu+CW^2*sa*EE*Mtau*Zl36*Zl63*mu                                                    |                                 
+B00118|-CW^2*SW*ca*cb*MW*Sqrt2*Zl33*Zl66*ls3-CW^2*SW*ca*cb*MW*Sqrt2*Zl36*Zl63*ls3                                   |                                 
+B00119|1/CW^2/MW/SW/cb/2*(B00116+B00117+B00118)                                                                     |                                 
+B00121|CW^2*sa*EE*Mtau*Zl36*Zl63*mu+CW^2*sa*EE*Mtau*Zl33*Zl66*mu                                                    |                                 
+B00122|-CW^2*SW*ca*cb*MW*Sqrt2*Zl36*Zl63*ls3-CW^2*SW*ca*cb*MW*Sqrt2*Zl33*Zl66*ls3                                   |                                 
+B00123|1/CW^2/MW/SW/cb/2*(B00116+B00121+B00122)                                                                     |                                 
+B00124|C2W*capb*cb*EE*MW^2*Zl36^2+2*SW^2*capb*cb*EE*MW^2*Zl66^2                                                     |                                 
+B00125|2*CW^2*sa*EE*Mtau*Zl36*Zl66*mu-2*CW^2*SW*ca*cb*MW*Sqrt2*Zl36*Zl66*ls3                                        |                                 
+B00127|1/CW^2/MW/SW/cb/2*(B00124+B00125+B00114)                                                                     |                                 
+B00130|B00108*capb*sb*EE*MW^2*Zu33^2+4*SW^2*capb*sb*EE*MW^2*Zu63^2                                                  |                                 
+B00131|-6*CW^2*ca*EE*MtopS*Zu33*Zu63*mu-6*CW^2*SW*sa*sb*MW*Sqrt2*Zu33*Zu63*us3                                      |                                 
+B00132|6*CW^2*sa*EE*MtopS^2                                                                                         |                                 
+B00133|(-1/CW^2/MW/SW/sb/6)*(B00130+B00131+B00132)                                                                  |                                 
+B00134|B00108*capb*sb*EE*MW^2*Zu33*Zu36+4*SW^2*capb*sb*EE*MW^2*Zu63*Zu66                                            |                                 
+B00135|-3*CW^2*ca*EE*MtopS*Zu33*Zu66*mu-3*CW^2*ca*EE*MtopS*Zu36*Zu63*mu                                             |                                 
+B00136|-3*CW^2*SW*sa*sb*MW*Sqrt2*Zu36*Zu63*us3-3*CW^2*SW*sa*sb*MW*Sqrt2*Zu33*Zu66*us3                               |                                 
+B00137|(-1/CW^2/MW/SW/sb/6)*(B00134+B00135+B00136)                                                                  |                                 
+B00139|-3*CW^2*ca*EE*MtopS*Zu36*Zu63*mu-3*CW^2*ca*EE*MtopS*Zu33*Zu66*mu                                             |                                 
+B00140|-3*CW^2*SW*sa*sb*MW*Sqrt2*Zu33*Zu66*us3-3*CW^2*SW*sa*sb*MW*Sqrt2*Zu36*Zu63*us3                               |                                 
+B00141|(-1/CW^2/MW/SW/sb/6)*(B00134+B00139+B00140)                                                                  |                                 
+B00142|B00108*capb*sb*EE*MW^2*Zu36^2+4*SW^2*capb*sb*EE*MW^2*Zu66^2                                                  |                                 
+B00143|-6*CW^2*ca*EE*MtopS*Zu36*Zu66*mu-6*CW^2*SW*sa*sb*MW*Sqrt2*Zu36*Zu66*us3                                      |                                 
+B00145|(-1/CW^2/MW/SW/sb/6)*(B00142+B00143+B00132)                                                                  |                                 
+B00148|2*CW^2*s2b*samb*EE^2*MW^2*vevv-2*(ca*cb^3-sa*sb^3)*CW^2*EE^2*Mh^2*vevv                                       |                                 
+B00149|2*CW^2*c2b*camb*EE^2*MH3^2*vevv+2*S2W^2*capb*MW^2*dlh5*vevv                                                  |                                 
+B00150|-8*CW^2*SW^2*ca*sb*MW^2*dlh7*vevv-S2W^2*s2b*samb*MH3^2*MW^2                                                  |                                 
+B00151|-S2W^2*s2b*samb*MW^4+S2W^2*s2b*samb*MHc^2*MW^2                                                               |                                 
+B00152|8*CW^2*SW^2*cb*sa*MW^2*dlh6*vevv                                                                             |                                 
+B00153|1/CW^2/EE/MW/SW/s2b/vevv/2*(B00148+B00149+B00150+B00151+B00152)                                              |                                 
+B00154|2*cb^2*sb*EE*MW^2*Sqrt2*Zl33-cb*EE*Mtau*Sqrt2*Zl63*mu                                                        |                                 
+B00155|-sb*EE*Mtau^2*Sqrt2*Zl33-SW*s2b*MW*Zl63*ls3                                                                  |                                 
+B00156|(-1/MW/SW/cb/2)*(B00154+B00155)                                                                              |                                 
+B00157|2*cb^2*sb*EE*MW^2*Sqrt2*Zl36-cb*EE*Mtau*Sqrt2*Zl66*mu                                                        |                                 
+B00158|-sb*EE*Mtau^2*Sqrt2*Zl36-SW*s2b*MW*Zl66*ls3                                                                  |                                 
+B00159|(-1/MW/SW/cb/2)*(B00157+B00158)                                                                              |                                 
+B00160|4*cb^2*sb^2*EE*MW^2*Sqrt2*Zd33*Zu33-s2b*EE*Mb*Sqrt2*Zd63*Zu33*mu                                             |                                 
+B00161|-s2b*EE*MtopS*Sqrt2*Zd33*Zu63*mu-2*EE*Mb*MtopS*Sqrt2*Zd63*Zu63                                               |                                 
+B00162|-2*cb^2*EE*MtopS^2*Sqrt2*Zd33*Zu33-2*sb^2*EE*Mb^2*Sqrt2*Zd33*Zu33                                            |                                 
+B00163|4*SW*cb^2*sb*MW*Zd33*Zu63*us3-4*SW*cb*sb^2*MW*Zd63*Zu33*ds3                                                  |                                 
+B00164|(-1/MW/SW/s2b/2)*(B00160+B00161+B00162+B00163)                                                               |                                 
+B00165|4*cb^2*sb^2*EE*MW^2*Sqrt2*Zd36*Zu33-s2b*EE*Mb*Sqrt2*Zd66*Zu33*mu                                             |                                 
+B00166|-s2b*EE*MtopS*Sqrt2*Zd36*Zu63*mu-2*EE*Mb*MtopS*Sqrt2*Zd66*Zu63                                               |                                 
+B00167|-2*cb^2*EE*MtopS^2*Sqrt2*Zd36*Zu33-2*sb^2*EE*Mb^2*Sqrt2*Zd36*Zu33                                            |                                 
+B00168|4*SW*cb^2*sb*MW*Zd36*Zu63*us3-4*SW*cb*sb^2*MW*Zd66*Zu33*ds3                                                  |                                 
+B00169|(-1/MW/SW/s2b/2)*(B00165+B00166+B00167+B00168)                                                               |                                 
+B00170|4*cb^2*sb^2*EE*MW^2*Sqrt2*Zd33*Zu36-s2b*EE*Mb*Sqrt2*Zd63*Zu36*mu                                             |                                 
+B00171|-s2b*EE*MtopS*Sqrt2*Zd33*Zu66*mu-2*EE*Mb*MtopS*Sqrt2*Zd63*Zu66                                               |                                 
+B00172|-2*cb^2*EE*MtopS^2*Sqrt2*Zd33*Zu36-2*sb^2*EE*Mb^2*Sqrt2*Zd33*Zu36                                            |                                 
+B00173|4*SW*cb^2*sb*MW*Zd33*Zu66*us3-4*SW*cb*sb^2*MW*Zd63*Zu36*ds3                                                  |                                 
+B00174|(-1/MW/SW/s2b/2)*(B00170+B00171+B00172+B00173)                                                               |                                 
+B00175|4*cb^2*sb^2*EE*MW^2*Sqrt2*Zd36*Zu36-s2b*EE*Mb*Sqrt2*Zd66*Zu36*mu                                             |                                 
+B00176|-s2b*EE*MtopS*Sqrt2*Zd36*Zu66*mu-2*EE*Mb*MtopS*Sqrt2*Zd66*Zu66                                               |                                 
+B00177|-2*cb^2*EE*MtopS^2*Sqrt2*Zd36*Zu36-2*sb^2*EE*Mb^2*Sqrt2*Zd36*Zu36                                            |                                 
+B00178|4*SW*cb^2*sb*MW*Zd36*Zu66*us3-4*SW*cb*sb^2*MW*Zd66*Zu36*ds3                                                  |                                 
+B00179|(-1/MW/SW/s2b/2)*(B00175+B00176+B00177+B00178)                                                               |                                 
+B00206|(ca*cb^3-sa*sb^3)*CW^2*EE^2*Mh^2-CW^2*c2b*camb*EE^2*MH3^2                                                    |                                 
+B00207|-S2W^2*capb*MW^2*dlh5+4*CW^2*SW^2*ca*sb*MW^2*dlh7                                                            |                                 
+B00208|-4*CW^2*SW^2*cb*sa*MW^2*dlh6                                                                                 |                                 
+B00209|(-1/CW^2/EE/MW/SW/s2b)*(B00206+B00207+B00208)                                                                |                                 
+B00210|EE*Mb*Zd33*Zd66*mu-EE*Mb*Zd36*Zd63*mu                                                                        |                                 
+B00211|-SW*sb*MW*Sqrt2*Zd36*Zd63*ds3+SW*sb*MW*Sqrt2*Zd33*Zd66*ds3                                                   |                                 
+B00212|1/MW/SW/2*(B00210+B00211)                                                                                    |                                 
+B00213|EE*Mb*Zd36*Zd63*mu-EE*Mb*Zd33*Zd66*mu                                                                        |                                 
+B00214|-SW*sb*MW*Sqrt2*Zd33*Zd66*ds3+SW*sb*MW*Sqrt2*Zd36*Zd63*ds3                                                   |                                 
+B00215|1/MW/SW/2*(B00213+B00214)                                                                                    |                                 
+B00216|EE*Mtau*Zl33*Zl66*mu-EE*Mtau*Zl36*Zl63*mu                                                                    |                                 
+B00217|SW*sb*MW*Sqrt2*Zl33*Zl66*ls3-SW*sb*MW*Sqrt2*Zl36*Zl63*ls3                                                    |                                 
+B00218|1/MW/SW/2*(B00216+B00217)                                                                                    |                                 
+B00219|EE*Mtau*Zl36*Zl63*mu-EE*Mtau*Zl33*Zl66*mu                                                                    |                                 
+B00220|SW*sb*MW*Sqrt2*Zl36*Zl63*ls3-SW*sb*MW*Sqrt2*Zl33*Zl66*ls3                                                    |                                 
+B00221|1/MW/SW/2*(B00219+B00220)                                                                                    |                                 
+B00222|EE*MtopS*Zu33*Zu66*mu-EE*MtopS*Zu36*Zu63*mu                                                                  |                                 
+B00223|SW*cb*MW*Sqrt2*Zu36*Zu63*us3-SW*cb*MW*Sqrt2*Zu33*Zu66*us3                                                    |                                 
+B00224|1/MW/SW/2*(B00222+B00223)                                                                                    |                                 
+B00225|EE*MtopS*Zu36*Zu63*mu-EE*MtopS*Zu33*Zu66*mu                                                                  |                                 
+B00226|SW*cb*MW*Sqrt2*Zu33*Zu66*us3-SW*cb*MW*Sqrt2*Zu36*Zu63*us3                                                    |                                 
+B00227|1/MW/SW/2*(B00225+B00226)                                                                                    |                                 
+B00228|CW*cb*MW*Zl33*Zn21+SW*cb*MW*Zl33*Zn11-CW*Mtau*Zl63*Zn31                                                      |                                 
+B00229|B00228                                                                                                       |                                 
+B00230|-2*SW*cb*MW*Zl63*Zn11-CW*Mtau*Zl33*Zn31                                                                      |                                 
+B00231|B00230                                                                                                       |                                 
+B00232|CW*cb*MW*Zl36*Zn21+SW*cb*MW*Zl36*Zn11-CW*Mtau*Zl66*Zn31                                                      |                                 
+B00233|B00232                                                                                                       |                                 
+B00234|-2*SW*cb*MW*Zl66*Zn11-CW*Mtau*Zl36*Zn31                                                                      |                                 
+B00235|B00234                                                                                                       |                                 
+B00236|CW*cb*MW*Zl33*Zn22+SW*cb*MW*Zl33*Zn12-CW*Mtau*Zl63*Zn32                                                      |                                 
+B00237|B00236                                                                                                       |                                 
+B00238|-2*SW*cb*MW*Zl63*Zn12-CW*Mtau*Zl33*Zn32                                                                      |                                 
+B00239|B00238                                                                                                       |                                 
+B00240|CW*cb*MW*Zl36*Zn22+SW*cb*MW*Zl36*Zn12-CW*Mtau*Zl66*Zn32                                                      |                                 
+B00241|B00240                                                                                                       |                                 
+B00242|-2*SW*cb*MW*Zl66*Zn12-CW*Mtau*Zl36*Zn32                                                                      |                                 
+B00243|B00242                                                                                                       |                                 
+B00244|CW*cb*MW*Zl33*Zn23+SW*cb*MW*Zl33*Zn13-CW*Mtau*Zl63*Zn33                                                      |                                 
+B00245|B00244                                                                                                       |                                 
+B00246|-2*SW*cb*MW*Zl63*Zn13-CW*Mtau*Zl33*Zn33                                                                      |                                 
+B00247|B00246                                                                                                       |                                 
+B00248|CW*cb*MW*Zl36*Zn23+SW*cb*MW*Zl36*Zn13-CW*Mtau*Zl66*Zn33                                                      |                                 
+B00249|B00248                                                                                                       |                                 
+B00250|-2*SW*cb*MW*Zl66*Zn13-CW*Mtau*Zl36*Zn33                                                                      |                                 
+B00251|B00250                                                                                                       |                                 
+B00252|CW*cb*MW*Zl33*Zn24+SW*cb*MW*Zl33*Zn14-CW*Mtau*Zl63*Zn34                                                      |                                 
+B00253|B00252                                                                                                       |                                 
+B00254|-2*SW*cb*MW*Zl63*Zn14-CW*Mtau*Zl33*Zn34                                                                      |                                 
+B00255|B00254                                                                                                       |                                 
+B00256|CW*cb*MW*Zl36*Zn24+SW*cb*MW*Zl36*Zn14-CW*Mtau*Zl66*Zn34                                                      |                                 
+B00257|B00256                                                                                                       |                                 
+B00258|-2*SW*cb*MW*Zl66*Zn14-CW*Mtau*Zl36*Zn34                                                                      |                                 
+B00259|B00258                                                                                                       |                                 
+B00268|CW*Zn21-SW*Zn11                                                                                              |                                 
+B00269|(-EE/S2W*Sqrt2)*B00268                                                                                       |                                 
+B00270|CW*Zn22-SW*Zn12                                                                                              |                                 
+B00271|(-EE/S2W*Sqrt2)*B00270                                                                                       |                                 
+B00272|CW*Zn23-SW*Zn13                                                                                              |                                 
+B00273|(-EE/S2W*Sqrt2)*B00272                                                                                       |                                 
+B00274|CW*Zn24-SW*Zn14                                                                                              |                                 
+B00275|(-EE/S2W*Sqrt2)*B00274                                                                                       |                                 
+B00276|2*cb*MW*Zl33*Zm11-Mtau*Sqrt2*Zl63*Zm21                                                                       |                                 
+B00277|(-EE/MW/SW/cb/2)*B00276                                                                                      |                                 
+B00278|2*cb*MW*Zl36*Zm11-Mtau*Sqrt2*Zl66*Zm21                                                                       |                                 
+B00279|(-EE/MW/SW/cb/2)*B00278                                                                                      |                                 
+B00280|2*cb*MW*Zl33*Zm12-Mtau*Sqrt2*Zl63*Zm22                                                                       |                                 
+B00281|(-EE/MW/SW/cb/2)*B00280                                                                                      |                                 
+B00282|2*cb*MW*Zl36*Zm12-Mtau*Sqrt2*Zl66*Zm22                                                                       |                                 
+B00283|(-EE/MW/SW/cb/2)*B00282                                                                                      |                                 
+B00308|s2b*MW*Zd33*Zm11-sb*Mb*Sqrt2*Zd63*Zm21                                                                       |                                 
+B00309|B00308                                                                                                       |                                 
+B00310|s2b*MW*Zd36*Zm11-sb*Mb*Sqrt2*Zd66*Zm21                                                                       |                                 
+B00311|B00310                                                                                                       |                                 
+B00312|s2b*MW*Zd33*Zm12-sb*Mb*Sqrt2*Zd63*Zm22                                                                       |                                 
+B00313|B00312                                                                                                       |                                 
+B00314|s2b*MW*Zd36*Zm12-sb*Mb*Sqrt2*Zd66*Zm22                                                                       |                                 
+B00315|B00314                                                                                                       |                                 
+B00316|3*CW*sb*MW*Zn21*Zu33+SW*sb*MW*Zn11*Zu33+3*CW*Mtop*Zn41*Zu63                                                  |                                 
+B00317|B00316                                                                                                       |                                 
+B00318|-4*SW*sb*MW*Zn11*Zu63+3*CW*Mtop*Zn41*Zu33                                                                    |                                 
+B00319|B00318                                                                                                       |                                 
+B00320|3*CW*sb*MW*Zn21*Zu36+SW*sb*MW*Zn11*Zu36+3*CW*Mtop*Zn41*Zu66                                                  |                                 
+B00321|B00320                                                                                                       |                                 
+B00322|-4*SW*sb*MW*Zn11*Zu66+3*CW*Mtop*Zn41*Zu36                                                                    |                                 
+B00323|B00322                                                                                                       |                                 
+B00324|3*CW*sb*MW*Zn22*Zu33+SW*sb*MW*Zn12*Zu33+3*CW*Mtop*Zn42*Zu63                                                  |                                 
+B00325|B00324                                                                                                       |                                 
+B00326|-4*SW*sb*MW*Zn12*Zu63+3*CW*Mtop*Zn42*Zu33                                                                    |                                 
+B00327|B00326                                                                                                       |                                 
+B00328|3*CW*sb*MW*Zn22*Zu36+SW*sb*MW*Zn12*Zu36+3*CW*Mtop*Zn42*Zu66                                                  |                                 
+B00329|B00328                                                                                                       |                                 
+B00330|-4*SW*sb*MW*Zn12*Zu66+3*CW*Mtop*Zn42*Zu36                                                                    |                                 
+B00331|B00330                                                                                                       |                                 
+B00332|3*CW*sb*MW*Zn23*Zu33+SW*sb*MW*Zn13*Zu33+3*CW*Mtop*Zn43*Zu63                                                  |                                 
+B00333|B00332                                                                                                       |                                 
+B00334|-4*SW*sb*MW*Zn13*Zu63+3*CW*Mtop*Zn43*Zu33                                                                    |                                 
+B00335|B00334                                                                                                       |                                 
+B00336|3*CW*sb*MW*Zn23*Zu36+SW*sb*MW*Zn13*Zu36+3*CW*Mtop*Zn43*Zu66                                                  |                                 
+B00337|B00336                                                                                                       |                                 
+B00338|-4*SW*sb*MW*Zn13*Zu66+3*CW*Mtop*Zn43*Zu36                                                                    |                                 
+B00339|B00338                                                                                                       |                                 
+B00340|3*CW*sb*MW*Zn24*Zu33+SW*sb*MW*Zn14*Zu33+3*CW*Mtop*Zn44*Zu63                                                  |                                 
+B00341|B00340                                                                                                       |                                 
+B00342|-4*SW*sb*MW*Zn14*Zu63+3*CW*Mtop*Zn44*Zu33                                                                    |                                 
+B00343|B00342                                                                                                       |                                 
+B00344|3*CW*sb*MW*Zn24*Zu36+SW*sb*MW*Zn14*Zu36+3*CW*Mtop*Zn44*Zu66                                                  |                                 
+B00345|B00344                                                                                                       |                                 
+B00346|-4*SW*sb*MW*Zn14*Zu66+3*CW*Mtop*Zn44*Zu36                                                                    |                                 
+B00347|B00346                                                                                                       |                                 
+B00356|3*Zd33^2-2*SW^2                                                                                              |                                 
+B00357|B00356                                                                                                       |                                 
+B00358|-3*Zd33^2+2*SW^2                                                                                             |                                 
+B00359|B00358                                                                                                       |                                 
+B00360|3*Zd36^2-2*SW^2                                                                                              |                                 
+B00361|B00360                                                                                                       |                                 
+B00362|-3*Zd36^2+2*SW^2                                                                                             |                                 
+B00363|B00362                                                                                                       |                                 
+B00364|Zl33^2-2*SW^2                                                                                                |                                 
+B00365|B00364                                                                                                       |                                 
+B00366|-Zl33^2+2*SW^2                                                                                               |                                 
+B00367|B00366                                                                                                       |                                 
+B00368|Zl36^2-2*SW^2                                                                                                |                                 
+B00369|B00368                                                                                                       |                                 
+B00370|-Zl36^2+2*SW^2                                                                                               |                                 
+B00371|B00370                                                                                                       |                                 
+B00372|3*Zu33^2-4*SW^2                                                                                              |                                 
+B00373|B00372                                                                                                       |                                 
+B00374|-3*Zu33^2+4*SW^2                                                                                             |                                 
+B00375|B00374                                                                                                       |                                 
+B00376|3*Zu36^2-4*SW^2                                                                                              |                                 
+B00377|B00376                                                                                                       |                                 
+B00378|-3*Zu36^2+4*SW^2                                                                                             |                                 
+B00379|B00378                                                                                                       |                                 
+B00444|S2W^2*camb^2*cb*sa*MW^2*dlh6-(cb*ca^3-sb*sa^3)*CW^2*EE^2*Mh^2                                                |                                 
+B00445|CW^2*camb^2*capb*EE^2*MH3^2+S2W^2*camb^2*capb*MW^2*dlh5                                                      |                                 
+B00446|-S2W^2*ca*camb^2*sb*MW^2*dlh7                                                                                |                                 
+B00447|3/CW^2/EE/MW/SW/s2b*(B00444+B00445+B00446)                                                                   |                                 
+B00448|B00110*cb*sapb*EE*MW^2*Zd33^2+2*SW^2*cb*sapb*EE*MW^2*Zd63^2                                                  |                                 
+B00449|-6*CW^2*ca*EE*Mb*Zd33*Zd63*mu-6*CW^2*SW*cb*sa*MW*Sqrt2*Zd33*Zd63*ds3                                         |                                 
+B00450|-6*CW^2*sa*EE*Mb^2                                                                                           |                                 
+B00451|(-1/CW^2/MW/SW/cb/6)*(B00448+B00449+B00450)                                                                  |                                 
+B00452|B00110*cb*sapb*EE*MW^2*Zd33*Zd36+2*SW^2*cb*sapb*EE*MW^2*Zd63*Zd66                                            |                                 
+B00453|-3*CW^2*ca*EE*Mb*Zd33*Zd66*mu-3*CW^2*ca*EE*Mb*Zd36*Zd63*mu                                                   |                                 
+B00454|-3*CW^2*SW*cb*sa*MW*Sqrt2*Zd36*Zd63*ds3-3*CW^2*SW*cb*sa*MW*Sqrt2*Zd33*Zd66*ds3                               |                                 
+B00455|(-1/CW^2/MW/SW/cb/6)*(B00452+B00453+B00454)                                                                  |                                 
+B00457|-3*CW^2*ca*EE*Mb*Zd36*Zd63*mu-3*CW^2*ca*EE*Mb*Zd33*Zd66*mu                                                   |                                 
+B00458|-3*CW^2*SW*cb*sa*MW*Sqrt2*Zd33*Zd66*ds3-3*CW^2*SW*cb*sa*MW*Sqrt2*Zd36*Zd63*ds3                               |                                 
+B00459|(-1/CW^2/MW/SW/cb/6)*(B00452+B00457+B00458)                                                                  |                                 
+B00460|B00110*cb*sapb*EE*MW^2*Zd36^2+2*SW^2*cb*sapb*EE*MW^2*Zd66^2                                                  |                                 
+B00461|-6*CW^2*ca*EE*Mb*Zd36*Zd66*mu-6*CW^2*SW*cb*sa*MW*Sqrt2*Zd36*Zd66*ds3                                         |                                 
+B00463|(-1/CW^2/MW/SW/cb/6)*(B00460+B00461+B00450)                                                                  |                                 
+B00464|C2W*cb*sapb*EE*MW^2*Zl33^2+2*SW^2*cb*sapb*EE*MW^2*Zl63^2                                                     |                                 
+B00465|-2*CW^2*ca*EE*Mtau*Zl33*Zl63*mu-2*CW^2*SW*cb*sa*MW*Sqrt2*Zl33*Zl63*ls3                                       |                                 
+B00466|-2*CW^2*sa*EE*Mtau^2                                                                                         |                                 
+B00467|(-1/CW^2/MW/SW/cb/2)*(B00464+B00465+B00466)                                                                  |                                 
+B00468|C2W*cb*sapb*EE*MW^2*Zl33*Zl36+2*SW^2*cb*sapb*EE*MW^2*Zl63*Zl66                                               |                                 
+B00469|-CW^2*ca*EE*Mtau*Zl33*Zl66*mu-CW^2*ca*EE*Mtau*Zl36*Zl63*mu                                                   |                                 
+B00470|-CW^2*SW*cb*sa*MW*Sqrt2*Zl33*Zl66*ls3-CW^2*SW*cb*sa*MW*Sqrt2*Zl36*Zl63*ls3                                   |                                 
+B00471|(-1/CW^2/MW/SW/cb/2)*(B00468+B00469+B00470)                                                                  |                                 
+B00473|-CW^2*ca*EE*Mtau*Zl36*Zl63*mu-CW^2*ca*EE*Mtau*Zl33*Zl66*mu                                                   |                                 
+B00474|-CW^2*SW*cb*sa*MW*Sqrt2*Zl36*Zl63*ls3-CW^2*SW*cb*sa*MW*Sqrt2*Zl33*Zl66*ls3                                   |                                 
+B00475|(-1/CW^2/MW/SW/cb/2)*(B00468+B00473+B00474)                                                                  |                                 
+B00476|C2W*cb*sapb*EE*MW^2*Zl36^2+2*SW^2*cb*sapb*EE*MW^2*Zl66^2                                                     |                                 
+B00477|-2*CW^2*ca*EE*Mtau*Zl36*Zl66*mu-2*CW^2*SW*cb*sa*MW*Sqrt2*Zl36*Zl66*ls3                                       |                                 
+B00479|(-1/CW^2/MW/SW/cb/2)*(B00476+B00477+B00466)                                                                  |                                 
+B00480|B00108*sapb*sb*EE*MW^2*Zu33^2+4*SW^2*sapb*sb*EE*MW^2*Zu63^2                                                  |                                 
+B00481|-6*CW^2*sa*EE*MtopS*Zu33*Zu63*mu+6*CW^2*SW*ca*sb*MW*Sqrt2*Zu33*Zu63*us3                                      |                                 
+B00482|-6*CW^2*ca*EE*MtopS^2                                                                                        |                                 
+B00483|1/CW^2/MW/SW/sb/6*(B00480+B00481+B00482)                                                                     |                                 
+B00484|B00108*sapb*sb*EE*MW^2*Zu33*Zu36+4*SW^2*sapb*sb*EE*MW^2*Zu63*Zu66                                            |                                 
+B00485|-3*CW^2*sa*EE*MtopS*Zu33*Zu66*mu-3*CW^2*sa*EE*MtopS*Zu36*Zu63*mu                                             |                                 
+B00486|3*CW^2*SW*ca*sb*MW*Sqrt2*Zu36*Zu63*us3+3*CW^2*SW*ca*sb*MW*Sqrt2*Zu33*Zu66*us3                                |                                 
+B00487|1/CW^2/MW/SW/sb/6*(B00484+B00485+B00486)                                                                     |                                 
+B00489|-3*CW^2*sa*EE*MtopS*Zu36*Zu63*mu-3*CW^2*sa*EE*MtopS*Zu33*Zu66*mu                                             |                                 
+B00490|3*CW^2*SW*ca*sb*MW*Sqrt2*Zu33*Zu66*us3+3*CW^2*SW*ca*sb*MW*Sqrt2*Zu36*Zu63*us3                                |                                 
+B00491|1/CW^2/MW/SW/sb/6*(B00484+B00489+B00490)                                                                     |                                 
+B00492|B00108*sapb*sb*EE*MW^2*Zu36^2+4*SW^2*sapb*sb*EE*MW^2*Zu66^2                                                  |                                 
+B00493|-6*CW^2*sa*EE*MtopS*Zu36*Zu66*mu+6*CW^2*SW*ca*sb*MW*Sqrt2*Zu36*Zu66*us3                                      |                                 
+B00495|1/CW^2/MW/SW/sb/6*(B00492+B00493+B00482)                                                                     |                                 
+B00608|Zd33^2+2*Zd63^2                                                                                              |                                 
+B00609|EE/CW*Maux/6*B00608                                                                                          |                                 
+B00610|Zd33*Zd36+2*Zd63*Zd66                                                                                        |                                 
+B00611|EE/CW*Maux/6*B00610                                                                                          |                                 
+B00614|Zd36^2+2*Zd66^2                                                                                              |                                 
+B00615|EE/CW*Maux/6*B00614                                                                                          |                                 
+B00616|Zl33^2-2*Zl63^2                                                                                              |                                 
+B00617|(-EE/CW*Maux/2)*B00616                                                                                       |                                 
+B00618|Zl33*Zl36-2*Zl63*Zl66                                                                                        |                                 
+B00619|(-EE/CW*Maux/2)*B00618                                                                                       |                                 
+B00622|Zl36^2-2*Zl66^2                                                                                              |                                 
+B00623|(-EE/CW*Maux/2)*B00622                                                                                       |                                 
+B00624|Zu33^2-4*Zu63^2                                                                                              |                                 
+B00625|EE/CW*Maux/6*B00624                                                                                          |                                 
+B00626|Zu33*Zu36-4*Zu63*Zu66                                                                                        |                                 
+B00627|EE/CW*Maux/6*B00626                                                                                          |                                 
+B00630|Zu36^2-4*Zu66^2                                                                                              |                                 
+B00631|EE/CW*Maux/6*B00630                                                                                          |                                 
+B00632|2*CW*sb*Zm11*Zn31-CW*sb*Sqrt2*Zm21*Zn21-SW*sb*Sqrt2*Zm21*Zn11                                                |                                 
+B00633|B00632                                                                                                       |                                 
+B00634|CW*cb*Sqrt2*Zn21*Zp21+2*CW*cb*Zn41*Zp11+SW*cb*Sqrt2*Zn11*Zp21                                                |                                 
+B00635|B00634                                                                                                       |                                 
+B00636|2*Zm11*Zn21+Sqrt2*Zm21*Zn31                                                                                  |                                 
+B00637|B00636                                                                                                       |                                 
+B00638|2*Zn21*Zp11-Sqrt2*Zn41*Zp21                                                                                  |                                 
+B00639|B00638                                                                                                       |                                 
+B00640|2*CW*sb*Zm11*Zn32-CW*sb*Sqrt2*Zm21*Zn22-SW*sb*Sqrt2*Zm21*Zn12                                                |                                 
+B00641|B00640                                                                                                       |                                 
+B00642|CW*cb*Sqrt2*Zn22*Zp21+2*CW*cb*Zn42*Zp11+SW*cb*Sqrt2*Zn12*Zp21                                                |                                 
+B00643|B00642                                                                                                       |                                 
+B00644|2*Zm11*Zn22+Sqrt2*Zm21*Zn32                                                                                  |                                 
+B00645|B00644                                                                                                       |                                 
+B00646|2*Zn22*Zp11-Sqrt2*Zn42*Zp21                                                                                  |                                 
+B00647|B00646                                                                                                       |                                 
+B00648|2*CW*sb*Zm11*Zn33-CW*sb*Sqrt2*Zm21*Zn23-SW*sb*Sqrt2*Zm21*Zn13                                                |                                 
+B00649|B00648                                                                                                       |                                 
+B00650|CW*cb*Sqrt2*Zn23*Zp21+2*CW*cb*Zn43*Zp11+SW*cb*Sqrt2*Zn13*Zp21                                                |                                 
+B00651|B00650                                                                                                       |                                 
+B00652|2*Zm11*Zn23+Sqrt2*Zm21*Zn33                                                                                  |                                 
+B00653|B00652                                                                                                       |                                 
+B00654|2*Zn23*Zp11-Sqrt2*Zn43*Zp21                                                                                  |                                 
+B00655|B00654                                                                                                       |                                 
+B00656|2*CW*sb*Zm11*Zn34-CW*sb*Sqrt2*Zm21*Zn24-SW*sb*Sqrt2*Zm21*Zn14                                                |                                 
+B00657|B00656                                                                                                       |                                 
+B00658|CW*cb*Sqrt2*Zn24*Zp21+2*CW*cb*Zn44*Zp11+SW*cb*Sqrt2*Zn14*Zp21                                                |                                 
+B00659|B00658                                                                                                       |                                 
+B00660|2*Zm11*Zn24+Sqrt2*Zm21*Zn34                                                                                  |                                 
+B00661|B00660                                                                                                       |                                 
+B00662|2*Zn24*Zp11-Sqrt2*Zn44*Zp21                                                                                  |                                 
+B00663|B00662                                                                                                       |                                 
+B00672|ca*Zm21*Zp11+sa*Zm11*Zp21                                                                                    |                                 
+B00673|(-EE/SW*Sqrt2/2)*B00672                                                                                      |                                 
+B00674|sb*Zm21*Zp11+cb*Zm11*Zp21                                                                                    |                                 
+B00675|(-EE/SW*Sqrt2/2)*B00674                                                                                      |                                 
+B00676|2*Zm11^2+Zm21^2                                                                                              |                                 
+B00677|B00676                                                                                                       |                                 
+B00678|2*Zp11^2+Zp21^2                                                                                              |                                 
+B00679|B00678                                                                                                       |                                 
+B00680|sa*Zm21*Zp11-ca*Zm11*Zp21                                                                                    |                                 
+B00681|EE/SW*Sqrt2/2*B00680                                                                                         |                                 
+B00682|ca*Zm21*Zp12+sa*Zm11*Zp22                                                                                    |                                 
+B00683|B00682                                                                                                       |                                 
+B00684|ca*Zm22*Zp11+sa*Zm12*Zp21                                                                                    |                                 
+B00685|B00684                                                                                                       |                                 
+B00686|sb*Zm21*Zp12+cb*Zm11*Zp22                                                                                    |                                 
+B00687|B00686                                                                                                       |                                 
+B00688|-sb*Zm22*Zp11-cb*Zm12*Zp21                                                                                   |                                 
+B00689|B00688                                                                                                       |                                 
+B00690|2*Zm11*Zm12+Zm21*Zm22                                                                                        |                                 
+B00691|B00690                                                                                                       |                                 
+B00692|2*Zp11*Zp12+Zp21*Zp22                                                                                        |                                 
+B00693|B00692                                                                                                       |                                 
+B00694|sa*Zm21*Zp12-ca*Zm11*Zp22                                                                                    |                                 
+B00695|B00694                                                                                                       |                                 
+B00696|sa*Zm22*Zp11-ca*Zm12*Zp21                                                                                    |                                 
+B00697|B00696                                                                                                       |                                 
+B00730|2*CW*sb*Zm12*Zn31-CW*sb*Sqrt2*Zm22*Zn21-SW*sb*Sqrt2*Zm22*Zn11                                                |                                 
+B00731|B00730                                                                                                       |                                 
+B00732|CW*cb*Sqrt2*Zn21*Zp22+2*CW*cb*Zn41*Zp12+SW*cb*Sqrt2*Zn11*Zp22                                                |                                 
+B00733|B00732                                                                                                       |                                 
+B00734|2*Zm12*Zn21+Sqrt2*Zm22*Zn31                                                                                  |                                 
+B00735|B00734                                                                                                       |                                 
+B00736|2*Zn21*Zp12-Sqrt2*Zn41*Zp22                                                                                  |                                 
+B00737|B00736                                                                                                       |                                 
+B00738|2*CW*sb*Zm12*Zn32-CW*sb*Sqrt2*Zm22*Zn22-SW*sb*Sqrt2*Zm22*Zn12                                                |                                 
+B00739|B00738                                                                                                       |                                 
+B00740|CW*cb*Sqrt2*Zn22*Zp22+2*CW*cb*Zn42*Zp12+SW*cb*Sqrt2*Zn12*Zp22                                                |                                 
+B00741|B00740                                                                                                       |                                 
+B00742|2*Zm12*Zn22+Sqrt2*Zm22*Zn32                                                                                  |                                 
+B00743|B00742                                                                                                       |                                 
+B00744|2*Zn22*Zp12-Sqrt2*Zn42*Zp22                                                                                  |                                 
+B00745|B00744                                                                                                       |                                 
+B00746|2*CW*sb*Zm12*Zn33-CW*sb*Sqrt2*Zm22*Zn23-SW*sb*Sqrt2*Zm22*Zn13                                                |                                 
+B00747|B00746                                                                                                       |                                 
+B00748|CW*cb*Sqrt2*Zn23*Zp22+2*CW*cb*Zn43*Zp12+SW*cb*Sqrt2*Zn13*Zp22                                                |                                 
+B00749|B00748                                                                                                       |                                 
+B00750|2*Zm12*Zn23+Sqrt2*Zm22*Zn33                                                                                  |                                 
+B00751|B00750                                                                                                       |                                 
+B00752|2*Zn23*Zp12-Sqrt2*Zn43*Zp22                                                                                  |                                 
+B00753|B00752                                                                                                       |                                 
+B00754|2*CW*sb*Zm12*Zn34-CW*sb*Sqrt2*Zm22*Zn24-SW*sb*Sqrt2*Zm22*Zn14                                                |                                 
+B00755|B00754                                                                                                       |                                 
+B00756|CW*cb*Sqrt2*Zn24*Zp22+2*CW*cb*Zn44*Zp12+SW*cb*Sqrt2*Zn14*Zp22                                                |                                 
+B00757|B00756                                                                                                       |                                 
+B00758|2*Zm12*Zn24+Sqrt2*Zm22*Zn34                                                                                  |                                 
+B00759|B00758                                                                                                       |                                 
+B00760|2*Zn24*Zp12-Sqrt2*Zn44*Zp22                                                                                  |                                 
+B00761|B00760                                                                                                       |                                 
+B00774|sb*Zm22*Zp11+cb*Zm12*Zp21                                                                                    |                                 
+B00775|B00774                                                                                                       |                                 
+B00776|-sb*Zm21*Zp12-cb*Zm11*Zp22                                                                                   |                                 
+B00777|B00776                                                                                                       |                                 
+B00786|ca*Zm22*Zp12+sa*Zm12*Zp22                                                                                    |                                 
+B00787|(-EE/SW*Sqrt2/2)*B00786                                                                                      |                                 
+B00788|sb*Zm22*Zp12+cb*Zm12*Zp22                                                                                    |                                 
+B00789|(-EE/SW*Sqrt2/2)*B00788                                                                                      |                                 
+B00790|2*Zm12^2+Zm22^2                                                                                              |                                 
+B00791|B00790                                                                                                       |                                 
+B00792|2*Zp12^2+Zp22^2                                                                                              |                                 
+B00793|B00792                                                                                                       |                                 
+B00794|sa*Zm22*Zp12-ca*Zm12*Zp22                                                                                    |                                 
+B00795|EE/SW*Sqrt2/2*B00794                                                                                         |                                 
+B00828|CW*ca*Zn21*Zn31-SW*ca*Zn11*Zn31                                                                              |                                 
+B00829|-CW*sa*Zn21*Zn41+SW*sa*Zn11*Zn41                                                                             |                                 
+B00830|(-2*EE/S2W)*(B00828+B00829)                                                                                  |                                 
+B00831|CW*sb*Zn21*Zn31-SW*sb*Zn11*Zn31                                                                              |                                 
+B00832|-CW*cb*Zn21*Zn41+SW*cb*Zn11*Zn41                                                                             |                                 
+B00833|(-2*EE/S2W)*(B00831+B00832)                                                                                  |                                 
+B00834|Zn31^2-Zn41^2                                                                                                |                                 
+B00835|EE/S2W*B00834                                                                                                |                                 
+B00836|CW*sa*Zn21*Zn31-SW*sa*Zn11*Zn31                                                                              |                                 
+B00837|CW*ca*Zn21*Zn41-SW*ca*Zn11*Zn41                                                                              |                                 
+B00838|2*EE/S2W*(B00836+B00837)                                                                                     |                                 
+B00839|CW*ca*Zn22*Zn31+CW*ca*Zn21*Zn32                                                                              |                                 
+B00840|-SW*ca*Zn11*Zn32-SW*ca*Zn12*Zn31                                                                             |                                 
+B00841|-CW*sa*Zn22*Zn41-CW*sa*Zn21*Zn42                                                                             |                                 
+B00842|SW*sa*Zn11*Zn42+SW*sa*Zn12*Zn41                                                                              |                                 
+B00843|(-EE/S2W)*(B00839+B00840+B00841+B00842)                                                                      |                                 
+B00844|CW*sb*Zn22*Zn31+CW*sb*Zn21*Zn32                                                                              |                                 
+B00845|-SW*sb*Zn11*Zn32-SW*sb*Zn12*Zn31                                                                             |                                 
+B00846|-CW*cb*Zn22*Zn41-CW*cb*Zn21*Zn42                                                                             |                                 
+B00847|SW*cb*Zn11*Zn42+SW*cb*Zn12*Zn41                                                                              |                                 
+B00848|(-EE/S2W)*(B00844+B00845+B00846+B00847)                                                                      |                                 
+B00849|Zn31*Zn32-Zn41*Zn42                                                                                          |                                 
+B00850|EE/S2W*B00849                                                                                                |                                 
+B00851|CW*sa*Zn22*Zn31+CW*sa*Zn21*Zn32                                                                              |                                 
+B00852|-SW*sa*Zn11*Zn32-SW*sa*Zn12*Zn31                                                                             |                                 
+B00853|CW*ca*Zn22*Zn41+CW*ca*Zn21*Zn42                                                                              |                                 
+B00854|-SW*ca*Zn11*Zn42-SW*ca*Zn12*Zn41                                                                             |                                 
+B00855|EE/S2W*(B00851+B00852+B00853+B00854)                                                                         |                                 
+B00856|CW*ca*Zn23*Zn31+CW*ca*Zn21*Zn33                                                                              |                                 
+B00857|-SW*ca*Zn11*Zn33-SW*ca*Zn13*Zn31                                                                             |                                 
+B00858|-CW*sa*Zn23*Zn41-CW*sa*Zn21*Zn43                                                                             |                                 
+B00859|SW*sa*Zn11*Zn43+SW*sa*Zn13*Zn41                                                                              |                                 
+B00860|(-EE/S2W)*(B00856+B00857+B00858+B00859)                                                                      |                                 
+B00861|CW*sb*Zn23*Zn31+CW*sb*Zn21*Zn33                                                                              |                                 
+B00862|-SW*sb*Zn11*Zn33-SW*sb*Zn13*Zn31                                                                             |                                 
+B00863|-CW*cb*Zn23*Zn41-CW*cb*Zn21*Zn43                                                                             |                                 
+B00864|SW*cb*Zn11*Zn43+SW*cb*Zn13*Zn41                                                                              |                                 
+B00865|(-EE/S2W)*(B00861+B00862+B00863+B00864)                                                                      |                                 
+B00866|Zn31*Zn33-Zn41*Zn43                                                                                          |                                 
+B00867|EE/S2W*B00866                                                                                                |                                 
+B00868|CW*sa*Zn23*Zn31+CW*sa*Zn21*Zn33                                                                              |                                 
+B00869|-SW*sa*Zn11*Zn33-SW*sa*Zn13*Zn31                                                                             |                                 
+B00870|CW*ca*Zn23*Zn41+CW*ca*Zn21*Zn43                                                                              |                                 
+B00871|-SW*ca*Zn11*Zn43-SW*ca*Zn13*Zn41                                                                             |                                 
+B00872|EE/S2W*(B00868+B00869+B00870+B00871)                                                                         |                                 
+B00873|CW*ca*Zn24*Zn31+CW*ca*Zn21*Zn34                                                                              |                                 
+B00874|-SW*ca*Zn11*Zn34-SW*ca*Zn14*Zn31                                                                             |                                 
+B00875|-CW*sa*Zn24*Zn41-CW*sa*Zn21*Zn44                                                                             |                                 
+B00876|SW*sa*Zn11*Zn44+SW*sa*Zn14*Zn41                                                                              |                                 
+B00877|(-EE/S2W)*(B00873+B00874+B00875+B00876)                                                                      |                                 
+B00878|CW*sb*Zn24*Zn31+CW*sb*Zn21*Zn34                                                                              |                                 
+B00879|-SW*sb*Zn11*Zn34-SW*sb*Zn14*Zn31                                                                             |                                 
+B00880|-CW*cb*Zn24*Zn41-CW*cb*Zn21*Zn44                                                                             |                                 
+B00881|SW*cb*Zn11*Zn44+SW*cb*Zn14*Zn41                                                                              |                                 
+B00882|(-EE/S2W)*(B00878+B00879+B00880+B00881)                                                                      |                                 
+B00883|Zn31*Zn34-Zn41*Zn44                                                                                          |                                 
+B00884|EE/S2W*B00883                                                                                                |                                 
+B00885|CW*sa*Zn24*Zn31+CW*sa*Zn21*Zn34                                                                              |                                 
+B00886|-SW*sa*Zn11*Zn34-SW*sa*Zn14*Zn31                                                                             |                                 
+B00887|CW*ca*Zn24*Zn41+CW*ca*Zn21*Zn44                                                                              |                                 
+B00888|-SW*ca*Zn11*Zn44-SW*ca*Zn14*Zn41                                                                             |                                 
+B00889|EE/S2W*(B00885+B00886+B00887+B00888)                                                                         |                                 
+B00890|CW*ca*Zn22*Zn32-SW*ca*Zn12*Zn32                                                                              |                                 
+B00891|-CW*sa*Zn22*Zn42+SW*sa*Zn12*Zn42                                                                             |                                 
+B00892|(-2*EE/S2W)*(B00890+B00891)                                                                                  |                                 
+B00893|CW*sb*Zn22*Zn32-SW*sb*Zn12*Zn32                                                                              |                                 
+B00894|-CW*cb*Zn22*Zn42+SW*cb*Zn12*Zn42                                                                             |                                 
+B00895|(-2*EE/S2W)*(B00893+B00894)                                                                                  |                                 
+B00896|Zn32^2-Zn42^2                                                                                                |                                 
+B00897|EE/S2W*B00896                                                                                                |                                 
+B00898|CW*sa*Zn22*Zn32-SW*sa*Zn12*Zn32                                                                              |                                 
+B00899|CW*ca*Zn22*Zn42-SW*ca*Zn12*Zn42                                                                              |                                 
+B00900|2*EE/S2W*(B00898+B00899)                                                                                     |                                 
+B00901|CW*ca*Zn23*Zn32+CW*ca*Zn22*Zn33                                                                              |                                 
+B00902|-SW*ca*Zn12*Zn33-SW*ca*Zn13*Zn32                                                                             |                                 
+B00903|-CW*sa*Zn23*Zn42-CW*sa*Zn22*Zn43                                                                             |                                 
+B00904|SW*sa*Zn12*Zn43+SW*sa*Zn13*Zn42                                                                              |                                 
+B00905|(-EE/S2W)*(B00901+B00902+B00903+B00904)                                                                      |                                 
+B00906|CW*sb*Zn23*Zn32+CW*sb*Zn22*Zn33                                                                              |                                 
+B00907|-SW*sb*Zn12*Zn33-SW*sb*Zn13*Zn32                                                                             |                                 
+B00908|-CW*cb*Zn23*Zn42-CW*cb*Zn22*Zn43                                                                             |                                 
+B00909|SW*cb*Zn12*Zn43+SW*cb*Zn13*Zn42                                                                              |                                 
+B00910|(-EE/S2W)*(B00906+B00907+B00908+B00909)                                                                      |                                 
+B00911|Zn32*Zn33-Zn42*Zn43                                                                                          |                                 
+B00912|EE/S2W*B00911                                                                                                |                                 
+B00913|CW*sa*Zn23*Zn32+CW*sa*Zn22*Zn33                                                                              |                                 
+B00914|-SW*sa*Zn12*Zn33-SW*sa*Zn13*Zn32                                                                             |                                 
+B00915|CW*ca*Zn23*Zn42+CW*ca*Zn22*Zn43                                                                              |                                 
+B00916|-SW*ca*Zn12*Zn43-SW*ca*Zn13*Zn42                                                                             |                                 
+B00917|EE/S2W*(B00913+B00914+B00915+B00916)                                                                         |                                 
+B00918|CW*ca*Zn24*Zn32+CW*ca*Zn22*Zn34                                                                              |                                 
+B00919|-SW*ca*Zn12*Zn34-SW*ca*Zn14*Zn32                                                                             |                                 
+B00920|-CW*sa*Zn24*Zn42-CW*sa*Zn22*Zn44                                                                             |                                 
+B00921|SW*sa*Zn12*Zn44+SW*sa*Zn14*Zn42                                                                              |                                 
+B00922|(-EE/S2W)*(B00918+B00919+B00920+B00921)                                                                      |                                 
+B00923|CW*sb*Zn24*Zn32+CW*sb*Zn22*Zn34                                                                              |                                 
+B00924|-SW*sb*Zn12*Zn34-SW*sb*Zn14*Zn32                                                                             |                                 
+B00925|-CW*cb*Zn24*Zn42-CW*cb*Zn22*Zn44                                                                             |                                 
+B00926|SW*cb*Zn12*Zn44+SW*cb*Zn14*Zn42                                                                              |                                 
+B00927|(-EE/S2W)*(B00923+B00924+B00925+B00926)                                                                      |                                 
+B00928|Zn32*Zn34-Zn42*Zn44                                                                                          |                                 
+B00929|EE/S2W*B00928                                                                                                |                                 
+B00930|CW*sa*Zn24*Zn32+CW*sa*Zn22*Zn34                                                                              |                                 
+B00931|-SW*sa*Zn12*Zn34-SW*sa*Zn14*Zn32                                                                             |                                 
+B00932|CW*ca*Zn24*Zn42+CW*ca*Zn22*Zn44                                                                              |                                 
+B00933|-SW*ca*Zn12*Zn44-SW*ca*Zn14*Zn42                                                                             |                                 
+B00934|EE/S2W*(B00930+B00931+B00932+B00933)                                                                         |                                 
+B00935|CW*ca*Zn23*Zn33-SW*ca*Zn13*Zn33                                                                              |                                 
+B00936|-CW*sa*Zn23*Zn43+SW*sa*Zn13*Zn43                                                                             |                                 
+B00937|(-2*EE/S2W)*(B00935+B00936)                                                                                  |                                 
+B00938|CW*sb*Zn23*Zn33-SW*sb*Zn13*Zn33                                                                              |                                 
+B00939|-CW*cb*Zn23*Zn43+SW*cb*Zn13*Zn43                                                                             |                                 
+B00940|(-2*EE/S2W)*(B00938+B00939)                                                                                  |                                 
+B00941|Zn33^2-Zn43^2                                                                                                |                                 
+B00942|EE/S2W*B00941                                                                                                |                                 
+B00943|CW*sa*Zn23*Zn33-SW*sa*Zn13*Zn33                                                                              |                                 
+B00944|CW*ca*Zn23*Zn43-SW*ca*Zn13*Zn43                                                                              |                                 
+B00945|2*EE/S2W*(B00943+B00944)                                                                                     |                                 
+B00946|CW*ca*Zn24*Zn33+CW*ca*Zn23*Zn34                                                                              |                                 
+B00947|-SW*ca*Zn13*Zn34-SW*ca*Zn14*Zn33                                                                             |                                 
+B00948|-CW*sa*Zn24*Zn43-CW*sa*Zn23*Zn44                                                                             |                                 
+B00949|SW*sa*Zn13*Zn44+SW*sa*Zn14*Zn43                                                                              |                                 
+B00950|(-EE/S2W)*(B00946+B00947+B00948+B00949)                                                                      |                                 
+B00951|CW*sb*Zn24*Zn33+CW*sb*Zn23*Zn34                                                                              |                                 
+B00952|-SW*sb*Zn13*Zn34-SW*sb*Zn14*Zn33                                                                             |                                 
+B00953|-CW*cb*Zn24*Zn43-CW*cb*Zn23*Zn44                                                                             |                                 
+B00954|SW*cb*Zn13*Zn44+SW*cb*Zn14*Zn43                                                                              |                                 
+B00955|(-EE/S2W)*(B00951+B00952+B00953+B00954)                                                                      |                                 
+B00956|Zn33*Zn34-Zn43*Zn44                                                                                          |                                 
+B00957|EE/S2W*B00956                                                                                                |                                 
+B00958|CW*sa*Zn24*Zn33+CW*sa*Zn23*Zn34                                                                              |                                 
+B00959|-SW*sa*Zn13*Zn34-SW*sa*Zn14*Zn33                                                                             |                                 
+B00960|CW*ca*Zn24*Zn43+CW*ca*Zn23*Zn44                                                                              |                                 
+B00961|-SW*ca*Zn13*Zn44-SW*ca*Zn14*Zn43                                                                             |                                 
+B00962|EE/S2W*(B00958+B00959+B00960+B00961)                                                                         |                                 
+B00963|CW*ca*Zn24*Zn34-SW*ca*Zn14*Zn34                                                                              |                                 
+B00964|-CW*sa*Zn24*Zn44+SW*sa*Zn14*Zn44                                                                             |                                 
+B00965|(-2*EE/S2W)*(B00963+B00964)                                                                                  |                                 
+B00966|CW*sb*Zn24*Zn34-SW*sb*Zn14*Zn34                                                                              |                                 
+B00967|-CW*cb*Zn24*Zn44+SW*cb*Zn14*Zn44                                                                             |                                 
+B00968|(-2*EE/S2W)*(B00966+B00967)                                                                                  |                                 
+B00969|Zn34^2-Zn44^2                                                                                                |                                 
+B00970|EE/S2W*B00969                                                                                                |                                 
+B00971|CW*sa*Zn24*Zn34-SW*sa*Zn14*Zn34                                                                              |                                 
+B00972|CW*ca*Zn24*Zn44-SW*ca*Zn14*Zn44                                                                              |                                 
+B00973|2*EE/S2W*(B00971+B00972)                                                                                     |                                 
+B00975|2*EE^2/S2W/9*B00356                                                                                          |                                 
+B00977|2*EE^2/S2W/9*B00360                                                                                          |                                 
+B00979|2*EE^2/S2W*B00364                                                                                            |                                 
+B00981|2*EE^2/S2W*B00368                                                                                            |                                 
+B00983|4*EE^2/S2W/9*B00372                                                                                          |                                 
+B00985|4*EE^2/S2W/9*B00376                                                                                          |                                 
+B00986|CW^2*s2a^2*samb^2*EE^2*Mh^2+4*(sb*ca^3+cb*sa^3)^2*CW^2*EE^2*MHH^2                                            |                                 
+B00987|-4*CW^2*samb^2*sapb^2*EE^2*MH3^2-4*S2W^2*samb^2*sapb^2*MW^2*dlh5                                             |                                 
+B00988|4*S2W^2*ca^2*s2b*samb^2*MW^2*dlh6+4*S2W^2*s2b*sa^2*samb^2*MW^2*dlh7                                          |                                 
+B00989|(-3/MW^2/S2W^2/s2b^2)*(B00986+B00987+B00988)                                                                 |                                 
+B00990|CW^2*EE^2*Mh^2*camb*s2a^2+2*(sb*ca^3+cb*sa^3)*CW^2*EE^2*MHH^2*s2a                                            |                                 
+B00991|2*MW^2*S2W^2*c2a*ca*cb*dlh6*s2b+4*MW^2*S2W^2*ca^2*dlh6*s2b*sa*sb                                             |                                 
+B00992|-2*CW^2*EE^2*MH3^2*s2a*sapb-2*MW^2*S2W^2*dlh5*s2a*sapb                                                       |                                 
+B00993|-2*MW^2*S2W^2*c2a*dlh7*s2b*sa*sb+4*MW^2*S2W^2*ca*cb*dlh7*s2b*sa^2                                            |                                 
+B00994|(-3*samb/MW^2/S2W^2/s2b^2)*(B00990+B00991+B00992+B00993)                                                     |                                 
+B00995|2*CW^2*camb^2*s2b^2*EE^2*MW^2*vevv+2*(ca*cb^3-sa*sb^3)*CW^2*s2a*samb*EE^2*Mh^2*vevv                          |                                 
+B00996|CW^2*s2a*s2b*EE^2*MHH^2*vevv+3*CW^2*samb^2*sapb^2*EE^2*MHH^2*vevv                                            |                                 
+B00997|CW^2*samb^4*EE^2*MHH^2*vevv-2*S2W^2*c2b^2*samb^2*MW^2*dlh5*vevv                                              |                                 
+B00998|-2*S2W^2*sapb^2*MW^2*dlh5*vevv+2*S2W^2*c2a*s2b*sb^4*MW^2*dlh6*vevv                                           |                                 
+B00999|2*S2W^2*s2b*MW^2*dlh6*vevv-4*S2W^2*ca*cb*s2b*sa*sb^3*MW^2*dlh6*vevv                                          |                                 
+B01000|-2*S2W^2*cb^2*s2b*sa^2*MW^2*dlh6*vevv-4*CW^2*c2b*samb*sapb*EE^2*MH3^2*vevv                                   |                                 
+B01001|-S2W^2*c2a*s2b*MW^2*dlh7*vevv+S2W^2*s2b*MW^2*dlh7*vevv                                                       |                                 
+B01002|S2W^2*s2b*samb^2*MW^2*dlh7*vevv+S2W^2*c2b*s2b*samb^2*MW^2*dlh7*vevv                                          |                                 
+B01003|-S2W^2*camb^2*s2b^2*MH3^2*MW^2-S2W^2*camb^2*s2b^2*MW^4                                                       |                                 
+B01004|S2W^2*camb^2*s2b^2*MHc^2*MW^2                                                                                |                                 
+B01005|(-1/MW^2/S2W^2/s2b^2/vevv)*(B00995+B00996+B00997+B00998+B00999+B01000+B01001+B01002+B01003+B01004)           |                                 
+B01006|2*(ca*cb^3-sa*sb^3)*CW^2*s2a*samb*EE^2*Mh^2+CW^2*s2a*s2b*EE^2*MHH^2                                          |                                 
+B01007|3*CW^2*samb^2*sapb^2*EE^2*MHH^2+CW^2*samb^4*EE^2*MHH^2                                                       |                                 
+B01008|-2*S2W^2*c2b^2*samb^2*MW^2*dlh5-2*S2W^2*sapb^2*MW^2*dlh5                                                     |                                 
+B01009|2*S2W^2*c2a*s2b*sb^4*MW^2*dlh6+2*S2W^2*s2b*MW^2*dlh6                                                         |                                 
+B01010|-4*S2W^2*ca*cb*s2b*sa*sb^3*MW^2*dlh6-2*S2W^2*cb^2*s2b*sa^2*MW^2*dlh6                                         |                                 
+B01011|-4*CW^2*c2b*samb*sapb*EE^2*MH3^2-S2W^2*c2a*s2b*MW^2*dlh7                                                     |                                 
+B01012|S2W^2*s2b*MW^2*dlh7+S2W^2*s2b*samb^2*MW^2*dlh7                                                               |                                 
+B01013|S2W^2*c2b*s2b*samb^2*MW^2*dlh7                                                                               |                                 
+B01014|(-1/MW^2/S2W^2/s2b^2)*(B01006+B01007+B01008+B01009+B01010+B01011+B01012+B01013)                              |                                 
+B01015|3*CW^2*s2a^2*samb^2*EE^2*Mh^2-4*CW^2*capb*s2a*samb*EE^2*Mh^2                                                 |                                 
+B01016|-2*CW^2*camb*s2a*sapb*EE^2*Mh^2-3*CW^2*s2a^2*samb^2*EE^2*MHH^2                                               |                                 
+B01017|-CW^2*s2a*s2b*EE^2*MHH^2-12*S2W^2*c2a*ca*cb*s2b*sa*sb*MW^2*dlh6                                              |                                 
+B01018|-2*S2W^2*cb^2*s2b*MW^2*dlh6+12*S2W^2*c2b*ca^2*s2b*sa^2*MW^2*dlh6                                             |                                 
+B01019|12*CW^2*ca^2*sa^2*EE^2*MH3^2-4*CW^2*cb^2*sb^2*EE^2*MH3^2                                                     |                                 
+B01020|12*S2W^2*ca^2*sa^2*MW^2*dlh5-4*S2W^2*cb^2*sb^2*MW^2*dlh5                                                     |                                 
+B01021|12*S2W^2*c2a*ca*cb*s2b*sa*sb*MW^2*dlh7-2*S2W^2*s2b*sb^2*MW^2*dlh7                                            |                                 
+B01022|-12*S2W^2*c2b*ca^2*s2b*sa^2*MW^2*dlh7                                                                        |                                 
+B01023|1/MW^2/S2W^2/s2b^2*(B01015+B01016+B01017+B01018+B01019+B01020+B01021+B01022)                                 |                                 
+B01024|B00110*c2a*cb^2*MW^2*Zd33^2+2*SW^2*c2a*cb^2*MW^2*Zd63^2                                                      |                                 
+B01025|-6*CW^2*ca^2*Mb^2                                                                                            |                                 
+B01026|EE^2/MW^2/S2W^2/cb^2/3*(B01024+B01025)                                                                       |                                 
+B01027|B00110*Zd33*Zd36+2*SW^2*Zd63*Zd66                                                                            |                                 
+B01028|EE^2/S2W^2*c2a/3*B01027                                                                                      |                                 
+B01031|B00110*c2a*cb^2*MW^2*Zd36^2+2*SW^2*c2a*cb^2*MW^2*Zd66^2                                                      |                                 
+B01033|EE^2/MW^2/S2W^2/cb^2/3*(B01031+B01025)                                                                       |                                 
+B01034|C2W*c2a*cb^2*MW^2*Zl33^2+2*SW^2*c2a*cb^2*MW^2*Zl63^2                                                         |                                 
+B01035|-2*CW^2*ca^2*Mtau^2                                                                                          |                                 
+B01036|EE^2/MW^2/S2W^2/cb^2*(B01034+B01035)                                                                         |                                 
+B01037|C2W*Zl33*Zl36+2*SW^2*Zl63*Zl66                                                                               |                                 
+B01038|EE^2/S2W^2*c2a*B01037                                                                                        |                                 
+B01041|C2W*c2a*cb^2*MW^2*Zl36^2+2*SW^2*c2a*cb^2*MW^2*Zl66^2                                                         |                                 
+B01043|EE^2/MW^2/S2W^2/cb^2*(B01041+B01035)                                                                         |                                 
+B01044|B00108*c2a*sb^2*MW^2*Zu33^2+4*SW^2*c2a*sb^2*MW^2*Zu63^2                                                      |                                 
+B01045|6*CW^2*sa^2*MtopS^2                                                                                          |                                 
+B01046|(-EE^2/MW^2/S2W^2/sb^2/3)*(B01044+B01045)                                                                    |                                 
+B01047|B00108*Zu33*Zu36+4*SW^2*Zu63*Zu66                                                                            |                                 
+B01048|(-EE^2/S2W^2*c2a/3)*B01047                                                                                   |                                 
+B01051|B00108*c2a*sb^2*MW^2*Zu36^2+4*SW^2*c2a*sb^2*MW^2*Zu66^2                                                      |                                 
+B01053|(-EE^2/MW^2/S2W^2/sb^2/3)*(B01051+B01045)                                                                    |                                 
+B01054|2*CW^2*camb*s2b^2*samb*EE^2*MW^2*vevv-2*(ca*cb^3-sa*sb^3)*CW^2*camb*s2a*EE^2*Mh^2*vevv                       |                                 
+B01055|-2*(sa*cb^3+ca*sb^3)*CW^2*s2a*samb*EE^2*MHH^2*vevv+4*S2W^2*s2b*samb^3*sapb*MW^2*dlh5*vevv                    |                                 
+B01056|2*S2W^2*capb*sapb*MW^2*dlh5*vevv+4*S2W^2*capb*samb^2*sapb*MW^2*dlh5*vevv                                     |                                 
+B01057|2*S2W^2*c2a*c2b*camb*samb*MW^2*dlh5*vevv+2*S2W^2*c2a*cb*s2b*sb^3*MW^2*dlh6*vevv                              |                                 
+B01058|4*S2W^2*ca*s2b*sa*sb^4*MW^2*dlh6*vevv+2*S2W^2*ca*cb^2*s2b*sa*MW^2*dlh6*vevv                                  |                                 
+B01059|2*CW^2*c2b*s2a*EE^2*MH3^2*vevv-2*S2W^2*camb*cb*s2b*sa*MW^2*dlh7*vevv                                         |                                 
+B01060|-2*S2W^2*capb*s2b*samb*MW^2*dlh7*vevv-S2W^2*s2b^2*samb^2*MW^2*dlh7*vevv                                      |                                 
+B01061|-S2W^2*camb*s2b^2*samb*MH3^2*MW^2-S2W^2*camb*s2b^2*samb*MW^4                                                 |                                 
+B01062|S2W^2*camb*s2b^2*samb*MHc^2*MW^2                                                                             |                                 
+B01063|1/MW^2/S2W^2/s2b^2/vevv*(B01054+B01055+B01056+B01057+B01058+B01059+B01060+B01061+B01062)                     |                                 
+B01064|cb^2*sapb*MW^2-ca*sb*Mtau^2                                                                                  |                                 
+B01065|(-EE^2/MW^2/SW^2*Sqrt2*Zl33/cb^2/4)*B01064                                                                   |                                 
+B01067|(-EE^2/MW^2/SW^2*Sqrt2*Zl36/cb^2/4)*B01064                                                                   |                                 
+B01068|s2b^2*sapb*MW^2*Zd33*Zu33-2*camb*s2b*Mb*MtopS*Zd63*Zu63                                                      |                                 
+B01069|-4*cb^3*sa*MtopS^2*Zd33*Zu33-4*ca*sb^3*Mb^2*Zd33*Zu33                                                        |                                 
+B01070|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01068+B01069)                                                              |                                 
+B01071|s2b^2*sapb*MW^2*Zd36*Zu33-2*camb*s2b*Mb*MtopS*Zd66*Zu63                                                      |                                 
+B01072|-4*cb^3*sa*MtopS^2*Zd36*Zu33-4*ca*sb^3*Mb^2*Zd36*Zu33                                                        |                                 
+B01073|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01071+B01072)                                                              |                                 
+B01074|s2b^2*sapb*MW^2*Zd33*Zu36-2*camb*s2b*Mb*MtopS*Zd63*Zu66                                                      |                                 
+B01075|-4*cb^3*sa*MtopS^2*Zd33*Zu36-4*ca*sb^3*Mb^2*Zd33*Zu36                                                        |                                 
+B01076|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01074+B01075)                                                              |                                 
+B01077|s2b^2*sapb*MW^2*Zd36*Zu36-2*camb*s2b*Mb*MtopS*Zd66*Zu66                                                      |                                 
+B01078|-4*cb^3*sa*MtopS^2*Zd36*Zu36-4*ca*sb^3*Mb^2*Zd36*Zu36                                                        |                                 
+B01079|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01077+B01078)                                                              |                                 
+B01096|2*(ca*cb^3-sa*sb^3)*CW^2*camb*s2a*EE^2*Mh^2+2*(sa*cb^3+ca*sb^3)*CW^2*s2a*samb*EE^2*MHH^2                     |                                 
+B01097|-4*S2W^2*s2b*samb^3*sapb*MW^2*dlh5-2*S2W^2*capb*sapb*MW^2*dlh5                                               |                                 
+B01098|-4*S2W^2*capb*samb^2*sapb*MW^2*dlh5-2*S2W^2*c2a*c2b*camb*samb*MW^2*dlh5                                      |                                 
+B01099|-2*S2W^2*c2a*cb*s2b*sb^3*MW^2*dlh6-4*S2W^2*ca*s2b*sa*sb^4*MW^2*dlh6                                          |                                 
+B01100|-2*S2W^2*ca*cb^2*s2b*sa*MW^2*dlh6-2*CW^2*c2b*s2a*EE^2*MH3^2                                                  |                                 
+B01101|2*S2W^2*camb*cb*s2b*sa*MW^2*dlh7+2*S2W^2*capb*s2b*samb*MW^2*dlh7                                             |                                 
+B01102|S2W^2*s2b^2*samb^2*MW^2*dlh7                                                                                 |                                 
+B01103|(-1/MW^2/S2W^2/s2b^2)*(B01096+B01097+B01098+B01099+B01100+B01101+B01102)                                     |                                 
+B01104|2*(cb*ca^3-sb*sa^3)*CW^2*EE^2*Mh^2*s2a+CW^2*EE^2*MHH^2*s2a^2*samb                                            |                                 
+B01105|-2*MW^2*S2W^2*c2a*cb*dlh6*s2b*sa-4*MW^2*S2W^2*ca*dlh6*s2b*sa^2*sb                                            |                                 
+B01106|-2*CW^2*EE^2*MH3^2*capb*s2a-2*MW^2*S2W^2*capb*dlh5*s2a                                                       |                                 
+B01107|-2*MW^2*S2W^2*c2a*ca*dlh7*s2b*sb+4*MW^2*S2W^2*ca^2*cb*dlh7*s2b*sa                                            |                                 
+B01108|(-3*camb/MW^2/S2W^2/s2b^2)*(B01104+B01105+B01106+B01107)                                                     |                                 
+B01109|B00110*cb^2*MW^2*Zd33^2+2*SW^2*cb^2*MW^2*Zd63^2                                                              |                                 
+B01110|-3*CW^2*Mb^2                                                                                                 |                                 
+B01111|(-EE^2/MW^2/S2W^2/cb^2*s2a/3)*(B01109+B01110)                                                                |                                 
+B01113|(-EE^2/S2W^2*s2a/3)*B01027                                                                                   |                                 
+B01116|B00110*cb^2*MW^2*Zd36^2+2*SW^2*cb^2*MW^2*Zd66^2                                                              |                                 
+B01118|(-EE^2/MW^2/S2W^2/cb^2*s2a/3)*(B01116+B01110)                                                                |                                 
+B01119|C2W*cb^2*MW^2*Zl33^2+2*SW^2*cb^2*MW^2*Zl63^2                                                                 |                                 
+B01120|-CW^2*Mtau^2                                                                                                 |                                 
+B01121|(-EE^2/MW^2/S2W^2/cb^2*s2a)*(B01119+B01120)                                                                  |                                 
+B01123|(-EE^2/S2W^2*s2a)*B01037                                                                                     |                                 
+B01126|C2W*cb^2*MW^2*Zl36^2+2*SW^2*cb^2*MW^2*Zl66^2                                                                 |                                 
+B01128|(-EE^2/MW^2/S2W^2/cb^2*s2a)*(B01126+B01120)                                                                  |                                 
+B01129|B00108*sb^2*MW^2*Zu33^2+4*SW^2*sb^2*MW^2*Zu63^2                                                              |                                 
+B01130|-3*CW^2*MtopS^2                                                                                              |                                 
+B01131|EE^2/MW^2/S2W^2*s2a/sb^2/3*(B01129+B01130)                                                                   |                                 
+B01133|EE^2/S2W^2*s2a/3*B01047                                                                                      |                                 
+B01136|B00108*sb^2*MW^2*Zu36^2+4*SW^2*sb^2*MW^2*Zu66^2                                                              |                                 
+B01138|EE^2/MW^2/S2W^2*s2a/sb^2/3*(B01136+B01130)                                                                   |                                 
+B01139|(ca*cb^3-sa*sb^3)^2*CW^2*EE^2*Mh^2+(sa*cb^3+ca*sb^3)^2*CW^2*EE^2*MHH^2                                       |                                 
+B01140|-CW^2*c2b^2*EE^2*MH3^2-S2W^2*c2b^2*MW^2*dlh5                                                                 |                                 
+B01141|8*CW^2*SW^2*cb^3*sb*MW^2*dlh7+8*CW^2*SW^2*cb*sb^3*MW^2*dlh6                                                  |                                 
+B01142|(-8/MW^2/S2W^2/s2b^2)*(B01139+B01140+B01141)                                                                 |                                 
+B01146|(-4/MW^2/S2W^2/s2b^2)*(B01139+B01140+B01141)                                                                 |                                 
+B01147|2*CW^2*s2b^2*samb^2*EE^2*MW^2*vevv+4*CW^2*c2a*c2b*EE^2*Mh^2*vevv                                             |                                 
+B01148|3*CW^2*samb^2*sapb^2*EE^2*Mh^2*vevv+CW^2*samb^4*EE^2*Mh^2*vevv                                               |                                 
+B01149|2*(sa*cb^3+ca*sb^3)*CW^2*camb*s2a*EE^2*MHH^2*vevv-S2W^2*s2b^2*samb^2*MW^2*dlh5*vevv                          |                                 
+B01150|-4*(ca*cb^3-sa*sb^3)^2*S2W^2*MW^2*dlh5*vevv+2*S2W^2*cb^2*s2b*sa^2*MW^2*dlh6*vevv                             |                                 
+B01151|4*S2W^2*ca*cb*s2b*sa*sb^3*MW^2*dlh6*vevv+4*S2W^2*s2b*sa^2*sb^4*MW^2*dlh6*vevv                                |                                 
+B01152|2*S2W^2*cb^2*s2b*sb^2*MW^2*dlh6*vevv-4*CW^2*c2b*camb*capb*EE^2*MH3^2*vevv                                    |                                 
+B01153|-S2W^2*c2b*s2b*samb^2*MW^2*dlh7*vevv+2*S2W^2*camb*capb*s2b*MW^2*dlh7*vevv                                    |                                 
+B01154|2*S2W^2*s2b*MW^2*dlh7*vevv-S2W^2*s2b*samb^2*MW^2*dlh7*vevv                                                   |                                 
+B01155|-S2W^2*s2b^2*samb^2*MH3^2*MW^2-S2W^2*s2b^2*samb^2*MW^4                                                       |                                 
+B01156|S2W^2*s2b^2*samb^2*MHc^2*MW^2                                                                                |                                 
+B01157|(-1/MW^2/S2W^2/s2b^2/vevv)*(B01147+B01148+B01149+B01150+B01151+B01152+B01153+B01154+B01155+B01156)           |                                 
+B01158|B00108*c2b*s2b^2*MW^2*Zd33^2-2*SW^2*c2b*s2b^2*MW^2*Zd63^2                                                    |                                 
+B01159|-24*CW^2*sb^4*Mb^2*Zd63^2-24*CW^2*cb^4*MtopS^2*Zd33^2                                                        |                                 
+B01160|EE^2/MW^2/S2W^2/s2b^2/3*(B01158+B01159)                                                                      |                                 
+B01161|B00108*c2b*s2b^2*MW^2*Zd33*Zd36-2*SW^2*c2b*s2b^2*MW^2*Zd63*Zd66                                              |                                 
+B01162|-24*CW^2*sb^4*Mb^2*Zd63*Zd66-24*CW^2*cb^4*MtopS^2*Zd33*Zd36                                                  |                                 
+B01163|EE^2/MW^2/S2W^2/s2b^2/3*(B01161+B01162)                                                                      |                                 
+B01167|B00108*c2b*s2b^2*MW^2*Zd36^2-2*SW^2*c2b*s2b^2*MW^2*Zd66^2                                                    |                                 
+B01168|-24*CW^2*sb^4*Mb^2*Zd66^2-24*CW^2*cb^4*MtopS^2*Zd36^2                                                        |                                 
+B01169|EE^2/MW^2/S2W^2/s2b^2/3*(B01167+B01168)                                                                      |                                 
+B01171|(-EE^2/S2W^2*c2b/3)*B00110                                                                                   |                                 
+B01172|4*SW^2-3                                                                                                     |                                 
+B01173|(-EE^2/S2W^2*c2b/3)*B01172                                                                                   |                                 
+B01174|c2b*cb^2*MW^2*Zl33^2-2*SW^2*c2b*cb^2*MW^2*Zl63^2                                                             |                                 
+B01175|-2*CW^2*sb^2*Mtau^2*Zl63^2                                                                                   |                                 
+B01176|EE^2/MW^2/S2W^2/cb^2*(B01174+B01175)                                                                         |                                 
+B01177|c2b*cb^2*MW^2*Zl33*Zl36-2*SW^2*c2b*cb^2*MW^2*Zl63*Zl66                                                       |                                 
+B01178|-2*CW^2*sb^2*Mtau^2*Zl63*Zl66                                                                                |                                 
+B01179|EE^2/MW^2/S2W^2/cb^2*(B01177+B01178)                                                                         |                                 
+B01183|c2b*cb^2*MW^2*Zl36^2-2*SW^2*c2b*cb^2*MW^2*Zl66^2                                                             |                                 
+B01184|-2*CW^2*sb^2*Mtau^2*Zl66^2                                                                                   |                                 
+B01185|EE^2/MW^2/S2W^2/cb^2*(B01183+B01184)                                                                         |                                 
+B01186|C2W*c2b*cb^2*MW^2+2*CW^2*sb^2*Mtau^2                                                                         |                                 
+B01187|(-EE^2/MW^2/S2W^2/cb^2)*B01186                                                                               |                                 
+B01190|B00110*c2b*s2b^2*MW^2*Zu33^2-4*SW^2*c2b*s2b^2*MW^2*Zu63^2                                                    |                                 
+B01191|24*CW^2*cb^4*MtopS^2*Zu63^2+24*CW^2*sb^4*Mb^2*Zu33^2                                                         |                                 
+B01192|(-EE^2/MW^2/S2W^2/s2b^2/3)*(B01190+B01191)                                                                   |                                 
+B01193|B00110*c2b*s2b^2*MW^2*Zu33*Zu36-4*SW^2*c2b*s2b^2*MW^2*Zu63*Zu66                                              |                                 
+B01194|24*CW^2*cb^4*MtopS^2*Zu63*Zu66+24*CW^2*sb^4*Mb^2*Zu33*Zu36                                                   |                                 
+B01195|(-EE^2/MW^2/S2W^2/s2b^2/3)*(B01193+B01194)                                                                   |                                 
+B01199|B00110*c2b*s2b^2*MW^2*Zu36^2-4*SW^2*c2b*s2b^2*MW^2*Zu66^2                                                    |                                 
+B01200|24*CW^2*cb^4*MtopS^2*Zu66^2+24*CW^2*sb^4*Mb^2*Zu36^2                                                         |                                 
+B01201|(-EE^2/MW^2/S2W^2/s2b^2/3)*(B01199+B01200)                                                                   |                                 
+B01204|c2b*cb^2*MW^2+sb^2*Mtau^2                                                                                    |                                 
+B01205|EE^2/MW^2/SW^2*Sqrt2*Zl33/cb^2/4*B01204                                                                      |                                 
+B01207|EE^2/MW^2/SW^2*Sqrt2*Zl36/cb^2/4*B01204                                                                      |                                 
+B01208|c2b*s2b^2*MW^2-4*cb^4*MtopS^2                                                                                |                                 
+B01209|4*sb^4*Mb^2                                                                                                  |                                 
+B01210|EE^2/MW^2/SW^2*Sqrt2*Zd33*Zu33/s2b^2/4*(B01208+B01209)                                                       |                                 
+B01213|EE^2/MW^2/SW^2*Sqrt2*Zd36*Zu33/s2b^2/4*(B01208+B01209)                                                       |                                 
+B01216|EE^2/MW^2/SW^2*Sqrt2*Zd33*Zu36/s2b^2/4*(B01208+B01209)                                                       |                                 
+B01219|EE^2/MW^2/SW^2*Sqrt2*Zd36*Zu36/s2b^2/4*(B01208+B01209)                                                       |                                 
+B01220|capb*cb^2*MW^2+sa*sb*Mtau^2                                                                                  |                                 
+B01221|(-EE^2/MW^2/SW^2*Sqrt2*Zl33/cb^2/4)*B01220                                                                   |                                 
+B01223|(-EE^2/MW^2/SW^2*Sqrt2*Zl36/cb^2/4)*B01220                                                                   |                                 
+B01224|capb*s2b^2*MW^2*Zd33*Zu33+2*s2b*samb*Mb*MtopS*Zd63*Zu63                                                      |                                 
+B01225|-4*ca*cb^3*MtopS^2*Zd33*Zu33+4*sa*sb^3*Mb^2*Zd33*Zu33                                                        |                                 
+B01226|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01224+B01225)                                                              |                                 
+B01227|capb*s2b^2*MW^2*Zd36*Zu33+2*s2b*samb*Mb*MtopS*Zd66*Zu63                                                      |                                 
+B01228|-4*ca*cb^3*MtopS^2*Zd36*Zu33+4*sa*sb^3*Mb^2*Zd36*Zu33                                                        |                                 
+B01229|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01227+B01228)                                                              |                                 
+B01230|capb*s2b^2*MW^2*Zd33*Zu36+2*s2b*samb*Mb*MtopS*Zd63*Zu66                                                      |                                 
+B01231|-4*ca*cb^3*MtopS^2*Zd33*Zu36+4*sa*sb^3*Mb^2*Zd33*Zu36                                                        |                                 
+B01232|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01230+B01231)                                                              |                                 
+B01233|capb*s2b^2*MW^2*Zd36*Zu36+2*s2b*samb*Mb*MtopS*Zd66*Zu66                                                      |                                 
+B01234|-4*ca*cb^3*MtopS^2*Zd36*Zu36+4*sa*sb^3*Mb^2*Zd36*Zu36                                                        |                                 
+B01235|(-EE^2/MW^2/SW^2*Sqrt2/s2b^2/4)*(B01233+B01234)                                                              |                                 
+B01238|(-EE^2/MW^2/SW^2*Sqrt2*Zd33*Zu33/s2b^2/4)*(B01208+B01209)                                                    |                                 
+B01241|(-EE^2/MW^2/SW^2*Sqrt2*Zd33*Zu36/s2b^2/4)*(B01208+B01209)                                                    |                                 
+B01244|(-EE^2/MW^2/SW^2*Sqrt2*Zd36*Zu33/s2b^2/4)*(B01208+B01209)                                                    |                                 
+B01247|(-EE^2/MW^2/SW^2*Sqrt2*Zd36*Zu36/s2b^2/4)*(B01208+B01209)                                                    |                                 
+B01249|(-EE^2/MW^2/SW^2*Sqrt2*Zl33/cb^2/4)*B01204                                                                   |                                 
+B01251|(-EE^2/MW^2/SW^2*Sqrt2*Zl36/cb^2/4)*B01204                                                                   |                                 
+B01271|(-12/MW^2/S2W^2/s2b^2)*(B01139+B01140+B01141)                                                                |                                 
+B01272|4*CW^2*c2a*c2b*EE^2*Mh^2+3*CW^2*samb^2*sapb^2*EE^2*Mh^2                                                      |                                 
+B01273|CW^2*samb^4*EE^2*Mh^2+2*(sa*cb^3+ca*sb^3)*CW^2*camb*s2a*EE^2*MHH^2                                           |                                 
+B01274|-S2W^2*s2b^2*samb^2*MW^2*dlh5-4*(ca*cb^3-sa*sb^3)^2*S2W^2*MW^2*dlh5                                          |                                 
+B01275|2*S2W^2*cb^2*s2b*sa^2*MW^2*dlh6+4*S2W^2*ca*cb*s2b*sa*sb^3*MW^2*dlh6                                          |                                 
+B01276|4*S2W^2*s2b*sa^2*sb^4*MW^2*dlh6+2*S2W^2*cb^2*s2b*sb^2*MW^2*dlh6                                              |                                 
+B01277|-4*CW^2*c2b*camb*capb*EE^2*MH3^2-S2W^2*c2b*s2b*samb^2*MW^2*dlh7                                              |                                 
+B01278|2*S2W^2*camb*capb*s2b*MW^2*dlh7+2*S2W^2*s2b*MW^2*dlh7                                                        |                                 
+B01279|-S2W^2*s2b*samb^2*MW^2*dlh7                                                                                  |                                 
+B01280|(-1/MW^2/S2W^2/s2b^2)*(B01272+B01273+B01274+B01275+B01276+B01277+B01278+B01279)                              |                                 
+B01281|2*SW^2*c2b*cb^2*MW^2*Zd33^2-3*c2b*cb^2*MW^2*Zd33^2                                                           |                                 
+B01282|-2*SW^2*c2b*cb^2*MW^2*Zd63^2-6*CW^2*sb^2*Mb^2                                                                |                                 
+B01283|EE^2/MW^2/S2W^2/cb^2/3*(B01281+B01282)                                                                       |                                 
+B01284|3*Zd33*Zd36-2*SW^2*Zd33*Zd36                                                                                 |                                 
+B01285|2*SW^2*Zd63*Zd66                                                                                             |                                 
+B01286|(-EE^2/S2W^2*c2b/3)*(B01284+B01285)                                                                          |                                 
+B01290|2*SW^2*c2b*cb^2*MW^2*Zd36^2-3*c2b*cb^2*MW^2*Zd36^2                                                           |                                 
+B01291|-2*SW^2*c2b*cb^2*MW^2*Zd66^2-6*CW^2*sb^2*Mb^2                                                                |                                 
+B01292|EE^2/MW^2/S2W^2/cb^2/3*(B01290+B01291)                                                                       |                                 
+B01297|C2W*c2b*cb^2*MW^2*Zl33^2+2*SW^2*c2b*cb^2*MW^2*Zl63^2                                                         |                                 
+B01298|2*CW^2*sb^2*Mtau^2                                                                                           |                                 
+B01299|(-EE^2/MW^2/S2W^2/cb^2)*(B01297+B01298)                                                                      |                                 
+B01301|(-EE^2/S2W^2*c2b)*B01037                                                                                     |                                 
+B01304|C2W*c2b*cb^2*MW^2*Zl36^2+2*SW^2*c2b*cb^2*MW^2*Zl66^2                                                         |                                 
+B01306|(-EE^2/MW^2/S2W^2/cb^2)*(B01304+B01298)                                                                      |                                 
+B01309|B01172*c2b*sb^2*MW^2*Zu33^2-4*SW^2*c2b*sb^2*MW^2*Zu63^2                                                      |                                 
+B01310|6*CW^2*cb^2*MtopS^2                                                                                          |                                 
+B01311|(-EE^2/MW^2/S2W^2/sb^2/3)*(B01309+B01310)                                                                    |                                 
+B01312|4*SW^2*Zu33*Zu36-3*Zu33*Zu36                                                                                 |                                 
+B01313|-4*SW^2*Zu63*Zu66                                                                                            |                                 
+B01314|(-EE^2/S2W^2*c2b/3)*(B01312+B01313)                                                                          |                                 
+B01318|B01172*c2b*sb^2*MW^2*Zu36^2-4*SW^2*c2b*sb^2*MW^2*Zu66^2                                                      |                                 
+B01320|(-EE^2/MW^2/S2W^2/sb^2/3)*(B01318+B01310)                                                                    |                                 
+B01323|3*B01172*Zd33^2-4*SW^4                                                                                       |                                 
+B01324|(-2*EE^2/S2W^2/9)*B01323                                                                                     |                                 
+B01325|3*B01172*Zd36^2-4*SW^4                                                                                       |                                 
+B01326|(-2*EE^2/S2W^2/9)*B01325                                                                                     |                                 
+B01327|4*SW^2*Zl33^2-Zl33^2                                                                                         |                                 
+B01328|-4*SW^4                                                                                                      |                                 
+B01329|(-2*EE^2/S2W^2)*(B01327+B01328)                                                                              |                                 
+B01330|4*SW^2-1                                                                                                     |                                 
+B01331|(-2*EE^2/S2W^2*Zl33*Zl36)*B01330                                                                             |                                 
+B01332|B01330*Zl36^2-4*SW^4                                                                                         |                                 
+B01333|(-2*EE^2/S2W^2)*B01332                                                                                       |                                 
+B01334|24*SW^2*Zu33^2-9*Zu33^2                                                                                      |                                 
+B01335|-16*SW^4                                                                                                     |                                 
+B01336|(-2*EE^2/S2W^2/9)*(B01334+B01335)                                                                            |                                 
+B01337|8*SW^2-3                                                                                                     |                                 
+B01338|(-2*EE^2/S2W^2*Zu33*Zu36/3)*B01337                                                                           |                                 
+B01339|3*B01337*Zu36^2-16*SW^4                                                                                      |                                 
+B01340|(-2*EE^2/S2W^2/9)*B01339                                                                                     |                                 
+B01341|4*(cb*ca^3-sb*sa^3)^2*CW^2*EE^2*Mh^2+CW^2*camb^2*s2a^2*EE^2*MHH^2                                            |                                 
+B01342|4*S2W^2*camb^2*s2b*sa^2*MW^2*dlh6-4*CW^2*camb^2*capb^2*EE^2*MH3^2                                            |                                 
+B01343|-4*S2W^2*camb^2*capb^2*MW^2*dlh5+4*S2W^2*ca^2*camb^2*s2b*MW^2*dlh7                                           |                                 
+B01344|(-3/MW^2/S2W^2/s2b^2)*(B01341+B01342+B01343)                                                                 |                                 
+B01346|6*CW^2*sa^2*Mb^2                                                                                             |                                 
+B01347|(-EE^2/MW^2/S2W^2/cb^2/3)*(B01024+B01346)                                                                    |                                 
+B01349|(-EE^2/S2W^2*c2a/3)*B01027                                                                                   |                                 
+B01354|(-EE^2/MW^2/S2W^2/cb^2/3)*(B01031+B01346)                                                                    |                                 
+B01356|2*CW^2*sa^2*Mtau^2                                                                                           |                                 
+B01357|(-EE^2/MW^2/S2W^2/cb^2)*(B01034+B01356)                                                                      |                                 
+B01359|(-EE^2/S2W^2*c2a)*B01037                                                                                     |                                 
+B01364|(-EE^2/MW^2/S2W^2/cb^2)*(B01041+B01356)                                                                      |                                 
+B01366|-6*CW^2*ca^2*MtopS^2                                                                                         |                                 
+B01367|EE^2/MW^2/S2W^2/sb^2/3*(B01044+B01366)                                                                       |                                 
+B01369|EE^2/S2W^2*c2a/3*B01047                                                                                      |                                 
+B01374|EE^2/MW^2/S2W^2/sb^2/3*(B01051+B01366)                                                                       |                                 
+======================================================================================================================================================
