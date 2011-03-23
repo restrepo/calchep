@@ -1,1 +1,1 @@
-char * rootDir=" ";
+char * rootDir="/home/restrepo/prog/CalcHEP";
