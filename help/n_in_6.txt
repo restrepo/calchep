@@ -1,15 +1,7 @@
-1 12 55
-   This menu item is active if one tests process with
-polarized beams. This CalcHEP version allows to set 
-polarization only for massless incoming particles. 
-Entering the process one has to write the '%' symbol
-after the particle which will be treated as polarized.  
-  Helicity is defined as projection of particle spin 
-on direction of motion. So, this parameter is changed 
-in [-1,1] interval for spin 1 particles and in the 
-[-0.5,0.5] interval for spin 1/2 particles.
-By definition left handed particle has positive 
-helicity. In general a value of helicity inside of 
-interval means partial polarized beam. In particular 
-unpolarized beam is characterized by zero helicity.
-
+3 15 70
+ The enter of value of helicity of the second incoming particle.
+ This option is available if process in symbolic session was 
+ specified in the corresponding manner with the % symbol after 
+ particle name. Note that helicity is defined as a projection 
+ of spin on the direction of motion. So,the input value is 
+ restricted by +/- particle spin. 

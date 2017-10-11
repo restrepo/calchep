@@ -138,55 +138,58 @@ void  messanykey(int x1,int y1,char* txtstr)
 }
 
 
-int informline(long curent, long total)
-{ int  xx;
-  int res=0;
-  static int Y;
-  static int X;
-   
-/*  if(blind==1)
-  { 
-     FILE *f=fopen("jobStatus","w");
-     fprintf(f,"Done %d from %d\n", curent,total);
-     fclose(f);
-     return 0;
-  } else
-*/  {    
-    int xm=where_x(), ym=where_y(), fc=fColor,bc=bColor;
+
+int infoLine(double rate)
+{  int  xx;
+   int res=0;
+   static int Y;
+   static int X;
+//   static void*dump=NULL;
+   if(blind>0) return 0;
+   int xm=where_x(), ym=where_y(), fc=fColor,bc=bColor;
   
-    if (curent == 0)
-    {
+   if (rate == 0)
+   {
       Y=maxRow();
       X=15;
-      goto_xy(15,Y); scrcolor(White,Red);
-      print(" Calculation in progress. Calculation in progress.");                                                                     
+/*      goto_xy(15,Y); scrcolor(Black,Red);
+      memset(b,' ',50); b[50] = '\0';
+*/
+     goto_xy(15,Y); scrcolor(White,Red);
+//     if(dump) del_text(&dump);     
+//     get_text(15,Y,15+50, Y,&dump);     
+     print(" Calculation in progress. Calculation in progress.");                                                                     
+/*          12345678901234567890123456789012345678901234567890 */
+/*      print("%s",b); */
       goto_xy(15,Y);
       scrcolor(fc,bc);
-      escpressed();
+      res=escpressed();
       goto exi;;
-    }
+   }
 
-    if(X>65 || X<15) X=15;
+   if(X>65 || X<15) X=15;
    
-    xx = 15 + (50 * curent) / total;
-    if (xx > 65) xx = 65;
-    scrcolor(Black,Red);
-    goto_xy(X,Y);
-    while (where_x() < xx) print("%c",'X');
-    if(xx !=X) { X=xx; res=escpressed();}
-    if (curent >= total)
-    {
+   xx = 15 + 50*rate;
+   if (xx > 65) xx = 65;
+   scrcolor(Black,Red);
+   goto_xy(X,Y);
+   while (where_x() < xx) print("%c",'X');
+   if(xx !=X) { X=xx;  res=escpressed(); } else { res=escpressed();}
+   if (rate  >= 1)
+   {
+//     put_text(&dump);
       scrcolor(White,Black);
-      goto_xy(1,Y); clr_eol();
       goto exi;
-    }
+   }
    
-    exi:
-   
-    scrcolor(fc,bc); goto_xy(xm,ym);   
-    return res;
-  }   
+   exi:
+   scrcolor(fc,bc); goto_xy(xm,ym);  
+   return res;   
 }
+
+int informline(long curent, long total) { return infoLine((double)curent/(double)total);}  
+
+
 
 
 void chepbox(int x1,int y1,int x2,int y2)
@@ -274,14 +277,13 @@ void  menu0(int col,int row,char* label, char* menstr ,
    }
 
    clearTypeAhead();
-
    if (*kk < 0) *kk = -(*kk);
       ncol=menstr[0];
       sprintf(fmt,"%%%d.%ds",ncol,ncol);
       height=strlen(menstr)/ncol;
+      if(height==0) { *kk=0; return; }
       if (row+height+1 >lastLine-2) height=lastLine-3-row;
       lastpage = 1+    (strlen(menstr)/ncol -1)/height ;
-       
    if(label[0] ==0 || row == 1) 
    { if (*hscr == NULL)  get_text(col,row,col+ncol+1,row+2,hscr);} 
    else
@@ -346,6 +348,7 @@ label_1:
    if (k > lastrow) k = lastrow;
    goto_xy(col + 1,row + k);
    if (lastrow) print(fmt,menstr+1+(k-1+(npage-1)*height)*ncol);
+
    while (1)
    {  int jump=1,mousePos;
 
@@ -353,29 +356,27 @@ label_1:
 
       ink = inkey();
 /* mouse filter */
+
       if ((ink==KB_MOUSE)&&(mouse_info.but1 == 2))
       {
          if (mouse_info.row == lastLine )
-         for(i=0; i<10;i++)
-         if ((mouse_info.col > fkPos[i]) && (mouse_info.col < fkPos[i+1]))
-         {  if (i==9)ink='0'; else ink='1'+i;}
-
-         if ( (mouse_info.col >= col ) && (mouse_info.col <=col+ncol+1) )
+         {
+            for(i=0; i<10;i++)
+            if ((mouse_info.col > fkPos[i]) && (mouse_info.col < fkPos[i+1]))
+            {  if (i==9)ink='0'; else ink='1'+i;}
+         } else if ( (mouse_info.col < col ) || (mouse_info.col >col+ncol+1) || (mouse_info.row < row ) || (mouse_info.row >row+height+1) )   goto label_3; 
+         else  
          {  mousePos = mouse_info.row - row;
-
-            if (col+ncol+1-mouse_info.col <4)
+            if (mousePos==0)
+            {      if( col+ncol+1-mouse_info.col <4) ink=KB_PAGEU;
+              else if( mouse_info.col-col <4       ) ink=KB_ESC;
+            }   
+            else if(  mousePos==height+1) ink=KB_PAGED;
+            else if((mousePos > 0)&&(mousePos <= height))
             {
-               if (mousePos==0)        ink=KB_PAGEU;
-               if (mousePos==height+1) ink=KB_PAGED;
-            }
-
-            if ((mousePos == 0 ) && ( mouse_info.col-col <4)) ink=KB_ESC;
-
-            if ((mousePos < 0)&&(mousePos >= height))
-            {
-               if (mousePos > k)  {ink=KB_DOWN; jump=mousePos - k;}
-               if (mousePos < k)  {ink=KB_UP;   jump=k - mousePos;}
-               if (mousePos==k )   ink=KB_ENTER;
+               if(mousePos > k)  {ink=KB_DOWN; jump=mousePos - k;}
+               if(mousePos < k)  {ink=KB_UP;   jump=k - mousePos;}
+               if(mousePos==k )   ink=KB_ENTER;
             }
          }
       }
@@ -384,6 +385,7 @@ label_1:
 label_4:
       switch (ink)
       {
+/*
         case KB_MOUSE:
         if (mouse_info.but1 != 2) break;
         if (mouse_info.row == lastLine )
@@ -393,8 +395,6 @@ label_4:
              goto label_4;
           }
 
-        if ( (mouse_info.col < col ) || (mouse_info.col >col+ncol+1) ||
-             (mouse_info.row < row ) || (mouse_info.row >row+height+1) ) break;
 
            mousePos = mouse_info.row - row;
            if ((mousePos == 0 ) && ( mouse_info.col-col <4)) ink=KB_ESC;
@@ -410,7 +410,7 @@ label_4:
            }
            if (mousePos==k       ) ink=KB_ENTER;
            if (ink!=KB_MOUSE) goto label_4;
-
+*/
           break;
 
 		  case  KB_DOWN: 
@@ -533,32 +533,6 @@ label_4:
              goto label_1;
            }
         } break; 
-        case 19:  /* ^S */
-        case 's':
-        case 'S':
-        {  char name[32]="";
-           int key=correctStr(5,23,"Enter name(Esc for exit):",name,30,1);
-           if(key)
-            { int l,lmax;
-              lmax=strlen(menstr+1)/menstr[0];
-              trim(name); 
-              for(l=0;l<lmax;l++)
-              {   
-                char line[80];
-                strncpy(line,menstr+1+l*menstr[0],menstr[0]);
-                line[menstr[0]]=0;
-                trim(line);
-                if(strcmp(name,line)==0)
-                { 
-                   k=l;
-                   npage = k/ height + 1;
-                   k = k% height + 1;
-                   goto label_1;
-                }
-              }  
-              if(blind) sortie(121); else messanykey(10,10, "Not detected"); 
-           }
-        } break;  
      }
   }
 
@@ -631,7 +605,7 @@ int  str_redact(char* txt,int npos, int maxLen)
    clearTypeAhead();
 
    strcpy(txttmp,txt);
-   if(strlen(txt)>=maxLen) txt[maxLen-1]=0;
+   if(strlen(txt)>maxLen) txt[maxLen]=0;
    first = 1;
    
    scrcolor(t_color,Black);

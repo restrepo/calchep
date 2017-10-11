@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2000, Alexander Pukhov, e-mail: pukhov@theory.npi.msu.su 
+ Author Alexander Pukhov 
 */
 
 #include "chep_crt.h"
@@ -15,44 +15,29 @@ void  cheplabel(void)
 
  while(1)
  { 
-/*   { int X=20,Y=1;
-     scrcolor(FGmain,BGmain);
-     goto_xy(X,Y);  print("Skobeltsyn Institute of Nuclear Physics,");
-     goto_xy(X+8,Y+1);  print("Moscow State University.");
-   }
-*/
    { int Y=2;
-     scrcolor(Red,LightGray);
+     scrcolor(Blue,LightGray);
      goto_xy(7,Y); print("CalcHEP - a package for Calculation in High Energy Physics");
      scrcolor(FGmain,BGmain);
-     goto_xy(15,Y+1);  print("Version 2.5.6: Last correction May 27,2010");
+     goto_xy(15,Y+1);  print("Version 3.6.30: Last correction September 21, 2017");
    }
-
    { int Y=6;
-
      scrcolor(FGmain,BGmain); 
-     goto_xy(4,Y);print("Main author:");
+     goto_xy(4,Y++);print("Authors:");
      scrcolor(Blue,LightGray);
      print(" Alexander Pukhov(Skobeltsyn Institute of Nuclear Physics,Moscow)");
+     goto_xy(4+8,Y++);print(" Alexander Belyaev(University of Southampton)"); 
+     goto_xy(4+8,Y++);print(" Neil Chistensen (University of Pittsburgh)");
    }
 
-   { int Y=7;
-     scrcolor(FGmain,BGmain); 
-     goto_xy(4,Y);print("Batch mode :");
-     scrcolor(Blue,LightGray);
-     print(" Neil Chistensen (Michigan State University)");
-     scrcolor(FGmain,BGmain);
-     goto_xy(4,Y+1);print("PYTHIA interface and testing:");
-     scrcolor(Blue,LightGray);  print("Alexander Belyaev(University of Southampton)");
-   }
-   
    { int Y=10;
      scrcolor(FGmain,BGmain);
      goto_xy(4,Y);print("For contacts:");
      scrcolor(Blue,LightGray);   
-     goto_xy(28,Y);print("email: <pukhov@lapp.in2p3.fr>");
-     goto_xy(28,Y+1);print("http://theory.sinp.msu.ru/~pukhov/calchep.html");
-  
+     goto_xy(20,Y++);print("email      : <calchep@googlegroups.com>");
+     goto_xy(20,Y++);print("Questions  : https://answers.launchpad.net/calchep");
+     goto_xy(20,Y++);print("Bugs       : https://bugs.launchpad.net/calchep");
+     goto_xy(20,Y);  print("Code&Models: http://theory.sinp.msu.ru/~pukhov/calchep.html");
    }
    
 
@@ -62,7 +47,7 @@ void  cheplabel(void)
      goto_xy(4,Y);print("The BSMs for CalcHEP were developed in collaboration with:");
      scrcolor(Blue,LightGray);
      goto_xy(10,Y+1); scrcolor(Blue,LightGray); 
-     print("G.Belanger,A.Belyaev,F.Boudjema,A.Semenov");
+     print("G.Belanger,F.Boudjema,A.Semenov");
    }
 
    { int Y=17;
@@ -74,14 +59,14 @@ void  cheplabel(void)
    }
    
 
-   { int X1=19, X2=61, Y1=21, Y2=Y1+2;
+   { int X1=19, X2=63, Y1=21, Y2=Y1+2;
      scrcolor(FGmain,BGmain);
      goto_xy(X1+2,Y1-1); print("Press F9 or click the box below to get");
 
      scrcolor(Blue,LightGray);  
      chepbox(X1,Y1,X2,Y2);
 
-     goto_xy(X1+3,Y1+1); print("References and Contributions ");
+     goto_xy(X1+1,Y1+1); print("References, Contributions, Acknowledgments");
 /*     goto_xy(X1+3,Y1+2); print("   and  relative information.      "); */
     
      scrcolor(FGmain,BGmain);
@@ -92,7 +77,8 @@ void  cheplabel(void)
                    && mouse_info.row>=Y1 && mouse_info.row<=Y2 
                    && mouse_info.col >=X1 &&  mouse_info.col<=X2 ) )
      { 
-       sprintf(fname,"%s%cCITE",pathtocomphep,f_slash);
+       sprintf(fname,"%s%cCITE",pathtocalchep,f_slash);
+//printf("fname:%s:\n",fname);       
        f=fopen(fname,"r");
        showtext (1, 1, 80,1,"",f);
        fclose(f);

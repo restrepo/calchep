@@ -18,7 +18,7 @@
 #include "saveres.h"
 #include "process.h"
 #include "writeF.h"
-
+#include "../../../include/version.h"
 #include "out_serv.h"
 
 
@@ -26,6 +26,7 @@
 static  polyvars  varsInfo={0,NULL};
 
 
+int noPict=1;
 
 int readSize;
 poly readBuff=NULL;
@@ -33,7 +34,7 @@ poly readBuff=NULL;
 int outputLanguage=0;
 
 void seekArchiv(long n)
-{  fseek(archiv,n,SEEK_SET);}
+{ fseek(archiv,n,SEEK_SET);}
 
 
 void DiagramToOutFile(vcsect * vcs, int label,char comment)
@@ -132,6 +133,7 @@ void readDenominators(void)
        FREAD1(denom[i].power,archiv);   /*  power  1 or 2  */
        FREAD1(denom[i].mass,archiv);
        FREAD1(denom[i].width,archiv);
+       FREAD1(denom[i].pnum,archiv);
        m=0;  
        do FREAD1(denom[i].momStr[m],archiv); while(denom[i].momStr[m++]);
    }
@@ -230,7 +232,7 @@ void writeLabel(char comment)
 {
  if (xpos !=1) writeF("\n");
  fprintf(outFile,"%c    ==============================\n",comment );
- fprintf(outFile,"%c    *  %s *\n",comment,version);
+ fprintf(outFile,"%c    *  %s *\n",comment,VERSION_);
  fprintf(outFile,"%c    ==============================\n",comment);         
 }
 
@@ -273,17 +275,9 @@ void  makeOutput(  void (*startOutput)(int,int*,int),
          fseek(catalog,0,SEEK_SET);
          while (FREAD1(cr,catalog))
          {
-            if (cr.nsub_ == nsub)
+            if (cr.status==1 && cr.nsub_ == nsub)
             {  
-               whichArchive(cr.nFile,'r',0);      
-/*               if(ArcNum && ArcNum!= cr.nFile ) fclose(archiv);
-               if(ArcNum==0 || ArcNum!= cr.nFile)
-               {  char archivName[40];
-                  ArcNum=cr.nFile; 
-                  sprintf(archivName,ARCHIV_NAME,ArcNum);
-                  archiv=fopen(archivName,"rb");
-               }
-*/               
+               whichArchive(cr.nFile,'r');      
                if (graphOn)
                {  fseek(diagrq,(cr.ndiagr_+recpos-1)*sizeof(csdiagram),SEEK_SET);
                   FREAD1(csdiagr,diagrq);
@@ -301,7 +295,7 @@ escexit:
    }
    fclose(catalog);
 /*   if(ArcNum)fclose(archiv);*/
-   whichArchive(0,0,0);
+   whichArchive(0,0);
    fclose(menuq);
    if(graphOn) fclose(diagrq);
    informline(ntot,ntot);

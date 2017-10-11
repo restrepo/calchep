@@ -417,6 +417,28 @@ ampllist  labeledDiagrams(FILE * diagrp)
   return ampl ;
 }
 
+static int checkLimQ( particleNumType * diag1 ,particleNumType * diag2)
+{ int n,i;
+  int L=2*(nin+nout) -3;
+  for(n=0; LimQ[n].who; n++)
+  {  int p=LimQ[n].who;
+     int ap=prtclbase1[p].anti;
+     int N=LimQ[n].how;
+     for(i=0;i<L;i++) 
+     { int np=diag1[i];
+       if(np<0 && (-np==p || -np==ap)) N--;
+       if(!N) return 1; 
+     }
+     for(i=0;i<L;i++) 
+     { int np=diag2[i];
+       if(np<0 && (-np==p || -np==ap)) N--;
+       if(!N) return 1; 
+     }
+     if(N!=1) return 1;   
+  }
+  return 0;
+}
+
 int  squaring(void)
 {
 
@@ -469,7 +491,10 @@ int  squaring(void)
             if (testsim) doleftident(group,amp1);
             amp2 = amp1;
             while (amp2 != NULL)
-            {
+            {  
+               if(LimQ[0].who && checkLimQ(amp1->dgrm,amp2->dgrm))
+               { amp2=amp2->next; continue;}
+                          
                memcpy(sqres.dgrm1,amp1->dgrm,sizeof(sqres.dgrm1));
                memcpy(sqres.dgrm2,amp2->dgrm,sizeof(sqres.dgrm2));
                if(amp1==amp2) sqres.mult=1; else sqres.mult=2;
@@ -480,8 +505,8 @@ int  squaring(void)
                   sqres.del = 1;
                   sqres.status = 0;
                   sqres.nsub=nsubcs;
+                  sqres.ndiagr=++nsdiagram;
                   FWRITE1(sqres,diagrq);
-                  nsdiagram++;
                }
                else
                {
@@ -521,8 +546,9 @@ int  squaring(void)
                         
                         sqres.status = 0;
                         sqres.nsub=nsubcs;
+                        
+                        sqres.ndiagr=++nsdiagram;
                         FWRITE1(sqres,diagrq);
-                        nsdiagram++;
                      }
 label_2:             n++;
                      sim = sim->next;
@@ -542,10 +568,8 @@ label_2:             n++;
      
          constrdiagr += nsdiagram; 
          goto_xy(13,21); print("%5d",constrdiagr); 
-                  
          if ((constrdiagr) > maxdiagr && !feof(diagrp))
-            if(mess_y_n(3,17," Continue ?"))  maxdiagr += 1000; 
-                         else                   goto label_3;
+          {  if(mess_y_n(3,17," Continue ?")) maxdiagr += 1000;  else goto label_3;}
       }  
    } 
 label_3: 

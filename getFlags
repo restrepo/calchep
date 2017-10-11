@@ -1,106 +1,114 @@
 :
 
+findMAKE()
+{
+if(test -x "`which gmake`") then
+    MAKE=gmake
+else
+    MAKE=make
+fi
+} 
+
+
+findMakeVar()
+{  
+cat >Makefile <<EOF
+all:
+	@echo \$($1)
+EOF
+$MAKE
+}
+
 defaultFlags()
 {
 
-HXll=
+HXll=  
 LX11=-lX11
 SNUM=
+SO=so
 echo UNIX `uname`
 case `uname` in
 
 Linux) CC=gcc
-#      CFLAGS="-fsigned-char -Wstrict-prototypes -Wimplicit  -Wmissing-prototypes -Wunused" 
-       CFLAGS="-fsigned-char"
+       CFLAGS="-g -fsigned-char -Wstrict-prototypes -Wimplicit -Wmissing-prototypes -std=gnu99"
+#       CFLAGS="-fsigned-char -Wall"
        lDL="-rdynamic -ldl"       
-       CFLAGSD=
        SHARED=-shared
        SONAME=
-       FC=g77
+       FC=gfortran
        FFLAGS="-fno-automatic"       
-       lFort=
+       lFort=-lgfortran
+       CXX=g++
+       CXXFLAGS=-g
        RANLIB=ranlib
      ;;
-IRIX)  CC="cc -signed -xansi -fullwarn"
-       FC=f77
-       lFort=-lftn
-       lDL=
-       RANLIB=ranlib
-     ;;
-IRIX64)CC="cc -signed -xansi -fullwarn"
-       FC=f77
-       lFort=-lftn
-       lDL=
-       RANLIB=ranlib
-     ;;
-HP-UX) CC="cc -Ae -D_HPUX_SOURCE "
-       FC="f77 +ppu"
-       lFort="-lcl -lisamstub -lc"
-       lDL="-ldld -Wl,-E"
-       RANLIB=ranlib
-     ;;
+
 OSF1)  CC=cc
-       CFLAGS="-std1 -ieee" 
+       CFLAGS="-g -std1 -ieee -std=gnu99" 
        FC=f77
        FFLAGS="-O0 -fpe2" 
        FFLAGSD=
-       SONAME=-soname
+       SONAME="-soname "
        SHARED=-shared
        lFort=-lfor
        lDL=
+       CXX=c++
+       CXXFLAGS=-g
        RANLIB=ranlib
      ;;
 SunOS) CC=cc
-       CFLAGS=
-       CFLAGSD=
+       CFLAGS=-g -std=gnu99
        SHARED=-G
        SONAME=
        FC=f77
        FFLAGS=
        lFort="-lF77 -lM77 -lsunmath"
        lDL=-ldl
+       CXX=c++
+       CXXFLAGS=-g
        RANLIB=ranlib
      ;;
 Darwin)CC=gcc
-       CFLAGS=-fsigned-char
+       CFLAGS="-g -fsigned-char -std=gnu99"
        lDL=-ldl
-       CFLAGSD=-dynamic
        SHARED=-dynamiclib
-       SONAME=
+       SONAME="-install_name "
        FC=gfortran
        FFLAGS= 
        lFort="-L/sw/lib  -lgfortran"
+       CXX=g++
+       CXXFLAGS=-g
        RANLIB="ranlib -c"
      ;;
 CYGWIN*)
        CC=gcc
-       CFLAGS=-fsigned-char
+       CFLAGS="-g -fsigned-char -std=gnu99"
        lDL=
-       CFLAGSD=
        SHARED=-shared
        SONAME=
        SO=dll
        FC=g77
        FFLAGS=-fno-automatic 
        lFort=-lg2c
+       CXX=g++
+       CXXFLAGS=-g
        RANLIB="ranlib"
      ;;
 
+
    *) CC=cc
+      CFLAGS="-g -std=gnu99" 
       FC=f77
       lFort=
       lDL=
+      SO=so
       RANLIB=ranlib
+      CXX=c++ 
+      CXXFLAGS=-g
       echo Unknown Unix  
      ;;
 esac
-if(test -x "`which gmake`") then
-    MAKE=gmake
-else
-    echo OK
-    MAKE=make
-fi
- 
+
 }
 
 writeFlags()
@@ -108,7 +116,10 @@ writeFlags()
 echo "# C compiler
 CC=\"$CC\" 
 
-# Flags for C compiler
+# Flags for C compiler 
+# Use -D_LONG_ to implement 'long double' for numerical calculations with gcc compiler. 
+# Use '-Qoption,cpp,--extended_float_type  -D_QUAD_'  flag for icc compiler to works
+# with quadrouple precision  
 CFLAGS=\"$CFLAGS\"
 
 # Disposition of header files for X11 
@@ -120,14 +131,14 @@ LX11=\"$LX11\"
 # Library which supports runtime  loading of shared libraries  
 lDL=\"$lDL\"
 
-# Addition flags needed to compile objet files for shared libraries
-CFLAGSD=\"$CFLAGSD\"
-
 # C Flag which forces compilation of  shared library 
 SHARED=\"$SHARED\"
 
 # FLAG to define  "shared_object_name" for shared library
-SONAME=$SONAME
+SONAME=\"$SONAME\"
+
+#Suffix for shared libraies
+SO=$SO
 
 
 # Flag which defines type of numbers used in symbolic calculations 
@@ -135,46 +146,54 @@ SONAME=$SONAME
 SNUM=$SNUM
 
 # Fortran compiler
-FC=\"$FC\"   
+FC=\"$FC\"
 
 # Flags for Fortran compiler
 FFLAGS=\"$FFLAGS\"
 
+# Special Fortran libraries one has to pass to C linker
+lFort=\"$lFort\"
 
+# C++ compiler
+CXX=\"$CXX\"
+
+CXXFLAGS=\"$CXXFLAGS\"
 
 # RANLIB 
 RANLIB=\"$RANLIB\"
 
-# MAKE
+# MAKE 
 MAKE=$MAKE        
 
-export CC CFLAGS CFLAGSD lDL LX11 SHARED SONAME SO FC FFLAGS RANLIB  MAKE 
+export CC CFLAGS  lDL LX11 SHARED SONAME SO FC FFLAGS RANLIB CXX CXXFLAGS lFort MAKE
 " > ../FlagsForSh    
-
 }
 
-#MAKE 
+#MAKE
 writeFlagsForMake()
 {
-
 echo "# compiler Flags
 CC = $CC
 CFLAGS = $CFLAGS
 HX11 = $HX11
 LX11 = $LX11
 lDL = $lDL 
-CFLAGSD = $CFLAGSD
 SHARED = $SHARED
-SONAME = $SONAME
+SONAME = "$SONAME"
+SO = $SO
 SNUM = $SNUM
 
 FC = $FC 
-FFLAGS = $FFLAGS 
+FFLAGS = $FFLAGS
+RANLIB = $RANLIB
+lFort = $lFort
+CXX=$CXX    
+CXXFLAGS = $CXXFLAGS 
+CALCHEP = `pwd`
+UNAME = `uname`
+export CC CFLAGS  lDL LX11 SHARED SONAME SO FC FFLAGS RANLIB CXX CXXFLAGS lFort
 
-RANLIB = $RANLIB  
-export CC CFLAGS CFLAGSD lDL LX11 SHARED SONAME SO FC FFLAGS RANLIB 
-
-" > ../FlagsForMake
+" > FlagsForMake
 }
 
 
@@ -322,6 +341,7 @@ C     TEST
       WRITE(*,*) 'test program'
       END
 EOF
+
   if(test ! -x "`which $FC`") then 
      echo Can not find Fortran compiler  $FC
  
@@ -376,7 +396,35 @@ EOF
   return 0
 }
 
+checklFort()
+{
+cat >test.f <<EOF
+C     TEST     
+      INTEGER FUNCTION XXXX()
+      WRITE(*,*) 'test program'
+      XXXX=5
+      RETURN
+      END
+EOF
 
+$FC $FFLAGS -c test.f  1>/dev/null 2>/dev/null
+
+cat >ctest.c <<EOF
+extern int xxxx(void);
+int main(void) {  return xxxx_(); }
+EOF
+
+$CC $CFLAGS -o a.out ctest.c test.o  $lFort 1>/dev/null 2>/dev/null
+if(test $? -ne 0) then
+   echo Problem with C-FORTRAN linking. Not fatal.
+   echo Find the name and disposition of Fortran libraries and fill
+   echo "    lFort=\" -L <disposition> -l<name> \""
+   echo in FlagsForSh
+   lFort=
+   return 1
+fi
+return 0  
+}
 
 checkNUM()
 { 
@@ -395,7 +443,7 @@ if(test $SNUM = "-DNUM_LONG_LONG" -o $SNUM = "OFF"  ) then
   else
     if(test $SNUM = "OFF") then
     ./a.out
-      if(test $? -ge 8) then
+      if(test $? -ge 8) then 
         SNUM=-DNUM_LONG_LONG
       fi
     fi
@@ -423,28 +471,111 @@ fi
 writeFlags
 }
 
+testSO()
+{
+cat >test.c<<EOF
+#include<stdlib.h>
+double *Q=NULL;
+void xxx(void)
+{ int i;
+  Q=(double*) realloc(Q,10*sizeof(double));
+  for(i=0;i<10;i++) Q[i]=0;
+}
+EOF
+                                                                                
+$CC $CFLAGS $SHARED -o test.$SO  test.c  1>/dev/null 2>/dev/null
+if(test $? -ne 0) then
+  echo can not generate shared  library
+#  if(test $CC = gcc) then 
+     echo tring to add -fPIC option 
+     CFLAGS="$CFLAGS -fPIC"
+     CXXFLAGS="$CXXFLAGS -fPIC"
+     $CC $CFLAGS $SHARED -o test.$SO  test.c  1>/dev/null 2>/dev/null
+     if(test $? -ne 0) then
+       echo .. it does not help
+       writeFlags 
+       return 1
+     else 
+       writeFlags
+     fi   
+#  fi
+fi   
+
+echo : shared liblary generation OK
+return 0
+}
 
 
-
+checkFCNTL()
+{
+cat >test.c<<EOF
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+                                                                                
+int main(void)
+{
+int fd;
+  struct flock myLock;
+  myLock.l_type= F_WRLCK;       /*  F_RDLCK ||  F_WRLCK || F_UNLCK */
+  myLock.l_whence=SEEK_SET;
+  myLock.l_start=0;
+  myLock.l_len=10; 
+                                                                                
+fd=open("myLock",O_WRONLY|O_CREAT,0666);
+if(fd<0) return fd;
+return fcntl(fd, F_GETLK, &myLock);
+                                                                              
+}
+EOF
+                                                                                
+$CC -o a.out $CFLAGS test.c
+if(test $? -eq 0) then
+   ./a.out
+    if(test $? -eq 0) then
+       echo FCNTL OK
+       return 0
+    fi
+fi
+return 1
+}
 
 #==================== Starting point ============
-rm -f CMessage
 rm -rf fTest
 mkdir fTest
 cd fTest
 
+
 if(test -r ../FlagsForSh) then
   . ../FlagsForSh
+
+#if(test -z "$LX11") then
+#    LX11=-lX11
+#fi
+
+
 else 
+  findMAKE
+echo MAKE= $MAKE
   defaultFlags
   writeFlags  
 fi
 
-testCC; if(test $? -ne 0  ) then  exit 1; fi
+testCC;  if(test $? -ne 0  ) then  exit 1; fi
+
+testSO;  if(test $? -ne 0  ) then  exit 1; fi
 
 if(test -z "$LX11") then 
-  echo You have empty LX11 paremeter that means that 
+  echo You have empty LX11 parameter that means that 
   echo calchep will be compiled for  "Blind" job only.  
+  echo"
+  If you  would like to use CalcHEP in interactive
+  mode, please, install the following additional package:
+    libX11-devel    for Fedora/Scientific, Darwin(MAC)
+    libX11-dev      for Ubuntu/Debian
+    xorg-x11-devel  for SUSE"
+
 else 
  testX11
  if(test $? -ne 0) then 
@@ -460,14 +591,14 @@ fi
 
 checkNUM
 
-testFC
+# FORTRAN COMPILER
+
+testFC;  if(test $? -ne 0 ) then exit 1; fi
+if(test -n "$FC" ) then checklFort; fi
 
 writeFlags
-writeFlagsForMake
-
 cd ..
-rm -fr fTest 
-echo >> CMessage
-echo  Calchep was compiled sucessfuly and can be started. >> CMessage
+rm -fr fTest
 
+writeFlagsForMake
 exit 0

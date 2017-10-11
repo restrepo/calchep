@@ -7,33 +7,30 @@
 #include "num_serv.h"
 #include "simpson.h"
 #include "cs_22.h"
-#include "const.h"
 #include "interface.h"
 #include "subproc.h"
 #include "mc_menu.h"
 #include "err_code.h"
 #include "mc_menu.h"
-#include "cut.h"
+//#include "cut.h"
 #include "kinaux.h"
 #include "param.h"
 #include "alphas2.h"
-#include "kinematic.h"
-#include "LDtype.h"
+#include "usrfun.h"
+#include "nType.h"
+#include "rw_sess.h"
+
+static REAL pvect4[16];
 
 static double         totcoef;
-static double         cos1, cos2;
+static double         cos1=-0.999, cos2=0.999;
 static double         eps=0.001;
 static int            recalc;
 static char           procname[STRSIZ];
 
-static double pmass[4];
-static double pRestIn,pRestOut;
+static REAL pmass[4];
+static REAL pRestIn,pRestOut;
 
-static Real pmassL[4];
-static Real pRestInL,pRestOutL;
-
-
-double Eps;
 
 static void  infotext(void)
 {
@@ -48,7 +45,7 @@ static void  infotext(void)
 
 
 static void  writeinformation(void)
-{  double Pcm=readVar(0);
+{  double Pcm=Pcm22;
    scrcolor(FGmain,BGmain);
    goto_xy(18,4); print("%12f [GeV]    ",Pcm);   /*  Energy  */
    goto_xy(18,5); print("%8.6f",cos1);
@@ -58,57 +55,12 @@ static void  writeinformation(void)
 
 static void  calccoef(void)
 {int i;
+   REAL  lambda12, lambda34, s_, ms, mdiff, sqrt_S;
+   
+   pRestIn=Pcm22;
    err_code = 0;
-
-   if(hPrec_int)
-   {
-#include"LDmath.h"   
-     Real lambda12, lambda34, s_, ms, mdiff, sqrt_S;
-   
-   pRestInL=readVar(0);
-
-   
-   for(i=0;i<4;i++) 
-   { pinf_int(Nsub,i+1,pmassL+i,NULL);
-     pmass[i]=pmassL[i];
-   }  
-   
-   sqrt_S=sqrt(pmassL[0]*pmassL[0]+pRestInL*pRestInL)
-         +sqrt(pmassL[1]*pmassL[1]+pRestInL*pRestInL);    
-
-   s_=sqrt_S*sqrt_S; 
-   
-   lambda12=2*sqrt_S*pRestInL;
-   
-   ms = pmassL[2] + pmassL[3];
-   if (ms >= sqrt_S) goto errorexit;
-   mdiff=pmassL[2] - pmassL[3];
-   lambda34 = sqrt((s_ - ms*ms) * (s_ - mdiff*mdiff));
-
-   pRestOutL=lambda34/(2*sqrt_S);
-   
-   totcoef = 3.8937966E8 * lambda34 /(32.0 * M_PI * lambda12 * s_);
-
-   for(i=0;i<16;i++)pvectL[i]=0;
-   
-   pvectL[3] = pRestInL; 
-   pvectL[7] =-pRestInL;
-   pvectL[0] = sqrt(pRestInL* pRestInL  + pmassL[0]*pmassL[0]);
-   pvectL[4] = sqrt(pRestInL* pRestInL  + pmassL[1]*pmassL[1]);
-   pvectL[8] = sqrt(pRestOutL*pRestOutL + pmassL[2]*pmassL[2]);
-   pvectL[12]= sqrt(pRestOutL*pRestOutL + pmassL[3]*pmassL[3]);
-   for(i=0;i<16;i++) pvect[i]=pvectL[i];
-#include"noLDmath.h"   
-   }else
-   {
-   double  lambda12, lambda34, s_, ms, mdiff;
-   double sqrt_S;
-   
-   pRestIn=readVar(0);
-
    
    for(i=0;i<4;i++) pinf_int(Nsub,i+1,pmass+i,NULL);
-   
    
    sqrt_S=sqrt(pmass[0]*pmass[0]+pRestIn*pRestIn)
          +sqrt(pmass[1]*pmass[1]+pRestIn*pRestIn);    
@@ -126,17 +78,15 @@ static void  calccoef(void)
    
    totcoef = 3.8937966E8 * lambda34 /(32.0 * M_PI * lambda12 * s_);
 
-   for(i=0;i<16;i++)pvect[i]=0;
+   for(i=0;i<16;i++)pvect4[i]=0;
    
-   pvect[3] = pRestIn; 
-   pvect[7] =-pRestIn;
-   pvect[0] = sqrt(pRestIn*pRestIn + pmass[0]*pmass[0]);
-   pvect[4] = sqrt(pRestIn*pRestIn + pmass[1]*pmass[1]);
-   pvect[8] = sqrt(pRestOut*pRestOut + pmass[2]*pmass[2]);
-   pvect[12]= sqrt(pRestOut*pRestOut + pmass[3]*pmass[3]);
-   }
-   
-   
+   pvect4[3] = pRestIn; 
+   pvect4[7] =-pRestIn;
+   pvect4[0] = sqrt(pRestIn*pRestIn + pmass[0]*pmass[0]);
+   pvect4[4] = sqrt(pRestIn*pRestIn + pmass[1]*pmass[1]);
+   pvect4[8] = sqrt(pRestOut*pRestOut + pmass[2]*pmass[2]);
+   pvect4[12]= sqrt(pRestOut*pRestOut + pmass[3]*pmass[3]);
+
    err_code = 0;
    return;
 
@@ -147,35 +97,25 @@ errorexit:
 
 static void  calcscalars(double  cos_f)
 {
-if(hPrec_int)
-{
-#include"LDmath.h"
-   Real sin_f=sqrt(fabs((1-cos_f)*(1+cos_f)));
-   pvectL[11]=pRestOutL*cos_f;
-   pvectL[15]=-pvectL[11];
-   pvectL[10]=pRestOutL*sin_f;
-   pvectL[14]=-pvectL[10];
-#include"noLDmath.h"   
-} else
-{
-   double sin_f=sqrt(fabs((1-cos_f)*(1+cos_f)));
-   pvect[11]=pRestOut*cos_f;
-   pvect[15]=-pvect[11];
-   pvect[10]=pRestOut*sin_f;
-   pvect[14]=-pvect[10];
-}   
+   REAL sin_f=sqrt(fabs((1-cos_f)*(1+cos_f)));
+   pvect4[11]=pRestOut*cos_f;
+   pvect4[15]=-pvect4[11];
+   pvect4[10]=pRestOut*sin_f;
+   pvect4[14]=-pvect4[10];
 } 
 
 
 static double  cross_section(double  x)
-{ double  r;
+{ double  r,GG,qF1,qF2,qR,qS,pvect4_[16];
+  int i; 
+  
   calcscalars(x);
-  alf_(Scale()); 
-if(hPrec_int)  
-   r = sqme_int(Nsub,pvectL,&err_code);
-else
-   r = sqme_int(Nsub,pvect,&err_code); 
-  r*=calcCutFactor();  
+  for(i=0;i<16;i++) pvect4_[i]=pvect4[i];
+ 
+  Scale(Nsub,pvect4_,&qR,&qF1,&qF2,&qS);
+  GG=sqrt(4*M_PI*alpha_2(qR));
+      
+  r = sqme_int( Nsub,GG,pvect4,NULL,&err_code)*usrFF(2,2,pvect4_,p_names,p_codes);
   if (err_code != 0) return 0; 
   return r * totcoef; 
 } 
@@ -188,10 +128,10 @@ static int fillseq(int  n,double * f)
  double      step;
  
    err_code = 0;
-   step = (cos2 - cos1) / (n - 1);
+   step = (cos2 - cos1)/n;
    for (i = 0; i < n; i++)
    {
-      f[i]=cross_section(cos1+i*step);
+      f[i]=cross_section(cos1+(i+0.5)*step);
       if (err_code > 1)  return 0;
    }
    return 1; 
@@ -200,7 +140,7 @@ static int fillseq(int  n,double * f)
 
 static void  drawgraph(void)
 {
- int         n=101;
+ int         n=100;
  double  f[202]; 
    
   calccoef();
@@ -229,7 +169,7 @@ static void  drawgraph(void)
 static double  totcs(void)
 {  double  int_val = 0.0;
    calccoef();
-   if (err_code == 0) int_val=gauss345(cross_section,cos1,cos2,eps);
+   if (err_code == 0) int_val=gauss345(cross_section,cos1,cos2,eps,&err_code);
    return int_val;
 }
 
@@ -245,7 +185,7 @@ static void  total_cs(void)
    calccoef(); 
    if (err_code ) print("incorrect"); else 
    {
-      totcs= gauss345(cross_section, cos1,cos2,eps); 
+      totcs= gauss345(cross_section, cos1,cos2,eps,&err_code); 
       if (err_code<=0 ) { print("%-G [pb]",totcs);} 
       if(err_code==1)  print("?");
    }
@@ -269,22 +209,19 @@ static double vtotcs(void)
                   
 
 
-int  cs_numcalc(double P1,double P2)
+int  cs_numcalc(double Pcm)
 {
    int  k,l;
    void * pscr0=NULL;
    void * pscr = NULL;
-   double Pcm=(P1+P2)/2;
     
    get_text(1,3,60,11,&pscr0); 
    k=Nsub;   
    sprintf(procname,"%s,%s ->%s,%s",pinf_int(k,1,NULL,NULL),
            pinf_int(k,2,NULL,NULL),pinf_int(k,3,NULL,NULL),pinf_int(k,4,NULL,NULL));              
-   writeVar(0,Pcm);
-   
-    cos1=-0.999;
-    cos2= 0.999;
-      
+
+   Pcm22=Pcm;
+
    infotext();
    writeinformation();
    k = 1;
@@ -300,11 +237,13 @@ int  cs_numcalc(double P1,double P2)
          " Angular dependence     "
          " Parameter dependence   "
          " sigma*v plots          ";
+
       if (recalc)
       {  
          total_cs();
          recalc = 0;
-        if (err_code) errormessage();                  
+        if (err_code) errormessage();
+        if(err_code==3) err_code=0;                  
       }
 
       improveStr(menuTxt,"cosmin","%.6f",cos1);

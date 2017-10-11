@@ -3,8 +3,8 @@
 
 struct mouse_info_struct mouse_info;
 void (*xw_expose)(int x,int y, int width,int height) =NULL; 
-void crt0_start(char * window_name,char * icon_file,char * ini_file,
-                         int*colors, void(*error)(void)){  }     
+int  crt0_start(char * window_name,char * icon_file,char * ini_file,
+                         int*colors, void(*error)(void)){return 1;}     
 void  crt0_finish(void){}
 void  crt0_puts(int xc,int yc, int color,int bkcolor,char* s){ }
 int crt0_keypressed(void) { return 0; }

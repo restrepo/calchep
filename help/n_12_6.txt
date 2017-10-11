@@ -1,4 +1,4 @@
-5 5 45
+5 5 45 8
   Calculates total width as a function of
 the chosen parameter at a number of points
 defined by the user.  The range of the

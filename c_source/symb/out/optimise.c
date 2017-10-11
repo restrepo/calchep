@@ -10,10 +10,10 @@
 #include "out_serv.h"
 #include "pvars.h"
 #include "procvar.h"
-#include "dpMonoms.h"
+
 #include "optimise.h"
 
- infoptr info,for_info;
+ infoptr info;
  int    firstVar;
 
 static infoptr infoone;
@@ -57,7 +57,6 @@ void  initinfo(void)
    info->ival = 1;
    info->consttype = numb;
    infoone=info;
-   for_info=NULL;
 }
 
 int      equalexpr(varptr v1,varptr v2)
@@ -74,22 +73,6 @@ int      equalexpr(varptr v1,varptr v2)
    }
    return 1;
 }
-
-int  for_equalexpr(varptr v1,varptr v2)
-{
-   while (v1 != NULL || v2 != NULL)
-   {
-      if (v1 == NULL || v2 == NULL) return 0;
-      if (v1->ncoef == v2->ncoef &&
-      int_strcmp(v1->vars,v2->vars) == 0)
-      {  v1 = v1->next;
-         v2 = v2->next;
-      }
-      else return 0;
-   }
-   return 1;
-}
-
 
 static void  readmonom(int * varstr,int * conststr,NUM_TYPE * numc)
 {  
@@ -171,58 +154,6 @@ static int addtmpconst(varptr tmpconst,int* s,infoptr* coeff )
    return 1;
 } /*  AddTmpConst */
 
-static int for_addtmpconst(varptr tmpconst,NUM_TYPE * F, infoptr* coeff)
-{
-   varptr  q; 
-   NUM_TYPE num1;
-   int numS,count;
- 
-   if(tmpconst->next==NULL && int_strlen(tmpconst->vars)<2) *F=1;
-   else
-   {    
-     num1=tmpconst->ncoef;
-     if(num1<0) {num1=-num1; numS=-1;} else  numS=1;
-  
-     for(q=tmpconst->next;q;q=q->next)
-     {  NUM_TYPE c, num2;
-        num2=q->ncoef >0 ? q->ncoef: -q->ncoef;
-        if (num2 > num1)  { c = num1; num1 = num2; num2 = c; }
-        while (num2 != 0) { c = num2; num2 = REST(num1,num2); num1 = c; }
-     }
-     num1*=-numS;
-     for(q=tmpconst;q;q=q->next) q->ncoef=DIV(q->ncoef,num1);
-     *F=num1;
-     
-     if( (tmpconst->next ) || int_strlen( tmpconst->vars)>1 )
-     {
-       for( *coeff = for_info,count=0; *coeff; *coeff = (*coeff)->next)
-       if ((*coeff)->consttype == expr)
-       { count++;
-         if(for_equalexpr((*coeff)->const_,tmpconst))
-         {  
-           (*coeff)->nused++;
-           return 0;
-         } 
-       }
-     }
-   } 
-   *coeff = (infoptr)getmem_(sizeof(struct inforec));
-   (*coeff)->next = for_info;
-   (*coeff)->const_ = tmpconst;
-   for(q=tmpconst;q;q=q->next) 
-   { char s;
-     infoptr coeff;
-     addnum(q->ncoef,&s,&coeff);
-     q->sgn=s;
-     q->coef=coeff;
-   }        
-   (*coeff)->consttype = expr;
-   (*coeff)->name[0]=0;
-   (*coeff)->nused=1;
-   for_info = *coeff;
-   return 1;
-}
-
 
 void  readpolynom(varptr* expr_)
 {      
@@ -277,52 +208,8 @@ void  readpolynom(varptr* expr_)
    }
 	if (! addtmpconst(tmpconst,&((*expr_)->sgn),&((*expr_)->coef)) )
 	  release_(&tmpmark);
-} 
+}   /* ReadPolynom */
 
-
-void  for_readpolynom(varptr* expr_)
-{      
-   int  varstr[STRSIZ], conststr[STRSIZ];
-   NUM_TYPE      n;
-   void*         pntr;
-   varptr       tmpconst;
-   
-   readmonom(varstr,conststr,&n);
-   if(!n) { *expr_ = NULL;  return;}
-
-   *expr_ = (varptr)getmem_(minvarrec + sizeof(int)*int_strlen(varstr));
-   (*expr_)->next = NULL;
-   int_strcpy((*expr_)->vars,varstr);
-
-   tmpconst = (varptr)getmem_(minvarrec + sizeof(int)*int_strlen(conststr));
-   tmpconst->next = NULL;
-   int_strcpy(tmpconst->vars,conststr);
-   tmpconst->ncoef=n;
-
-   while(1)
-   {
-      readmonom(varstr,conststr,&n);
-      if(!n) break;
-      if (int_strcmp( varstr,(*expr_)->vars) != 0)
-      {     
-         for_addtmpconst(tmpconst, &((*expr_)->ncoef), &((*expr_)->coef));
-                      
-         pntr = (void*)(*expr_);
-         *expr_ = (varptr)getmem_(minvarrec + sizeof(int)*int_strlen(varstr));
-         (*expr_)->next = (varptr)pntr;
-         int_strcpy((*expr_)->vars,varstr);
-         pntr = NULL;
-      }
-      else  pntr = (void*)tmpconst;
-      
-      tmpconst = (varptr)getmem_(minvarrec + sizeof(int)*int_strlen(conststr));
-      tmpconst->next = (varptr)pntr;
-      int_strcpy(tmpconst->vars,conststr);
-      tmpconst->ncoef = n;
-   }
-   
-   for_addtmpconst(tmpconst,&((*expr_)->ncoef), &((*expr_)->coef));
-} 
 
 static void  findmaxvar(varptr ex,unsigned* n,int* ch,int * power)
 { int   *   nterms;

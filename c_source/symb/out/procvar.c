@@ -5,7 +5,7 @@
 #include "syst2.h"
 #include "physics.h"
 #include "parser.h"
-#include "pvars.h"
+//#include "pvars.h"
 #include "s_files.h"
 #include "out_serv.h"
 #include "procvar.h"
@@ -22,14 +22,13 @@ static void * PP=(void *)"PP";
 static void *  rd_hiddenVars(char* s)
 { int l;
   if (isdigit(*s)) return PP;
-  for(l=0;l<=nmodelvar;l++)
-     {if (!strcmp(modelvars[l].varname,s)) {vararr[l].used=1; break;}}
+  for(l=0;l<=nmodelvar;l++) if (!strcmp(modelvars[l].varname,s)) { vararr[l].used=1; break;}
   return PP;
 }
 
 static void * act_hiddenVars(char * ch,int n,void ** mm1) {  return PP; }
 
-int initvararray(int nsub, char key, int width)
+int initvararray(int nsub, char key, polyvars * vardef_ext)
 {  int i,j,k,kk,l; 
    catrec    cr;
    FILE * catalog_;   
@@ -50,26 +49,20 @@ int initvararray(int nsub, char key, int width)
       vararr[k].used = 0;
    }
    sprintf(vararr[0].alias,"0");
+         
    
-   for(k=1;k<=nmodelvar;k++) vararr[k].used=modelvars[k].need;
-      
+   
+   if(vardef_ext==NULL) 
+   {  
    vardef=&allVars;
    
-   if(width &1) catalog_=fopen(CATALOG_NAME,"rb"); else catalog_=NULL;
+   catalog_=fopen(CATALOG_NAME,"rb");
    
-   if(catalog_)while (FREAD1(cr,catalog_))
+   if(catalog_)while (FREAD1(cr,catalog_)) if(cr.status==1)
    {  
-      if(!nsub || cr.nsub_ == nsub)
+      if(!nsub || cr.nsub_ == nsub )
       {
-         whichArchive(cr.nFile,'r',0); 
-/*         if(ArcNum!=0 && ArcNum!= cr.nFile) fclose(archiv);
-         if(ArcNum==0 || ArcNum!= cr.nFile)
-         {  char archivName[40];
-            ArcNum=cr.nFile; 
-            sprintf(archivName,ARCHIV_NAME,ArcNum);
-            archiv=fopen(archivName,"rb");
-          }
-*/          
+         whichArchive(cr.nFile,'r'); 
          seekArchiv(cr.factpos);
          readvardef(archiv);
          for(l=0;l<vardef->nvar;l++) vararr[vardef->vars[l].num].used=1;
@@ -87,46 +80,16 @@ int initvararray(int nsub, char key, int width)
          clearvardef();
       }
    }
-/*   if(ArcNum) fclose(archiv); */
-   whichArchive(0,0,0);
+   whichArchive(0,0);
    if(catalog_) fclose(catalog_);
    ArcNum=0;
-
-   if(width&2)catalog_=fopen(CATALOG_NAME "2","rb"); else catalog_=NULL;
-   if(catalog_) while(FREAD1(cr,catalog_))
-   {
-     if(!nsub || cr.nsub_ == nsub)
-     {  
-        whichArchive(cr.nFile,'r',1);
-/*
-        if(ArcNum!=0 && ArcNum!= cr.nFile) fclose(archiv);
-        if(ArcNum==0 || ArcNum!= cr.nFile)
-        {  char archivName[40];
-           ArcNum=cr.nFile; 
-           sprintf(archivName,ARCHIV_NAME "2",ArcNum);
-           archiv=fopen(archivName,"rb");
-         } 
-*/                    
-        fseek(archiv,cr.factpos,SEEK_SET);
-        readvardef(archiv);
-        for(l=0;l<vardef->nvar;l++) vararr[vardef->vars[l].num].used=1;
-        clearvardef();
-        fseek(archiv,cr.rnumpos,SEEK_SET);
-        readvardef(archiv);
-        for(l=0;l<vardef->nvar;l++) vararr[vardef->vars[l].num].used=1;
-        clearvardef();
-     }  
-   }
-/*   if(ArcNum) fclose(archiv);  */
-   whichArchive(0,0,0);
-   if(catalog_)fclose(catalog_);
-  
+   } else for(i=0;i<vardef_ext->nvar;i++) vararr[vardef_ext->vars[i].num].used=1;  
    for (k = nmodelvar ; k >=0; k--) 
-   if( vararr[k].used && modelvars[k].func)
+   if( vararr[k].used && modelvars[k].func && (key!='c' || (k>nCommonVars) && modelvars[k].pub==0)     )
        readExpression(modelvars[k].func,rd_hiddenVars,act_hiddenVars,NULL); 
 
    kk=0;
-   for (i = 2; i <= nin+nout; i++)
+   for (i = 2; i <= MAXINOUT; i++)
    for (j = 1; j <= i - 1; j++)
    { k=scalarProductPos(i,j); 
      switch(key)
@@ -148,54 +111,49 @@ int initvararray(int nsub, char key, int width)
      switch(key)
      { case 'R':
        case 'F':
-       case 'M': sprintf( vararr[k].alias, "Helicity%d", i);  break;
+       case 'M': sprintf( vararr[k].alias, "Helicity%d"  , i ); break;
        case 'c': sprintf( vararr[k].alias, "Helicity[%d]",i-1); break;
-       case 'f': sprintf( vararr[k].alias, "Helicity(%d)",i); break;
+       case 'f': sprintf( vararr[k].alias, "Helicity(%d)",i  ); break;
      } 
      vararr[k].used = 1;
    }
-   for(i=1;i<=2;i++)
-   { k=i+nmodelvar+3; 
-     switch(key)
-     { case 'R':
-       case 'F':
-       case 'M': sprintf( vararr[k].alias, "HelicityN%d", i);  break;
-       case 'c': sprintf( vararr[k].alias, "HelicityN[%d]",i-1); break;
-       case 'f': sprintf( vararr[k].alias, "HelicityN(%d)",i); break;
-     } 
-     vararr[k].used = 1;
-   }
-
+   k=nmodelvar+4;
+    switch(key)
+    { case 'R':
+      case 'F': sprintf( vararr[k].alias, "(1/p1.p2)"    );  break; 
+      case 'M': sprintf( vararr[k].alias, "(1/SC[p1,p2])");  break;
+      case 'c': sprintf( vararr[k].alias, "N_p1p2_"      );  break;
+    }                                      
+    vararr[k].used = 1;                                      
       
-   nvar=0;
-   for(k=0;k<=nmodelvar;k++) 
-   if (vararr[k].used && (!modelvars[k].func && !modelvars[k].pwidth))
-   {  vararr[k].tmpvalue = modelvars[k].varvalue;
+   nvar=0; nfunc=0;
    
-      switch(key)
-      {
-          case 'R':
-          case 'F':
-          case 'M':  strcpy( vararr[k].alias, modelvars[k].varname);break;
-          case 'c':  sprintf(vararr[k].alias,"V[%d]",++nvar); 
-                     vararr[k].num=nvar; break;
-          case 'f':  sprintf(vararr[k].alias,"A(%d)",++nvar); break;
-      }
+   if(key=='F' ||key=='R'||key== 'M') for(k=0;k<=nmodelvar;k++) strcpy(vararr[k].alias, modelvars[k].varname);
+   else     
+   if(key=='c')
+   {   
+       for(k=0;k<4;k++)
+       {
+         if(strcmp(modelvars[k].varname,"i")==0) strcpy(vararr[k].alias,"I");
+         else  if(strcmp(modelvars[k].varname,"pi")==0) strcpy(vararr[k].alias,"M_PI"); 
+         else  if(strcmp(modelvars[k].varname,"Sqrt2")==0) strcpy(vararr[k].alias,"M_SQRT2");
+         vararr[k].used=0;
+       }
+       for(k=4;k<nmodelvar;k++) if (vararr[k].used && ( k<=nCommonVars || modelvars[k].pub) )
+       {  
+          sprintf(vararr[k].alias,"V[%d]",++nvar);
+          vararr[k].num=nvar;
+       }
+       for(k=nCommonVars+1;k<nmodelvar;k++)   if (vararr[k].used && ( modelvars[k].pub==0))
+       { sprintf(vararr[k].alias,"V[%d]",++nfunc+nvar); 
+         vararr[k].num=nfunc+nvar;
+       }
+       k=nmodelvar;
+       strcpy(vararr[k].alias,"GG");
+       vararr[k].used=0; 
+       vararr[k].num=0;
+       modelvars[k].pub=0;
    }
-   nfunc=0;
-   for(k=0;k<=nmodelvar;k++) 
-   if (vararr[k].used && (modelvars[k].func ||modelvars[k].pwidth))
-   {  vararr[k].tmpvalue = modelvars[k].varvalue;
-      switch(key)
-      {
-          case 'R':
-          case 'F':
-          case 'M':  strcpy( vararr[k].alias, modelvars[k].varname);break;
-          case 'c':  sprintf(vararr[k].alias,"V[%d]",++nfunc+nvar); 
-                     vararr[k].num=nfunc+nvar; break;
-          case 'f':  sprintf(vararr[k].alias,"A(%d)", ++nfunc+nvar); break;
-      }
-   }
-
-   return 1;
+   
+   return 0;
 } 

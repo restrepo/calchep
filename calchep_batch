@@ -1,17 +1,26 @@
 
+if(test -n "$LHAPDFPATH") then
+  export  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$$LHAPDFPATH
+fi
+
+
 export CALCHEP
 
-if(test -r lock) then 
-   echo The \"lock\" file in the current directory tells us that CalcHEP
+if(test -r lock.batch) then 
+   echo The \"lock.baatch\" file in the current directory tells us that CalcHEP
    echo already was launched in this directory. See details about  
-   echo the process in the \"lock\" file. If the process indeed was
-   echo finished remove the \"lock\" file to continue.
+   echo the process in the \"lock.batch\" file. If the process indeed was
+   echo finished remove the \"lock.batch\" file to continue.
    exit 1
 fi 
 
-echo host `uname -n` ,  process $$  >lock
+echo host `uname -n` ,  process $$  >lock.batch
+
+WORK=`pwd`
+export WORK
    
-trap "rm -f lock"  0 1 2 3 9 
+
+trap "rm -f lock.batch"  0 1 2 3 9 15 20
 
 if(test $# -eq 0 ) then 
    echo ""

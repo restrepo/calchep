@@ -2,16 +2,16 @@
 #ifndef __4_VERTOR__
 #define __4_VERTOR__
 
-extern Real   pvect[400];
+#include"nType.h"
+extern REAL  vsqrt(REAL a);
+extern REAL  vdot4(int i, int j,REAL*V);
+extern void  vsum4(int i, int j, int k, int isg,REAL*V);
+extern void  eps4(int n1, int n2, int n3, int n4,REAL*V);
+extern void  pvFill(REAL  mass, REAL * mom, int pos,REAL*V); 
+extern void  lvtonv(char * lv, int nin, int nvpos,REAL*V);
+//extern REAL  pvect[400];
 
-extern Real   vdot4(int i, int j);
-extern void   vsum4(int i, int j, int k, int isg);
-extern void   vnull4(int i);
-extern void   eps4(int n1, int n2, int n3, int n4);
-extern void   pvFill(Real mass, Real * mom, int pos); 
-extern void   lvtonv(char * lv, int nin, int nvpos);
-
-extern void incomkin(Real m1, Real m2, Real p1, Real p2,  
-           Real *sqrt_S_,  Real *Pcm_, Real * rapidity_);
-           
+extern void incomkin(REAL m1, REAL m2, REAL p1, REAL p2,  
+           REAL *sqrt_S_, REAL *Pcm_,REAL * rapidity_);
+            
 #endif

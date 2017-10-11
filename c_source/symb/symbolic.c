@@ -2,6 +2,8 @@
  Copyright (C) 1997,2006, Alexander Pukhov
 */
 
+#include <unistd.h>
+#include <signal.h>
 #include "chep_crt.h"
 #include "syst2.h"
 #include "physics.h"
@@ -42,6 +44,8 @@ static symb_data  block[6*MAXINOUT],fermres[maxvert];
 
 static symb_data rnum; 
 static poly factn, factd;
+
+static int onlineWrt=1;
 
 
 static poly  polyfactor(poly p)
@@ -98,9 +102,12 @@ static poly  polyfactor(poly p)
 
 static void memoryInfo_(int used)
 { 
-  goto_xy(14,16);  
-  print("%d Kb    ",used >> 10);
-  if (escpressed()) save_sos(-2);
+  if(onlineWrt)
+  {
+     goto_xy(14,16);  
+     print("%d Kb    ",used >> 10);
+     if (escpressed()) save_sos(-2);
+  }   
 }
 
       
@@ -241,9 +248,7 @@ static void  addscmult( int nSpin )
 
    addvar("Helicity1",1);  
    addvar("Helicity2",1);
-   addvar("HelicityN1",1);  
-   addvar("HelicityN2",1);
-   
+   addvar("N_p1p2_",2);
    sortvar();
    symb_start(vardef->nvar, vardef->vars, nSpin, findMaxIndex(),py);
 
@@ -256,24 +261,13 @@ static void  addscmult( int nSpin )
       delpoly(&(ee.expr.p)); 
    }
 
-   for(i=0;i<vardef->nvar;  i++) 
-   { char *c=strchr(vardef->vars[i].name,'.');
-     if(c) c[0]='_';
-   }
-
    for(n=2; n<=px; n++) for(m=1; m<=n-1; m++)
    {  symb_all mm;
-      sprintf(name,"p%d_p%d",m,n);
+      sprintf(name,"p%d.p%d",m,n);
       mm=rd_symb(name);
       assignsclmult(-m,-n,mm->expr.p);
       delunit(mm);      
    }
-
-   for(i=0;i<vardef->nvar;  i++) 
-   {  char *c=strchr(vardef->vars[i].name,'_');
-      if(c) c[0]='.';
-   }
-              
 
    for(n=px; n<py; n++) for(m=0; m<=n; m++) if((n!=m || n>= nin+nout))
    {  poly qq=NULL;
@@ -445,12 +439,14 @@ static void  multblocks(int v1,int v2,int saveEps)
    ind1=vertinfo[v1-1].ind;
    ind2=vertinfo[v2-1].ind;
 
-   strcpy(messtxt,"Indices contraction   ");
+
+if(onlineWrt)
+{   strcpy(messtxt,"Indices contraction   ");
    for (i = 1; i <= 15; i++) if (set_in(i,ind1) && set_in(i,ind2)) 
            sprintf(messtxt+strlen(messtxt)," L%d",i);
    strcat(messtxt,"           ");
    wrtoperat(messtxt);
-
+}
    msind=set_and(ind1,ind2);
    msind=set_and(msind,setmassindex);
 
@@ -496,7 +492,7 @@ static void  del_pp(poly* p, poly * fact, long * del)
 {
    int      d1, n, i, j;
    unsigned long  z_d, m_d;
-   poly     psub, fact1, ans,q,*pp_powers,**pp_next;
+   poly     psub, fact1, ans,q,*pp_powers;
    long dmax;   
 
    if(*p == NULL) { *fact=plusone(); *del=1; return; }
@@ -512,46 +508,41 @@ static void  del_pp(poly* p, poly * fact, long * del)
       sewpoly(&psub,&q);
    }
 
-   if (nout > 2) multpolyint(&psub,-1);
+   if (nout != 2) multpolyint(&psub,-1);
 
    z_d = vardef->vars[0].zerodeg;
    m_d = vardef->vars[0].maxdeg;
    fact1=polyfactor(*p);
    dmax=((*p)->power[0] / z_d) % m_d;
 
-   pp_powers=m_alloc((dmax+1)*sizeof(poly*));
-   pp_next=m_alloc((dmax+1)*sizeof(poly**));
-   for(i=0;i<=dmax;i++)  pp_next[i]=pp_powers+i;
-/*   pp_powers[0]=plusone();
-   
+   pp_powers=m_alloc((dmax+1)*sizeof(poly));
+   pp_powers[0]=plusone();
    for(i=1;i<=dmax;i++) pp_powers[i]=multtwopoly(pp_powers[i-1],psub);
-*/
+
 
    ans=NULL;
-   for(q=*p;q;)
+   q=*p;
+   while(q)
    {  poly mon=q;
       poly tmp; 
       q=q->next;
+
+      mon->next=NULL;
       d1 = (mon->power[0] / z_d) % m_d;
       mon->power[0] -= d1 * z_d;
-      *pp_next[d1]=mon;
-      pp_next[d1]=&(mon->next);
-   }   
-   for(i=0;i<=dmax;i++) { *pp_next[i]=NULL;  multpolyint(pp_powers+i, 1<< (dmax-i));}
-   
-   for(i=dmax;i>=0;i--)
-   {
-      poly tmp=ans; 
-      ans=multtwopoly(tmp, psub);
-      sewpoly(&ans, pp_powers+i);
-   }      
+      tmp=multtwopoly(pp_powers[d1], mon);
+      multpolyint(&tmp, 1<< (dmax-d1));
+      sewpoly(&ans, &tmp);     
+      delpoly(&mon);
+   }
    q=polyfactor(ans);
    (*fact)=multtwopoly(fact1,q);
    delpoly(&fact1);
     delpoly(&q);
    *del= 1<<dmax;   
-   (*p)=ans; 
-   free(pp_powers); free(pp_next);
+   (*p)=ans;
+   for(i=0;i<=dmax;i++) delpoly(pp_powers +i); 
+   free(pp_powers);
 }
 
 
@@ -619,11 +610,11 @@ static void  transformfactor(rmptr* t_fact,poly mon,long del)
 
 
 /* ----------- end of numeric factors collecting--------------- */
-   sprintf(factortxt,"%d",factnum);
+   sprintf(factortxt,"%ld",factnum);
 
    tf_add = (rmptr)read_rmonom(factortxt);
    mult_rptr(t_fact,&tf_add);
-   sprintf(factortxt,"1/(%d",factdenum);
+   sprintf(factortxt,"1/(%ld",factdenum);
 
    for(v=0; v<vcs.sizet; v++) for(l=0; l<vcs.valence[v]; l++)
    {  edgeinvert *L = &(vcs.vertlist[v][l]);
@@ -754,9 +745,7 @@ static void  formBlocks(void)
            char txt[150];
            int Paux;
            if(P==1) Paux=2; else Paux=1;
-           sprintf(txt,"m%d.m%d+i*HelicityN%d*eps(p%d,p%d,m%d,m%d)",
-           m1,m2, P,P,Paux,m1,m2);           
-            
+           sprintf(txt,"m%d.m%d -N_p1p2_*(m%d.p%d*m%d.p%d+m%d.p%d*m%d.p%d-i*Helicity%d*eps(p%d,p%d,m%d,m%d))",m1,m2, m1,P,m2,Paux,m1,Paux,m2,P, P,P,Paux,m1,m2);           
                                                       
            m=symb_read(txt);
 
@@ -818,7 +807,6 @@ static int  delImageryOne(rmptr   t_factor)
 }
 
 
-
 static int  symbcalc(hlpcsptr ghst)
 {  vcsect       vcs_copy;
    hlpcsptr     gstcopy;
@@ -833,10 +821,13 @@ static int  symbcalc(hlpcsptr ghst)
    poly          mon;
    polyvars *   vardef_s;
 
+if(onlineWrt)
+{  
    goto_xy(14,15); clr_eol();
    wrtoperat("Factors normalization");
+}   
    diagramsrfactors(ghst,&d_facts,&t_fact);
-   wrtoperat("Preparing for calculation");
+if(onlineWrt) wrtoperat("Preparing for calculation");
    vcs_copy = vcs;
    first = 1;
 
@@ -885,13 +876,16 @@ static int  symbcalc(hlpcsptr ghst)
 
    do
    {   
+if(onlineWrt)
+{
       goto_xy(14,15);
       print("%d(of %d)  ",ghst->num,ghst->maxnum);
+}      
       coloringvcs(ghst);
       attachvertexes();
       findReversVert();
       secondVertexReading();
-      wrtoperat("Fermion loops calculation  ");
+if(onlineWrt)      wrtoperat("Fermion loops calculation  ");
 
       calcFermLoops();
 #ifdef STRACE
@@ -980,15 +974,14 @@ for (i = 0;i<=n_vrt-1;i++)
 
    if(symb_iszero(rnum)) return 2;
 
-   if (/*consLow*/ nin+nout<=5 ) del_pp(&(rnum.expr.t->re), &mon,&del);
-       else { mon= polyfactor(rnum.expr.t->re); del=1;} 
-
+   if (/*consLow*/ nin+nout<=5) del_pp(&(rnum.expr.t->re), &mon,&del);
+       else  { mon= polyfactor(rnum.expr.t->re); del=1;}
 
    if(rnum.expr.t->re==NULL) return 2;
 
-   wrtoperat("Total factor calculation");
+if(onlineWrt)   wrtoperat("Total factor calculation");
    transformfactor(&t_fact,mon,del);
-   wrtoperat("Denominator calculation");
+if(onlineWrt)   wrtoperat("Denominator calculation");
    if(factn) return 1; else return 2;
 }
 
@@ -998,6 +991,7 @@ static void  calcproc(csdiagram* csdiagr)
 
    transfdiagr(csdiagr,&vcs);
    cwtarg(&vcs);
+   
    if (vcs.clrnum == 0)  csdiagr->status = 2;
    else
    {
@@ -1015,7 +1009,7 @@ static void  calcproc(csdiagram* csdiagr)
 static void  writestatistic(unsigned noutmemtot,char* txt)
 {
    goto_xy(1,12);  print("%u\n",calcdiag_sq);
-   goto_xy(1,13);  print("%u",noutmemtot);
+   if(noutmemtot) {goto_xy(1,13);  print("%u Out of memory   ",noutmemtot);}
    goto_xy(17,14); print("%4d",ndiagr);
    goto_xy(42,14); print("%s      ",txt);
    goto_xy(14,17); clr_eol();
@@ -1033,15 +1027,17 @@ void  calcallproc(void)
    marktp     heap_beg;
    int        ArcNum;
 
+onlineWrt=1;
    polyvars  varsInfo[3]={ {0,NULL}, {0,NULL}, {0,NULL} };
    
    memerror=heap_is_empty;
    memoryInfo=memoryInfo_;
 
-   goto_xy(1,13);
+   goto_xy(1,14);
    scrcolor(FGmain,BGmain);
 
-   print("0     Out of memory\n");
+//   print("0     Out of memory\n");
+   
    print("current diagram          in (Sub)process \n");
    print("Subdiagram  :\n");
    print("Used memory :%3d Kb       \n",(int)(usedmemory/1000));
@@ -1051,7 +1047,6 @@ void  calcallproc(void)
    print(" Press Esc to halt calculations \n");
    
    scrcolor(Blue,BGmain);
-
    
    catalog = fopen(CATALOG_NAME,"rb");
    if(catalog==NULL)  ArcNum=1; else
@@ -1084,6 +1079,7 @@ void  calcallproc(void)
    menuq=fopen(MENUQ_NAME,"r+b");
    for(nsub=1;nsub<=subproc_sq;nsub++)
    {  int naux;  
+   
       rd_menu(2,nsub,txt,&ndel,&ncalc,&nrest,&nrecord);
       naux = ndel + ncalc + nrest;
       for (ndiagr = 1; ndiagr <= naux; ndiagr++)
@@ -1102,8 +1098,8 @@ void  calcallproc(void)
             {
                wrtoperat("Writing result             ");
                vardef=&(varsInfo[0]);     
-               ArcNum=whichArchive(ArcNum,'w',0); 
-               saveanaliticresult(rnum.expr.t->re,factn,factd, vcs,ArcNum); 
+               ArcNum=whichArchive(ArcNum,'w'); 
+               saveanaliticresult(rnum.expr.t->re,factn,factd, vcs, nrecord+ndiagr-1, ArcNum); 
                newCodes=1;
             }
             release_(&heap_beg);
@@ -1120,10 +1116,382 @@ exi:
 
    fclose(diagrq);
    fclose(menuq);
-   
+
    fclose(catalog);
-   whichArchive(0,0,0);      
+   whichArchive(0,0);      
    scrcolor(FGmain,BGmain);
    clrbox(1,14,70,20);
    memerror=NULL;
 }
+
+static int toFinish=0;
+static void my_signal(int n) { toFinish=1;}
+
+void calcWithFork(int np, int * diag,int fi)
+{  
+   csdiagram  csd;
+   unsigned   noutmemtot;
+   shortstr   txt;
+   marktp     heap_beg;
+   int        ArcNum;
+   int k;
+   char ctlgName[50];
+
+   struct sigaction new_action;
+   
+   if(diag[0]<0) return;
+onlineWrt=0;
+toFinish=0;
+   new_action.sa_handler = my_signal;
+   sigemptyset (&new_action.sa_mask);
+   new_action.sa_flags = 0;
+   sigaction (SIGUSR1, &new_action, NULL);
+
+   polyvars  varsInfo[3]={ {0,NULL}, {0,NULL}, {0,NULL} };
+
+   memerror=heap_is_empty;
+   memoryInfo=memoryInfo_;
+
+   sprintf(ctlgName,"%s_%d",CATALOG_NAME,np);
+   catalog = fopen(ctlgName,"wb");
+
+   ArcNum=1+10*np;
+     
+   calcdiag_sq = 0;
+   noutmemtot = 0;
+   
+   
+   diagrq=fopen(DIAGRQ_NAME,"r+b");
+
+   for(k=0;diag[k]>=0;k++)
+   { int one=1; 
+     fseek(diagrq,sizeof(csd)*diag[k],SEEK_SET);
+     FREAD1(csd,diagrq);
+     if(csd.status>0) continue;
+     nsub=csd.nsub;
+     ndiagr=csd.ndiagr;
+     vardef=&varsInfo[0];
+     mark_(&heap_beg);
+     calcproc(&csd);
+ //printf(" calc %d by process %d  status=%d \n",  diag[k],np,csd.status );      
+     
+     if(csd.status == 1)
+     { 
+        vardef=&(varsInfo[0]);     
+        ArcNum=whichArchive(ArcNum,'w'); 
+        saveanaliticresult(rnum.expr.t->re,factn,factd, vcs,diag[k],ArcNum); 
+     }else if(csd.status == 2) saveanaliticresult(NULL,NULL,NULL, vcs,diag[k],ArcNum); 
+     
+     release_(&heap_beg);
+     {int i; for(i=0;i<3;i++) clearVars(varsInfo+i);}
+//     write(fi,&one,sizeof(int));
+     if(toFinish) goto exi;            
+   }
+exi:
+//printf(" normal termination branch %d\n",np);
+   fclose(diagrq); 
+   fclose(catalog);
+   whichArchive(0,0);      
+   memerror=NULL;
+}
+
+int sqDiagList( int **sd, int nCore)
+{
+  int i,n,ntot,ntot_,l; 
+  csdiagram  csd;
+  diagrq=fopen(DIAGRQ_NAME,"rb"); 
+  for(ntot=0;FREAD1(csd,diagrq);) if(csd.status==0)ntot++;
+  
+  ntot_=ntot;
+  l=0;
+  rewind(diagrq);
+  for(n=0;n<nCore;n++)
+  { int n1=ntot_/(nCore-n);
+    int i=0;
+    sd[n]=malloc(sizeof(int)*(n1+1));
+    for(i=0;i<n1;l++) { FREAD1(csd,diagrq); if(csd.status==0) sd[n][i++]=l;}
+    sd[n][n1]=-1;
+    ntot_=ntot_-n1;
+  }
+  fclose(diagrq);
+  
+  return ntot;
+}
+
+void updateMenuQ(void)
+{
+   catrec  cr;
+   csdiagram  csd;
+
+   int rdOk;
+   int        ndel, ncalc, nrest;
+   long       nrecord;
+        
+
+   catalog = fopen(CATALOG_NAME,"r");
+   if(!catalog) return;
+   diagrq=fopen(DIAGRQ_NAME,"r+b");
+   while(FREAD1(cr,catalog))
+   {
+      fseek(diagrq, sizeof(csd)*cr.ndiagr_abs,SEEK_SET); 
+      FREAD1(csd,diagrq);
+      csd.status =cr.status;
+      fseek(diagrq,sizeof(csd)*cr.ndiagr_abs,SEEK_SET)  ;
+      FWRITE1(csd,diagrq);         
+   }
+   fclose(catalog);
+   fclose(diagrq);
+   
+   diagrq=fopen(DIAGRQ_NAME,"rb");
+   menuq=fopen(MENUQ_NAME,"r+b");
+   nsub=1;
+   ncalc=0;
+   
+   calcdiag_sq=0;
+   for(rdOk=1;rdOk;)
+   { rdOk=FREAD1(csd,diagrq);
+     if(rdOk)
+     {  if(csd.status>0)
+        { if(csd.nsub==nsub){  ncalc++;  continue;} 
+          else  if(ncalc==0){  ncalc=1; nsub=csd.nsub; continue;}  
+        } else continue;
+     }
+     if( (!rdOk && ncalc) || (rdOk && csd.nsub!=nsub))
+     { int ncalc0;
+       shortstr   txt;
+       rd_menu(2,nsub,txt,&ndel,&ncalc0,&nrest,&nrecord);
+        if( ncalc0 != ncalc)
+        { nrest -= ncalc-ncalc0;
+          wrt_menu(2,nsub,txt,ndel,ncalc,nrest,nrecord);
+        }
+        if(rdOk) { nsub=csd.nsub; ncalc=1;}
+     }
+   }
+   fclose(menuq);
+   fclose(diagrq);  
+}
+
+
+#include"../service2/include/writeF.h"
+
+extern int symb_expand(symb_data  m, char***txt,poly**exp);
+extern int vert_code(polyvars * vardef_ext);
+
+static void  writepolyC(poly p)
+{  char txt[STRSIZ], numtxt[STRSIZ];
+   int  i, deg;
+   int  plus, first;
+   int  wpos;
+   unsigned long   wpower;
+
+   if(!p){writeF("0"); return;}
+   if(p->next) plus=0; else plus=1;
+ 
+
+   for(;p;p=p->next)
+   {
+      strcpy(txt,"");
+      i = 1;
+      first = 1;
+      wpos = 1;
+      wpower = p->power[wpos-1];
+      for (i = 1; i <= vardef->nvar; i++)
+      {
+         deg = (p->power[vardef->vars[i-1].wordpos-1] /
+                vardef->vars[i-1].zerodeg) %
+                vardef->vars[i-1].maxdeg;
+
+         if(deg > 0)
+         {
+            if(first)  first = 0; else        strcat(txt,"*");
+            if(deg > 1)  sprintf(txt+strlen(txt),"pow(%s,%d)",vardef->vars[i-1].name,deg);
+            else sprintf(txt+strlen(txt),"%s",vardef->vars[i-1].name);
+         }
+      }
+
+      sprintf(numtxt,"%"NUM_STR, p->num);
+       
+      if(plus && numtxt[0]!='-') writeF("+"); 
+
+      if(strlen(txt))
+      {  if(strcmp(numtxt,"1"))
+         {
+            if(strcmp(numtxt,"-1")==0) writeF("-");
+            else {wrt_0(numtxt);writeF("*");}
+         }    
+         writeF(txt); 
+      }
+      else writeF(numtxt);
+      plus=1;
+   }
+}  
+
+
+
+
+int writeVertexCode(char*pathToModels,int Model,int N,char**field_txt,char *label)
+{ 
+
+  int i;
+  readModelFiles(pathToModels,Model);
+  if(!loadModel(0,1)) {printf("Error in model\n"); return 5;}
+  
+  int field[4], field_inp[4]; 
+  for(i=0;i<N;i++) 
+  { locateinbase(field_txt[i], field_inp +i); 
+    field[i]=field_inp[i]; 
+    if(field[i]==0){ printf("can not find particle %s in the model\n",field_txt[i]); return i+1;}
+  }
+  
+  char fName[40];
+  
+  sprintf(fName,"%s.c",label);
+  outFile=fopen(fName,"w"); 
+  
+  writeF(" // vertex: ");for(i=0;i<N;i++) writeF(" %s ",field_txt[i]);  writeF("\n");
+
+  for(i=0;i<N-1; )  // sorting 
+  { if(field[i]<field[i+1]) 
+    { int m=field[i]; field[i]=field[i+1]; field[i+1]=m;
+      if(i>0)i--;
+    } else i++;
+  } 
+
+  if(N==3) {field[3]=0; field_inp[3]=0;}
+
+  algvertptr  lgrgn1;
+  for(lgrgn1=lgrgn; lgrgn1; lgrgn1=lgrgn1->next)
+  {
+  
+     if( field[0]==lgrgn1->fields[0] && 
+         field[1]==lgrgn1->fields[1] &&
+         field[2]==lgrgn1->fields[2] &&
+         field[3]==lgrgn1->fields[3]    )
+     { 
+
+       rmptr rm=(rmptr)read_rmonom(lgrgn1->comcoef);
+       int GGpower=rmonomGG(rm);
+       int Ipower=rmonomI(rm); while(Ipower<0)Ipower+=4;  while(Ipower>=4) Ipower-=4; 
+       int tcSize=(strchr(lgrgn1->comcoef,'|')-  lgrgn1->comcoef)+10 ;
+       char * tcNtxt=malloc(tcSize);
+       char * tcDtxt=malloc(tcSize);
+             
+       strcpy(tcNtxt, smonomtxt((*rm).n));
+       strcpy(tcDtxt, smonomtxt((*rm).d)); 
+
+       char*txtPre=malloc(strlen(lgrgn1->description)+2*tcSize+20); 
+       sprintf(txtPre,"(%s)*(%s)*(%s",tcNtxt,tcDtxt,lgrgn1->description);     
+       for(i= strlen(txtPre)-1; txtPre[i] ==' ' || txtPre[i] =='\n'  || txtPre[i] =='|';  txtPre[i--]=0) continue;
+       strcat(txtPre,")");
+
+       polyvars  varsInfo={0,NULL};
+       vardef=&varsInfo;
+       preres m= (preres) readExpression(txtPre,rd_pre,act_pre,NULL);
+       free(txtPre);
+
+       int nSpin=m->maxg;
+       int  MaxIndex=8;
+       int maxmomdeg=m->degp+4;
+
+       for (int n=0;n<vardef->nvar;n++) vardef->vars[n].maxdeg=m->varsdeg[n]+1;
+    
+
+       for(int n=1; n<=N+1; n++) for(int m=1; m<n; m++)
+       {  
+         char name[20];
+         sprintf(name,"p%d.p%d",m,n);         
+         addvar(name,maxmomdeg/2);        
+       }
+       sortvar();
+       // rename scalar product 
+       for(i=0;i<vardef->nvar;i++) if(vardef->vars[i].name[2]=='.' &&  vardef->vars[i].name[4]-'0'==N+1) vardef->vars[i].name[4]=vardef->vars[i].name[1];
+
+       symb_start(vardef->nvar, vardef->vars, nSpin, MaxIndex ,N+1);
+
+       for(int n=1; n<=N; n++) for(int m=1; m<=n; m++)
+       {   symb_all mm;
+           char name[20];
+           sprintf(name,"p%d.p%d",m,n);
+           mm=rd_symb(name);
+           assignsclmult(-m,-n,mm->expr.p);
+           delunit(mm);      
+       }
+     
+       int field_in_vert[4],aperm[4],perm[4];
+
+       for(int i=0;i<4;i++) aperm[lgrgn1->perm[i]-1]=i;
+       for(int i=0;i<4;i++) field_in_vert[i]=lgrgn1->fields[aperm[i]];
+
+       for(i=0;i<4;i++)  // set relation between field_in_vert and field_inp
+       { for(int j=0;j<4;j++) if(field_in_vert[i]==field_inp[j]) { perm[i]=j+1; field_inp[j]=-1; break;} }
+
+       char*pstr;
+       if(!Ipower) pstr=parseOneVertex(lgrgn1->description,perm ,field_in_vert);
+       else 
+       { char *buff=malloc(strlen(lgrgn1->description)+10);    
+         switch(Ipower)
+         {  case 1: sprintf(buff,"i*(%s)",lgrgn1->description); break;
+            case 2: sprintf(buff,"-(%s)",lgrgn1->description);  break;
+            case 3: sprintf(buff,"-i*(%s)",lgrgn1->description);  break;
+         }
+         pstr=parseOneVertex(buff,perm ,field_in_vert);
+         free(buff);
+       }     
+       symb_data v= symb_read(pstr);
+
+       symb_data tcN=symb_read(tcNtxt);
+       symb_data tcD=symb_read(tcDtxt);
+       
+       free(pstr); free(tcNtxt); free(tcDtxt);
+
+       char **txt;
+       poly * exp;             
+       int Nterm=symb_expand(v, &txt, &exp);
+
+    int nvars=vert_code(vardef);
+    writeF(" double R=(");writepolyC(tcN.expr.p);writeF(")/(");writepolyC(tcD.expr.p); writeF(");\n");
+        
+    for(int i=0;i<Nterm;i++) { writeF(" coeff_out[%d]=R*(",i); writepolyC(exp[i]); writeF(");\n"); }     
+    writeF(" return 0;\n}\n"); 
+
+    writeF(" static char *SymbVert[%d]={",Nterm);
+    for(int i=0;i<Nterm;i++) {if(i) fprintf(outFile,","); 
+                              if(strlen(txt[i])>0) fprintf(outFile,"\"%s\"",txt[i]); else fprintf(outFile,"\"1\""); }    
+    writeF("};\n"); 
+
+    fprintf(outFile,
+    "typedef struct  lVert\n{\n"
+    "    void * handle;\n"
+    "    void ** link;\n"
+    "    int init;\n"
+    "    int GGpower; int nVar; char **varNames; double *varValues; int nTerms; char **SymbVert;  int (*calcCoeff)(double*);\n"
+    "}  lVert;\n");
+
+    fprintf(outFile," extern lVert %s;\n",label);
+    fprintf(outFile," lVert %s={NULL,NULL,0,%d,%d, varName+1, V, %d, SymbVert, vertexCoeff};\n",label,GGpower,nvars,Nterm);
+                            
+    fclose(outFile);  
+   
+    return 0;
+  }
+  
+  } 
+
+  fprintf(outFile,
+  "// vertex is not found\n" 
+  "#include<stdlib.h>\n"
+  "typedef struct  lVert\n"
+  "{\n"
+  "    void * handle;\n"
+  "    void ** link;\n"
+  "    int init;\n"
+  "    int GGpower; int nVar; char **varNames; double *varValues; int nTerms; char **SymbVert;  int (*calcCoeff)(double*);\n"
+  "}  lVert;\n"
+  "extern lVert %s;\n"
+  " lVert %s={NULL,NULL,0,0,0,NULL,NULL, 0 , NULL, NULL};\n",
+  label,label);
+  fclose(outFile);
+  printf("vertex is not found\n");
+  return 0;
+}
+

@@ -1,4 +1,4 @@
-6 6 51   Composite particle 
+6 6 51 5  Composite particle 
  The name of the particle  is absent in the 
 table of particles. You  are  prompted to describe 
 this particle as a composite one.

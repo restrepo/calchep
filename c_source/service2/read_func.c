@@ -48,7 +48,7 @@ static void*  act_num(char* ch,int n, void**args)
      case '+': p1+=p2;  break;
      case '*': p1*=p2;  break;
      case '/': if(p2==0.)rderrcode=naninoperation; else p1/=p2;  break;
-     case '^': if(p2==floor(p2)) p1=pow_dl(p1,floor(p2)); else p1=pow(p1,p2);
+     case '^': p1=pow(p1,p2);
                break;
      case '.': rderrcode=typemismatch; 
                break;
@@ -79,7 +79,7 @@ static void*  act_num(char* ch,int n, void**args)
                }
    } 
    if(rderrcode) return NULL;
-   if(!isAble) 
+   if(!isAble)
    {  int i;
       if(strcmp(ch,"min")==0)
       { for(i=1; i<n; i++) if(p1> *(double*)args[i]) p1=*(double*)args[i];
@@ -89,6 +89,7 @@ static void*  act_num(char* ch,int n, void**args)
         isAble=1;
       }else p1=0;
    }
+
    *(double*)args[0] = p1; return args[0];
 }
 
@@ -105,7 +106,7 @@ int calcExpression(char *s,int(*nameToDouble)(char *,double *), double *p)
   if(rderrcode==0 && !isAble) rderrcode=unknownfunction; 
  
   if(!rderrcode) *p=*r;
-  if(!rderrcode && !finite(*r)) rderrcode=cannotevaluate;
+  if(!rderrcode && !isfinite(*r)) rderrcode=cannotevaluate;
  
   release_(&heapbeg); 
   return rderrcode;

@@ -1,15 +1,22 @@
 .PHONY: all
 
 include ../../FlagsForMake
-CALCHEP=../..
 
-all: $(CALCHEP)/lib/libSLHAplus.a
- special = test_rdiag.c test_slha.c
-OBJ = $(notdir $(subst .c,.o,$(filter-out $(special),$(wildcard *.c ))))
+ifeq ($(FC),)
+all: $(CALCHEP)/lib/libSLHAplus.a 
+else
+all: $(CALCHEP)/lib/libSLHAplus.a $(CALCHEP)/lib/faux.o
+endif
+
+OBJ = alpha_s.o aux.o chDiag.o ferror.o fixArg.o hgg.o jacobi.o SLHAreader.o fortran.o
+
 override CFLAGS += -I./include
 
 $(CALCHEP)/lib/libSLHAplus.a:$(CALCHEP)/lib/libSLHAplus.a($(OBJ))
 	$(RANLIB) $(CALCHEP)/lib/libSLHAplus.a
 	rm -f *.o
-	cp $(CALCHEP)/lib/libSLHAplus.a $(CALCHEP)/lib/model_aux.a
- 
+	 
+
+ $(CALCHEP)/lib/faux.o:faux.f
+	$(FC) $(FFLAGS) -c -o $(CALCHEP)/lib/faux.o faux.f
+	

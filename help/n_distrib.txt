@@ -1,3 +1,4 @@
+2 3 75
       Distributions
    Here you can specify distributions, which will be filled during the
  Monte Carlo sessions. For one-dimensional distributions only the first
@@ -6,15 +7,25 @@
  syntax.
  
     The first and fourth columns are where the user specifies the 
-  phase space functions that they would like to histogram.  This 
-  observable is defined with a key name followed by a list of the 
-  outgoing particles the user would like histogramed.  For example,
-  "M(u,D)" would give the invariant mass of the quark pair.  The 
-  available key names are:
+  phase space functions that they would like to histogram.  In general 
+  it is defined with a key name followed by a list of the  OUTGOING 
+  particles. For example, "M(u,D)" would give the invariant mass of the
+  quark pair.  
+    There are 3 special parameters   which allow to test incoming particle
+  distribution: 'E1', 'E2' - energies of first and second incoming 
+  particles and   M12   - total  CMS energy.
+
+
+  For outgoing particles the available key names are:
 
   A  - Angle in degree unit
-  C  - Cosine of angle   
-  J  - Jet cone angle    
+  C  - Cosine of angle 
+  D  -  min(T1^2,T2^2)*(cosh(eta_12)-cos(phi_12))
+        where T1,T2 - transverce momena, eta_12 - pseudo-rapidity
+        difference, phi_12 - azimuth angle difference.      
+  J  - Delta R jet separation = sqrt(|eta_12|^2 +|phi_12|^2)
+  K  - |eta_12|
+  F  - azimuth angle[rad] between 2 particles
   E  - Energy of the particle set
   M  - Mass of the particle set 
   P  - Cosine of the angle between the first particle in the list and 
@@ -27,6 +38,7 @@
   Z  - Transverse energy
   U  - User defined function 
 
+ Particle separators 'D','J','K' need two arguments.
  In general 'A' and 'C' take 2 arguments. But, in the case of a
  collision, these functions with one argument designate the angle
  between the given particle and the first (in the list) incoming
@@ -66,11 +78,6 @@
  limits can be specified with numbers or formulas which contain 
  numbers, model parameters and standard operations such as 
  "(,),+,-,/,*,**,sqrt()".
-
-   For collision processes there are 3 special parameters which can not
- be measured in practice, but could clarify the phase space measure:
-   E1,E2 - Energies of first and second incoming particles
-   M12   - CMS energy of incoming particles
 
    To view the plots use the "Display Distributions" menu function.
  After the end of each Monte Carlo session CalcHEP saves the generated 

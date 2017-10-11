@@ -87,15 +87,6 @@ static void  emitexpression(catrec*  cr)
    if(i) writeF(");\n"); else writeF("1;\n");
 }
 
-static void modifyFunc(char * lch)
-{ int c;
-  lch[0]=toupper(lch[0]);
-  while(lch[0]!='(') lch++;
-  lch[0]='[';           
-  for(c = 1, lch++; c; lch++) if(lch[0]==')') c--; else if(lch[0]=='(') c++;
-  lch[-1] = ']'; 
-}
-
 
 static int modifyF(char * txt)
 { 
@@ -192,7 +183,7 @@ static void  writeparameters(int nsub)
 static void startMath(int nsub, int* prtclNum,int ncalc)
 {
    outputLanguage='M';
-   initvararray(nsub,outputLanguage,3);
+   initvararray(nsub,outputLanguage,NULL);
 
    outFileOpen("%sresults%csymb%d.m",pathtouser,f_slash,nsub); 
 
@@ -220,7 +211,7 @@ static void  diagramMath(vcsect * vcs,catrec * cr)
 { 
    writeF("\n(*\n"); 
    writeF("  Diagram  %d in subprocess %d\n",cr->ndiagr_,cr->nsub_);               
-   if (vcs != NULL)  DiagramToOutFile(vcs,0,' ');  
+   if (vcs != NULL && !noPict )  DiagramToOutFile(vcs,0,' ');  
    writeF("*)\n");
    emitexpression(cr);
    

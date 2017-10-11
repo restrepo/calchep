@@ -1,7 +1,7 @@
 /*
  Copyright (C) 1997, Victor Edneral 
 */
-#include"chep_crt.h"
+#include "chep_crt.h"
 #include <math.h>
 #include "syst2.h"
 #include "physics.h"
@@ -70,6 +70,8 @@ static void  mline(int x1_,int y1,int x2_,int y2,
    { case 0: lt = DottedLn;   break;
      case 1: lt = SolidLn;    break;
      case 2: lt = DashedLn;   break;
+     case 3: lt = SolidLn;   break;
+     case 4: lt = DashedLn;   break;
    }
    tg_setlinestyle(lt,NormWidth);
    
@@ -80,7 +82,7 @@ static void  mline(int x1_,int y1,int x2_,int y2,
       xc = (x1 + x2) / 2;
       yc = (y1 + y2) / 2;
       uk = (prtclbase[np-1].anti < np) ;
-      if (prtclbase[np-1].anti != np ) if(uk) arrowflag= -1; else arrowflag=1;
+      if (prtclbase[np-1].anti != np ) { if(uk) arrowflag= -1; else arrowflag=1;}
             
       if (uk && (x1 == x2 || r == 1 || r == 3))
          np = prtclbase[np-1].anti;
@@ -226,7 +228,7 @@ static void  triplet(int l)
       }
       else
          if (tpc == 2)
-            if (se == k)
+         {   if (se == k)
                se1 = l;
             else
                if (se == l)
@@ -238,6 +240,7 @@ static void  triplet(int l)
                   m2 = ll;
                   se1 = k;
                }
+         }    
       order(&l2,&l3,&m2,&m3);
       if (tpc == 1 || (se != l && se != k))
       {  order(&l1,&l2,&m1,&m2);
@@ -329,6 +332,7 @@ ll:   if (ar[l-1] > 0)
 pp:for (k = nk; k >= 0; k--)
    {  knot *with1 = &kn[k];
       if (with1->ty == 0)
+      {
          if (ar[l-1] > 0)
          {
             with1->e1 = ar[l-1];
@@ -344,6 +348,7 @@ pp:for (k = nk; k >= 0; k--)
             with1->e1 = -(++nk);
             goto nn;
          }
+       }  
    }
    for (k = 0; k <= nk; k++)
    {  knot *with1 = &kn[k];
@@ -523,7 +528,7 @@ static void   draw(void)
 
    if ((tpc == 2)) 
       if (((tpc == 2) && (kl == 4) && (kk == 1)) || 
-          (kn[0].e2 < 0) && (kn[0].e3 < 0)) 
+          ((kn[0].e2 < 0) && (kn[0].e3 < 0)) ) 
          { 
             mline(x[0],y[7],x[2],yl,0,kn[0].pt,0);
             mline(x[0],y[3],x[2],yl,0,kn[0].e1,0);
@@ -544,8 +549,8 @@ static void   draw(void)
          } 
    else 
    if (((tpc == 3) && ((kt == 0) || (ks != 0)) &&
-       (kl != elongl(0) + 3)) || (tpc == 1) && 
-       (kn[0].e2 < 0) && (kn[-(kn[0].e2)].ty == 0)) 
+       (kl != elongl(0) + 3)) || ((tpc == 1) && 
+       (kn[0].e2 < 0) && (kn[-(kn[0].e2)].ty == 0))) 
       {
          mline(x[0],yl,x[1],yl,0,kn[0].pt,0);
          knot2(&yl,&yyl); 
@@ -574,7 +579,7 @@ void  picture(int squared,void * buff, int x, int y)
 
    ur=1; 
    tpc =nin;
-
+   
    if (squared) {  upr=2; filler(((csdiagram*)buff)->dgrm1);}
    else         {  upr=1; filler((( adiagram*)buff)->dgrm0);}   
  
@@ -615,7 +620,9 @@ void setPictureScale(int squared, int * xn,int *ynu)
    int i;
    int len;
    int dWidth;
+   int nout_;
 
+   if(nout==1) nout_=2; else nout_=nout;
    cHeight=tg_textheight("H");
    cWidth =  tg_textwidth("H");
    
@@ -635,9 +642,9 @@ void setPictureScale(int squared, int * xn,int *ynu)
    quant=quant/2;
 
 /*   *ynu=5+2*cHeight+2*MAX(3,nout)*quant; */
-   *ynu=5+2*cHeight+2*nout*quant;
+   *ynu=5+2*cHeight+2*nout_*quant;
    y[0]=*ynu-3-cHeight; 
-   if(nout==2) y[0]+=2*quant;
+   if(nout_==2) y[0]+=2*quant;
    for(i=1;i<=8;i++) y[i]=y[i-1] - quant;
       
    ys = 2*quant;

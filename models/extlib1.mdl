@@ -1,8 +1,6 @@
-Standard Model(CKM=1)
+Standard Model
 Libraries
-External libraries  and citation                                      <|
-$CALCHEP/lib/model_aux.a
-% To switch on CERN PDFLIB uncomment the line below, 
-% improving path to CERNLIB if it needs
-%   -L/cern/pro/lib -lpdflib804 -lmathlib -lpacklib $lFort
-========================================================================
+External libraries                                                                          |
+%-L$HOME/Packages/lhapdf-5.9.1/install/lib -lLHAPDF
+%-L$HOME/Packages/LHAPDF-6.1.5/install/lib -lLHAPDF
+=============================================================================================

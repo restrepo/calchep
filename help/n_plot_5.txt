@@ -1,13 +1,9 @@
-3 5 50 Plot
-  This menu function provides the user a
-possibility to save current graphical image of
-the plot in the LaTeX format. We use Axodraw
-commands to write axes, lines and curves.
-   The Axodraw syntax is very easy and you can
-alter the CalcHEP output to get some local
-correction in picture if any.
-    Before the file writing CalcHEP gives you a
-possibility to change the picture and letter
-sizes.
-  After  the file writing CalcHEP informs you
-about the file name used for the output.
+3 5 50 Mouse
+This function switches mode of mouse. 
+  if  "Mouse: show XY" 
+  then mouse click gives coordinates of point in 
+  the plot.
+  if  "Mouse: show Func" 
+  then CalcHEP writes values of ploted functions
+  for given  X.
+Close menu to activate this mouse function.

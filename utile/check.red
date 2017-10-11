@@ -2,9 +2,6 @@
 PathToResults:="results";
 
 procedure in_(r)$ << in r$ >>$
-operator propDen, propDen0;
-
-            for all p,m,w let propDen(p,m,w) = propDen0(p,m);
 
 symbolic procedure concatstr(x,y)$
 compress  append( reverse cdr reverse explode x,cdr explode y)  $

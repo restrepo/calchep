@@ -1,6 +1,7 @@
 ###############################################
 #  batch_file for CalcHEP                     #
-#  bin/run_batch  batch-file-name             #
+#  It has to be launched via                  #
+#          ./calchep_batch batch_file         #
 #  Lines beginning with # are ignored.        #
 ###############################################
 
@@ -16,7 +17,7 @@
 #  Gauge specifies gauge.  Choices are        #
 #       Feynman or unitary.                   #
 ###############################################
-Model:         Triangle 3-Site Model
+Model:         Standard Model(CKM=1)
 Model changed: False
 Gauge:         Feynman
 
@@ -31,51 +32,48 @@ Gauge:         Feynman
 #  Composite specifies composite particles    #
 #       present in the processes or decays.   #
 ###############################################
-#Process:   p,p->E,ne,M,m
-#Process:   p,p->W,Z
-#Process:   p,p->b,B,W+,W-
-#Process:   p,p->j,j,W+,W-
-Process:    p,p->e1,E1
-#Process:    p,p->m,M,j
-#Decay:     W->le,n
-#Decay:     Z->le,le
-#Decay:     W-->m,Nm
-#Decay:     Z->2*x
-#Decay:     W+->2*x
+Process:   p,p->W,b,B
+Decay:     W->le,n
 
-Composite: p=u1,U1,d1,D1,G
-#Composite: j=u,U,d,D,G
-#Composite: W=W+,W-
-Composite: le=e1,E1,e2,E2
-#Composite: n=ne,Ne,nm,Nm
+Composite: p=u,U,d,D,s,S,c,C,b,B,G
+Composite: W=W+,W-
+Composite: le=e,E,m,M
+Composite: n=ne,Ne,nm,Nm
+Composite: jet=u,U,d,D,s,S,c,C,b,B,G
 
 
 
 ##############################################
-#  PDF Info                                  #
-#  Choices are:                              #
-#    cteq6l (anti-proton)                    #
-#    cteq6l (proton)                         #
-#    mrst2002lo (anti-proton)                #
-#    mrst2002lo (proton)                     #
-#    cteq6m (anti-proton)                    #
-#    cteq6m (proton)                         #
-#    cteq5m (anti-proton)                    #
-#    cteq5m (proton)                         #
-#    mrst2002nlo (anti-proton)               #
-#    mrst2002nlo (proton)                    #
+#             PDF Info                       #
+# Proton-antiproton parton densities         #
+#
+# PDT(buint-in) family. Format:              #
+#  PDT:NAME(proton)  or PDT:NAME(antiproton) #
+#  for supprted distributions see directory  #
+#  CalcHEP/pdTables                          #
+#  CT10     NNPDF23_lo_as_0130.LHgrid        #
+#  cteq6l1  MRST2004qed_proton               #
+#           NNPDF23_lo_as_0130_qed           #
+#                                            #
+# LHAPDF. Format:                            #
+#  LHA:NAME:set:1   for proton               #
+#  LHA:NAME:set:-1  for antiprotons          #
+#  To work with LHAPDF one has to define     #
+#  global envinroment variable LHAPDFPATH    #
+#  which contains path to LHAPDF library     #
+#                                            #
 #    ISR                                     #
 #    ISR & Beamstrahlung                     #
 #    Equiv. Photon                           #
 #    Laser photons                           #
 #    Proton Photon                           #
-#    None                                    #
+#    OFF                                     #
 #                                            #
 #  ISR and Beamstrahlung are only available  #
 #    for electrons and positrons, while the  #
 #    others are available for protons and    #
 #    antiprotons.                            #
-#    Default pdf: None                       #
+#    Default pdf: OFF                        #
 #  Bunch x+y sizes (nm)                      #
 #    Ignored unless ISR & Beam chosen.       #
 #    Default: 560                            #
@@ -91,7 +89,7 @@ Composite: le=e1,E1,e2,E2
 #  Equiv. Photon, Laser photons and          #
 #    Proton Photon are available for         #
 #    photons.                                #
-#    Default pdf: None                       #
+#    Default pdf: OFF                        #
 #  Photon particle                           #
 #    Ignored unless Equiv. Photon chosen.    #
 #    Choices are: mu^-,e^-,e^+,mu^+          #
@@ -113,8 +111,10 @@ Composite: le=e1,E1,e2,E2
 #    Ignored unless Proton Photon chosen.    #
 #    Default: 0.1                            #
 ##############################################
-pdf1:      cteq6m (proton)
-pdf2:      cteq6m (proton)
+
+pdf1:      PDT:cteq6l1(proton)
+pdf2:      PDT:cteq6l1(proton)
+
 
 #Bunch x+y sizes (nm)      : 202500
 #Bunch length (mm)         : 10
@@ -131,17 +131,14 @@ pdf2:      cteq6m (proton)
 #  Momentum Info                              #
 #    in GeV                                   #
 ###############################################
-p1:        7000
-p2:        7000
+p1:        4000
+p2:        4000
 
 ###############################################
 #  Parameter Info                             #
 #  Masses and Energies are in GeV             #
 ###############################################
 #Parameter: EE=0.31
-#Parameter: SW=0.481
-#Parameter: MZ=91.1884
-#Parameter: wW=2.08895
 
 ###############################################
 #  Run Info                                   #
@@ -149,15 +146,10 @@ p2:        7000
 #  More than one run can be specified at      #
 #     the same time.                          #
 ###############################################
-#Run parameter: MZ
-#Run begin:     90
-#Run step size: 1
-#Run n steps:   1
-
-#Run parameter: MF
-#Run begin:     2000
-#Run step size: 100
-#Run n steps:   3
+Run parameter: Mh
+Run begin:     120
+Run step size: 5
+Run n steps:   3
 
 ###############################################
 #  QCD Running Info                           #
@@ -191,46 +183,39 @@ p2:        7000
 
 #alpha Q :1:         M34
 #alpha Q :2:         M45
-#alpha Q :           M34
+alpha Q :            M45
 
 
 
 ###############################################
 #  Cut Info                                   #
-#  Must be in terms of the final state        #
-#     particles.                              #
+#  Must be in terms of the (production mode)  #
+#     final state particles.                  #
 #     :n: specifies which process.            #
 #     : means to apply to all processes.      #
 ###############################################
-Cut parameter:    T(le)
-Cut invert:       True
-Cut min:          
-Cut max:          20  
 
-#Cut parameter:    T(E)
-#Cut invert:       False
-#Cut min:          20
-#Cut max:            
-
-Cut parameter:    N(le)
+Cut parameter:    M(b,B)
 Cut invert:       False
-Cut min:         -2.5
-Cut max:          2.5
+Cut min:          100
+Cut max:     
 
-#Cut parameter:    N(E)
-#Cut invert:       False
-#Cut min:         -2.5
-#Cut max:          2.5
-
-Cut parameter:    J(le,le)
+Cut parameter:    J(jet,jet)
 Cut invert:       False
-Cut min:          0.2
-Cut max:          
+Cut min:          0.5
+Cut max:            
 
-#Cut parameter:    M(e,E)
-#Cut invert:       False
-#Cut min:          0
-#Cut max:          200
+Cut parameter:    T(jet)
+Cut invert:       False
+Cut min:          20
+Cut max:            
+
+Cut parameter:    N(jet)
+Cut invert:	  False
+Cut min:	 -2.5
+Cut max:	  2.5
+
+
 
 ###############################################
 #  Kinematics Info                            #
@@ -243,8 +228,8 @@ Cut max:
 #Kinematics :1:    34 -> 3 , 4
 #Kinematics :1:    56 -> 5 , 6
 
-#Kinematics :      12 -> 34 , 5
-#Kinematics :      34 -> 3 , 4
+Kinematics :      12 -> 3, 45
+Kinematics :      45 -> 4 , 5
 
 
 
@@ -255,45 +240,11 @@ Cut max:
 #     :n: specifies which process.            #
 #     : means to apply to all processes.      #
 ###############################################
-#Regularization momentum:1: 34
-#Regularization mass:1:     MW
-#Regularization width:1:    wW
-#Regularization power:1:    2
+Regularization momentum:1: 45
+Regularization mass:1:     Mh
+Regularization width:1:    wh
+Regularization power:1:    2
 
-#Regularization momentum:1: 56
-#Regularization mass:1:     MZ
-#Regularization width:1:    wZ
-#Regularization power:1:    2
-
-#Regularization momentum:1: 3456
-#Regularization mass:1:     MWP
-#Regularization width:1:    wWP
-#Regularization power:1:    2
-
-#Regularization momentum:2: 56
-#Regularization mass:2:     MZ
-#Regularization width:2:    wZ
-#Regularization power:2:    2
-
-#Regularization momentum:2: 34
-#Regularization mass:2:     MZ
-#Regularization width:2:    wZ
-#Regularization power:2:    2
-
-#Regularization momentum:2: 35
-#Regularization mass:2:     Mt
-#Regularization width:2:    wt
-#Regularization power:2:    2
-
-#Regularization momentum:2: 46
-#Regularization mass:2:     Mt
-#Regularization width:2:    wt
-#Regularization power:2:    2
-
-#Regularization momentum:   34
-#Regularization mass:       MZ
-#Regularization width:      wZ
-#Regularization power:      2
 
 ###############################################
 #  Distribution Info                          #
@@ -305,19 +256,19 @@ Cut max:
 #  Dist title and Dist x-title should be      #
 #     plain text.                             #
 ###############################################
-Dist parameter:    M(e1,E1)
-Dist min:          0
+Dist parameter:    M(b,B)
+Dist min:          100
 Dist max:          200
 Dist n bins:       100
-Dist title:        p,p->e+,e-
-Dist x-title:      M(e+,e-) (GeV)
+Dist title:        p,p->W,b,B
+Dist x-title:      M(b,B) (GeV)
 
-#Dist parameter:    T(le)
-#Dist min:          0
-#Dist max:          200
-#Dist n bins:       100
-#Dist title:        p,p->l,l
-#Dist x-title:      T(l) (GeV)
+Dist parameter:    M(W,jet)
+Dist min:	   100
+Dist max:	   200
+Dist n bins:	   100
+Dist title:	   p,p->W,b,B
+Dist x-title:	   M(W,jet) (GeV)
 
 ###############################################
 #  Events Generation                          #
@@ -340,7 +291,7 @@ Dist x-title:      M(e+,e-) (GeV)
 #       Default: True                         #
 ###############################################
 Number of events (per run step): 1000
-Filename:                        mc4bsm
+Filename:                        test
 NTuple:                          False
 Cleanup:                         False
 
@@ -357,7 +308,7 @@ Cleanup:                         False
 #      not require this and will let a        #
 #      job run until it is finished.          #
 #  Memory is the amount of memory required    #
-#		 for each job in gb.  Leave blank       #
+#      for each job in gb.  Leave blank       #
 #      if not required on your cluster.       #
 #  email is only used on the pbs cluster      #
 #      if you want it to inform you of        #
@@ -371,11 +322,14 @@ Cleanup:                         False
 #      default: 19                            #
 ###############################################
 Parallelization method:      local
-Que:                         brody_main
-Walltime:                    0.15
-Memory:                      1
-email:                       name@address
-Max number of cpus:          2
+#Que:                         brody_main
+#Walltime:                    0.15
+#Memory:                      1
+#email:                       name@address
+#Max number of cpus:          2
+Max number of nodes:   8
+Max number of processes per node: 1
+
 sleep time:                  3
 nice level :                 19
 
@@ -395,9 +349,9 @@ nice level :                 19
 #     default: 10000                          #
 ###############################################
 nSess_1:   5
-nCalls_1:  10000
+nCalls_1:  100000
 nSess_2:   5
-nCalls_2:  10000
+nCalls_2:  100000
 
 
 ###############################################

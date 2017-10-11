@@ -25,13 +25,65 @@ static int  nincount(int v,int l)
    return summ;
 }
 
+static int  checkOut( int p, int v, int l)
+{ int i,vv,ll,s;
+
+  if( vcs.vertlist[v][l].prop&IN_PRTCL) return -1;
+  if( vcs.vertlist[v][l].prop&OUT_PRTCL)
+  { int pt=vcs.vertlist[v][l].partcl; 
+    if( pt==p) return 1; 
+    else 
+    {  long N=prtclbase[pt-1].N;
+       if(N==22 || N==21) return 0;
+       else return 2;
+    } 
+  }
+  
+  vv=vcs.vertlist[v][l].nextvert.vno-1;
+  ll=vcs.vertlist[v][l].nextvert.edno-1;                                      
+
+
+  for(s=0,i=0;i< vcs.valence[vv];i++) if(i!=ll)
+  { int r= checkOut(p,vv,i);                                       
+    if(r<0) return -1;
+    if(r>1) return  2;
+    s+=r;
+  } 
+  if(s) return s;
+  
+}    
+
+static int rtypepropag(int v, int l)
+{
+  int p,r;
+  int vv,ll;
+  
+  p=vcs.vertlist[v-1][l-1].partcl;
+
+  r=checkOut(p,v-1,l-1);
+  if(r==-1) 
+  {   vv=vcs.vertlist[v-1][l-1].nextvert.vno-1; 
+      ll=vcs.vertlist[v-1][l-1].nextvert.edno-1;
+      p=vcs.vertlist[vv][ll].partcl;
+      r=checkOut(p,vv,ll);
+  }
+  if(r!=1) r=0;
+  return r;
+}
+
 
 
 int  ttypepropag(int v,int l)
-{
-   if (nin == 1) return 0;
-   return (nincount(v,l) == 1);
+{  int r;
+   if (nin == 2) 
+   { int r=nincount(v,l);
+     if(r==1) return 1;
+   }   
+   r=rtypepropag(v, l);
+   if(r==1) return 1;
+   return 0;
 }
+
       
       
 static int stype(char * momStr)
@@ -81,8 +133,8 @@ void  calcdenominators(vcsect vcs )
          }
 
          strcpy(denom[denrno].momStr,buff);
-         denom[denrno].power = 1;
-
+         if(v <= vcs.sizel) denom[denrno].power = 1; else denom[denrno].power = -1;
+         denom[denrno].pnum=prtclbase[ln->partcl-1].pnum-1;
          denom[denrno].mass=modelVarPos(prtclbase[ln->partcl-1].massidnt);
          if(ttypepropag(v,l)&&!tWidths) denom[denrno].width = 0; else 
          denom[denrno].width=modelVarPos(prtclbase[ln->partcl-1].imassidnt);
@@ -91,7 +143,7 @@ void  calcdenominators(vcsect vcs )
          if ( !strcmp(denom[denrno].momStr,denom[k].momStr) &&
                denom[denrno].mass  ==  denom[k].mass &&
                denom[denrno].width ==  denom[k].width )
-         {  ++(denom[k].power); goto label_1;}
+         {   denom[k].power=2;    goto label_1;}
          denrno++;
 label_1:;
       }
@@ -101,13 +153,12 @@ label_1:;
 
 void  denominatorStatistic(int nsub, 
    int * n_swidth, int *n_twidth, int * n_0width, denlist * allDenominators, 
-   FILE * fd, int for12)
+   FILE * fd)
 { 
    int i;
    catrec    cr;
    denlist    den_, den_tmp;
-   deninforec   dendescript;
-   int ArchNum=0;
+   deninforec   dendescript={0};
     
    (*n_swidth)  = 0;
    (*n_twidth)  = 0;
@@ -116,22 +167,12 @@ void  denominatorStatistic(int nsub,
    den_ =NULL;
    
    fseek(catalog,0,SEEK_SET);
-   while (FREAD1(cr,catalog))
+   while (FREAD1(cr,catalog))if(cr.status==1)
    {
       
       if (cr.nsub_ == nsub)
       { 
-         whichArchive(cr.nFile,'r',for12);
-/*          if(ArchNum!=0 && ArchNum!=cr.nFile) fclose(archiv);
-         if(ArchNum==0 || ArchNum!=cr.nFile) 
-         { char archiveName[40];
-           ArchNum=cr.nFile;
-           sprintf(archiveName,ARCHIV_NAME,ArchNum);
-           if(for12) strcat(archiveName,"2");
-           archiv=fopen(archiveName,"rb");
-         }
-            
-*/      
+         whichArchive(cr.nFile,'r');
          dendescript.cr_pos = ftell(catalog) - sizeof(cr);
 
          fseek(archiv,cr.denompos,SEEK_SET);
@@ -142,6 +183,7 @@ void  denominatorStatistic(int nsub,
          {  
             dendescript.denarr[i].power=denom[i].power;
             dendescript.denarr[i].width=denom[i].width;
+            
             den_tmp = den_;  
             while (den_tmp != NULL &&
               (  strcmp(denom[i].momStr,den_tmp->momStr)
@@ -154,6 +196,7 @@ void  denominatorStatistic(int nsub,
                strcpy(den_tmp->momStr,denom[i].momStr);
                den_tmp->mass=denom[i].mass;
                den_tmp->width=denom[i].width;
+               den_tmp->pnum=denom[i].pnum;
                den_tmp->stype= stype(denom[i].momStr);
                den_ = den_tmp;
                if(denom[i].width) 
@@ -169,6 +212,6 @@ void  denominatorStatistic(int nsub,
    }
    
 /*   if(ArchNum) fclose(archiv);  */
-   whichArchive(0,0,0);
+   whichArchive(0,0);
   *allDenominators=den_;
 }

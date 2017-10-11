@@ -1,41 +1,19 @@
-#include"e_tools.h"
-#define Real double
-#include"4_vector.h"
+#include<stdlib.h>
+#include<math.h>
 #include"phys_val.h"
 #include"interface.h"
-/*
-#define const
-#include"num_out.h"
-#undef const
-*/
+#include"histogram.h"
+#include"../../include/num_out.h"
+#include"num1.h"
 
-#include "../mix_events/event2pyth.h"
+#include "event2pyth.h"
 
 hepeup_str E_;
 heprup_str R_;
+int nout_int;
 
-
-
-#include"interface.h"
-
-
-/*
-int nin_ext, nout_ext;
-*/
 
 double sum;
-static  char   p_names[MAXNP][20];
-static  long   p_codes[MAXNP];
-static  double p_masses[MAXNP];
-
-
-static char* pinf_ext(int nsub,int num , void * mass,long * N) 
-{  
-  if(nsub>1 || num>nin_int+nout_int) return NULL;
-  if(mass) *((double*)mass)=p_masses[num-1];
-  if(N) *N=p_codes[num-1];
-  return  p_names[num-1]; 
-}
 
 
 static void wrongParam(int N)
@@ -75,17 +53,19 @@ int  main(int argc,char** argv)
   physValRec * plist;
   
   double *hist, *dhist;
-  double weight,coef;
-  long nPoints;  
+  double weight,coef;  
+  double pvect[4*MAXNP];
+  double Etot,pmiss[4]={0,0,0,0};
+  double qmiss[4]={0,0,0,0};
 
   int outPos[50];
   char buff[200];
+
+  pinf_int=pinf_ext;
   
  
   if(argc != 5 ) { wrongParam(0); return 1;} 
-  
-    
-       
+         
   if(sscanf(argv[2],"%lf",&minX)!=1){ wrongParam(2); return 1;}
   if(sscanf(argv[3],"%lf",&maxX)!=1 || minX>=maxX){ wrongParam(3); return 1;}
   if(sscanf(argv[4],"%d",&nbin)!=1  || nbin<=0)
@@ -96,25 +76,33 @@ int  main(int argc,char** argv)
   hist=(double*)malloc(nbin*sizeof(double));
   dhist=(double*)malloc(nbin*sizeof(double));
   for(i=0;i<nbin;i++){hist[i]=0; dhist[i]=0;}
-
-  for(i=0;i<nin_int+nout_int;i++) pinf_int(1,i+1,p_masses+i,NULL);
-  nPoints=0;
   
   openeventfile_(NULL, -1);
   err=readeventheader_();
-  pinf_int=&pinf_ext;
      
   nEvents=0;
   while(readevent_()==0)
   { nEvents++;
+
+    for(i=0;i<E_.NUP;i++) if(E_.ISTUP[i]==2)
+    { double M=sqrt(fabs(E_.PUP[i][3]*E_.PUP[i][3]-E_.PUP[i][0]*E_.PUP[i][0]-E_.PUP[i][1]*E_.PUP[i][1]-E_.PUP[i][2]*E_.PUP[i][2])); 
+        for(k=0;k<4;k++)
+        { double dif=E_.PUP[i][k];
+          int j;
+          for(j=i+1;j<E_.NUP;j++) if(E_.MOTHUP[j][0]==i+1) dif-= E_.PUP[j][k];
+          dif=fabs(dif)/M;
+          if(dif> qmiss[k]) qmiss[k]=dif;
+        }   
+    }
+
     
     for(i=0, nin_int=0; i<E_.NUP; i++)if(E_.ISTUP[i]==-1)
     { double *pp=pvect+4*nin_int;
       for(k=1;k<3;k++) pp[k]=0;
       pp[0]=E_.PUP[i][3];
       pp[3]=E_.PUP[i][2];
-      p_masses[nin_int]=E_.PUP[i][4];
-      p_codes[nin_int]=E_.IDUP[i];
+      p_masses_[nin_int]=E_.PUP[i][4];
+      p_codes_[nin_int]=E_.IDUP[i];
       nin_int++;
     }
       
@@ -132,17 +120,28 @@ int  main(int argc,char** argv)
     { double* pp=pvect+4*(i+nin_int); 
       pp[0]=E_.PUP[outPos[i]][3];
       for(k=0;k<3;k++) pp[k+1]=E_.PUP[outPos[i]][k];
-      p_masses[nin_int+i]=E_.PUP[outPos[i]][4];
-      p_codes[nin_int+i]=E_.IDUP[outPos[i]];
+      p_masses_[nin_int+i]=E_.PUP[outPos[i]][4];
+      p_codes_[nin_int+i]=E_.IDUP[outPos[i]];
     }
     
-    for(i=0;i<nout_int+nin_int;i++) sprintf(p_names[i],"%d",p_codes[i]);
+    for(i=0;i<nout_int+nin_int;i++) sprintf(p_names_[i],"%d",p_codes_[i]);
+
+    Etot=pvect[0];
+    for(i=1;i<nin_int;i++) Etot+=pvect[4*i];
+    for(k=0;k<4;k++)
+    { double dif=pvect[k];
+      for(i=1;i<nin_int;i++) dif+=pvect[k+i*4];
+      for(i=nin_int;i<nin_int+nout_int;i++) dif-=pvect[k+i*4];
+      dif=fabs(dif)/Etot;
+      if(dif>pmiss[k])  pmiss[k]=dif;
+    }     
+
     
     if(checkPhysValN(argv[1], key, &plist))
     { double z0[100];
       int n0=0;
       physValRec * plist0=plist;
-      for(;plist;plist=plist->next) z0[n0++]=calcPhysVal(key[0],plist->pstr);
+      for(;plist;plist=plist->next) z0[n0++]=calcPhysVal(key[0],plist->pstr,pvect);
       cleanPVlist( plist0);
       switch(key[1])
       { case '^':
@@ -155,18 +154,19 @@ int  main(int argc,char** argv)
          break;
       }    
       for(k=0;k<n0;k++)
-      {
-        i=nbin*(z0[k]- minX)/(maxX-minX); 
-        if(i>=0 && i<nbin) {hist[i]+=1; nPoints++;}
+      { double id=nbin*(z0[k]- minX)/(maxX-minX); 
+        if(id>=0 && id<nbin) 
+        {i=id;  hist[i]+=E_.XWGTUP; dhist[i]+=E_.XWGTUP*E_.XWGTUP;}
       }
     }
   }
   
-  coef= R_.XSECUP[0]* nbin/(maxX - minX)/nEvents;
+  coef= nbin/(maxX - minX)/nEvents;
   
   for(i=0;i<nbin;i++)
-  { dhist[i]=sqrt(hist[i])*coef;
-    hist[i]*=coef;
+  { 
+     hist[i]*=coef;
+     dhist[i]=sqrt(dhist[i])*coef;
   }
 
 
@@ -183,12 +183,14 @@ int  main(int argc,char** argv)
     fprintf(stdout,"\n");
       
 
-   fprintf(stdout,"#type 1  %%1d-histogram\n");
+//   fprintf(stdout,"#type 1  %%1d-histogram\n");
    fprintf(stdout,"#xName %s\n",argv[1]);
    fprintf(stdout,"#xMin %E\n",minX);
    fprintf(stdout,"#xMax %E\n",maxX);
    fprintf(stdout,"#xDim %d\n",nbin);
-   fprintf(stdout,"#yName %s\n",yname);
+   fprintf(stdout,"#yName %s {h}\n",yname);
+   fprintf(stdout,"#lost_momenta_max/Etot %.1E %.1E %.1E %.1E\n",pmiss[0],pmiss[1],pmiss[2],pmiss[3]); 
+   fprintf(stdout,"#lost_internal_momenta_max/M %.1E %.1E %.1E %.1E\n",qmiss[3],qmiss[0],qmiss[1],qmiss[2]);
   }
   for(i=0;i<nbin;i++) fprintf(stdout,"%-12E  %-12E\n",hist[i],dhist[i]);
   return 0;

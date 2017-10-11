@@ -5,26 +5,29 @@
 #include"model.h"
 #include"physics.h"
 
-#define whohowMAX 120
+#define whohowMAX 300
 typedef struct whohow
 {  int    who, how;
 }  whohow[whohowMAX];
 
+extern int ZWmax,ZWmin;
+
 typedef struct hadron
 {
-   char        name[8];
+   char        name[P_NAME_SIZE];
    shortstr    contents;
-   int         pow;
-   int         parton[120];
-   int         polarized[120];
+   int         len;
+   int         parton[1000];
+   int         polarized[1000];
 }  hadron;
 
-extern whohow     liminsp;
+extern whohow     liminsp, LimQ;
 extern whohow     limout;
 extern void  nilprtcl(whohow      p_list);
 
 
-extern shortstr processch, limpch, deloutch;
+extern shortstr processch;
+char limpch[STRSIZ], deloutch[STRSIZ];
 extern int  nin, nout, n_x;   /* Number of X-particles */
 extern int  enter(void);
 extern  hadron hadrons[MAXINOUT];

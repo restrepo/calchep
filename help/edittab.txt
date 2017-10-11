@@ -1,4 +1,4 @@
-2 4 76   Table editor
+2 4 76 22  Table editor
   To change position of the  cursor and  the   highlighted  cell one  can
 use the arrow keys, the Tab key, and the mouse click. If the table is open
 for changes and one types any printing symb it will be inserted into the

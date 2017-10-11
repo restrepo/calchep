@@ -11,19 +11,22 @@
 
 #include"n_calchep_.h"
 
+#include<unistd.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+              
+#include "../../include/num_out.h"
+#include "dynamic_cs.h"
+
+
+
 void n_comphep(void)
 {
   clr_scr(FGmain,BGmain); 
 
   while(checkParam()) 
-   if(mess_y_n(15,15, "You have to quit the session and\n"
-                      "change parameters into the\n"
-                      "session.dat file (Y) or do it by\n"
-                      "means of menu function in the \n"
-                      "current session (N)"))
-     {w_sess__(NULL); return;} else change_parameter(54,7,0);
- 
-          
+   if(mess_y_n(15,15, "Quit the session?"))
+     {w_sess__(NULL); return;} else change_parameter(54,7,0);        
   do
   { int err=monte_carlo_menu();
     switch(err)

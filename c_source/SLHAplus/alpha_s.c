@@ -1,24 +1,48 @@
 #include "SLHAplus.h"
- 
-double MbPole=4.967923;  
-static double MtPole=174.1; 
-static double qMin=3.125347E-1;
+
+/*
+   this file contains routines for running QCD coupling, 
+   running quark masses,  and  effective quarks masses 
+   which  generate correct widths of scalar particles.
+*/
+
+
+// default parameter
+static double MtPole=173.21; 
+static double MbMb=4.18;
+static double McMc=1.28;
+static double alphaMZ=0.1181;
+#define MZ 91.1876
+// ==========
+
+static double qMin=3.274942E-01, qLim=1;
+double MbPole=4.931978;
+
+static double qMass[7] ={ 0,0,0,      0,       1.280000E+00, 4.180000E+00, 1.635602E+02};
+static double lambda[7]={ 0,0,0, 3.274942E-01, 2.888141E-01, 2.095375E-01, 8.929726E-02};
+
+
 static double m_fact(int nf, double alpha1, double alpha2);
+static int nfMax=6;
+
+double bPoleMass(void) { return MbPole;}
+double tPoleMass(void) { return MtPole;}
 
 
-
+// https://pos.sissa.it/archive/conferences/260/010/LL2016_010.pdf
 static double alpha3(double Q, double lambda, int nf)
-{
-  double b0,b1,b2,lg,lg2,x;
+{ 
+  double   b0=  (11-(2./3.)*nf)/4,
+           b1=  (102-(38./3.)*nf)/16,
+           b2=  (2857./2. -5033./18.*nf +325./54.*nf*nf)/64,
+           b3=   114.23-27.1339+1.58238*nf*nf+0.0058567*nf*nf*nf; 
+//  b_i  RG coefficients for  a=alpha/pi  b_i=beta_i*pi^{i+1}             
+  double t=2*log(Q/lambda), Lt=log(t), b0t=b0*t;
+  double d1=b1/(b0*b0t), d2=b2/(b0*b0t*b0t), d3=b3/(b0*b0t*b0t*b0*t);
 
-  b0 =   11 -    (2./3.)*nf;
-  b1 =   51 -   (19./3.)*nf;
-  b2 = 2857 - (5033./9.)*nf + (325./27.) *nf*nf;
-  lg = 2*log(Q/lambda);
-  lg2= log(lg);
-  x  = 2*b1/(b0*b0*lg);
-
-  return 4*M_PI*(1-x*(lg2 -x*((lg2-0.5)*(lg2-0.5)+b2*b0/(8*b1*b1)-1.25) ))/(b0*lg);
+// http://pdg.lbl.gov/2016/reviews/rpp2016-rev-qcd.pdf
+  return  (M_PI/b0t)*(1-d1*Lt+ d1*d1*( Lt*Lt-Lt-1) +d2 
+   - d1*d1*d1*(Lt*Lt*Lt-2.5*Lt*Lt-2*Lt+0.5) -3*d1*d2*Lt +0.5*d3);   
 }
 
 
@@ -38,11 +62,8 @@ static double findLambda(int nf,double alpha, double M)
   return l;
 }      
 
-static double qMass[7]={0,0,0,0, 1.200000E+00, 4.230000E+00, 1.619152E+02};
-static double lambda[7]={0,0,0,3.125347E-01, 2.763267E-01, 1.991586E-01, 8.449407E-02};
 
-
-static double poleQmass(double mm, double alpha, int nf)
+double poleQmass(double mm, double alpha, int nf)
 {
   double 
          zeta2=1.6439,
@@ -64,7 +85,7 @@ double  initQCD(double MZalphaS, double McMc, double MbMb, double MtP)
 { 
   double Mq,Mq_;
 
-  lambda[5]= findLambda(5,MZalphaS, 91.187);
+  lambda[5]= findLambda(5,MZalphaS, MZ);
 
   MtPole=MtP;
 
@@ -80,6 +101,7 @@ double  initQCD(double MZalphaS, double McMc, double MbMb, double MtP)
 
   lambda[6]= findLambda(6,alpha3(qMass[6],lambda[5], 5),qMass[6]);
   notInitialized=0;
+  nfMax=6;
   
   qMass[5]=0; qMass[4]=0;
   if(MbMb<=lambda[5]) { qMin=lambda[5]; return qMin;}
@@ -93,22 +115,32 @@ double  initQCD(double MZalphaS, double McMc, double MbMb, double MtP)
   qMass[4]=McMc;
   lambda[3]=findLambda(3,alpha3(qMass[4],lambda[4],4),qMass[4]);
                        qMin=lambda[3]; return qMin;
-
 }
+
+double  initQCD5(double MZalphaS, double McMc, double MbMb, double MtP)
+{
+   double lmbd= initQCD(MZalphaS,McMc, MbMb,MtP);
+   lambda[6]=lambda[5]; 
+   nfMax=5;
+   return lmbd;   
+}
+
 
 static int  NF(double Q)
 { 
          if(Q<qMass[4]) return 3;
    else  if(Q<qMass[5]) return 4; 
-   else  if(Q<qMass[6]) return 5; 
+   else  if(Q<qMass[6]||nfMax==5) return 5; 
    else                 return 6;
 }
 
 double alphaQCD(double Q) 
 { 
-  if(notInitialized) initQCD(0.1172,1.2,4.23,171.4);
+  if(notInitialized) initQCD(0.1184,1.2,4.23,173.07);
+  if(Q<qLim) Q=qLim;
   if(Q<qMin) return 1; return alpha3(Q,lambda[NF(Q)],NF(Q));
 }
+
 
 
 static double m_fact(int nf, double alpha1, double alpha2)
@@ -132,7 +164,7 @@ static double m_fact(int nf, double alpha1, double alpha2)
 static double  runningMass(double M0, double Q0,double Q)
 {  double alpha0, alpha1;
    int n=0;   
-
+   if(Q<qLim) Q=qLim;
    for(n=3; n<6;n++) if(Q0<qMass[n+1]) break;     
 
    alpha0=alphaQCD(Q0)/M_PI;   
@@ -154,6 +186,10 @@ static double  runningMass(double M0, double Q0,double Q)
    return M0;
 }
 
+double MqRun(double mass2GeV, double Q)
+{ return runningMass(mass2GeV, 2., Q);}
+
+
 
 double McRun(double Q) 
 {  if(Q<=qMass[4])  return qMass[4];
@@ -168,7 +204,7 @@ double MbRun(double Q)
 }
 
 double MtRun(double Q) 
-{ if(Q<qMass[6]) return qMass[6];   
+{ 
    return runningMass(qMass[6], qMass[6], Q); 
 } 
 
@@ -176,25 +212,28 @@ static double DeltaQCD(double Q)
 {
  double  a=alphaQCD(Q)/M_PI;
  int nf=NF(Q);
+ double res, res1;
 
  return  a*( 5.67 + a*( (35.94-1.36*nf) + a*(164.14-nf*(25.77-nf*0.259) )));
 }
 
+double MqEff(double mass2GeV, double Q) { return MqRun(mass2GeV,Q)*sqrt(1+DeltaQCD(Q));}
 
 double McEff(double Q) { return McRun(Q)*sqrt(1+DeltaQCD(Q)); }
 double MbEff(double Q) { double m=MbRun(Q)*sqrt(1+DeltaQCD(Q));  if(m>MbPole) return MbPole; else return m;}
+
 double MtEff(double Q) 
 { 
   double meff,alpha;
-
   if(Q<=2*MtPole) return  MtPole;
-
   meff=MtRun(Q)*sqrt(1+DeltaQCD(Q));
   if(meff>MtPole)   return  MtPole;
-
   alpha=pow(2*MtPole/Q,15.);
   return alpha*MtPole+(1-alpha)*meff;
 }
+
+ 
+double nfQCD(double Q) {return NF(Q);}
 
 
 #ifdef TEST

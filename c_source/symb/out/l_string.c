@@ -11,7 +11,6 @@
 #include "out_serv.h" 
 #include "l_string.h"
 #include "writeF.h"
-#include "dpMonoms.h"
 
 #define buffsize MIN(1290,STRSIZ-3)
 
@@ -28,7 +27,7 @@ typedef longstr *longstrptr;
 typedef struct degreerec
    {
       struct degreerec *    next;
-      char         name[10];
+      char         name[20];
       int         deg;
    }  degreerec;
 
@@ -40,7 +39,7 @@ int   tmpNameMax=0;
 
 void  initdegnames(void)
 {int   k;
-   degnamesptr=(degreerec**)m_alloc(sizeof(degreerec **) * (nProcessVar));
+   degnamesptr=(degreerec**)m_alloc(sizeof(degreerec*) * (nProcessVar));
    for (k = 0; k < nProcessVar; k++) degnamesptr[k] = NULL;
    degnamecount=0;
 }
@@ -161,7 +160,7 @@ static char *  writevardeg(int nv,int deg)
 {
  degreerec *   p;
  static char namest[21];
- int deg0;
+ int k;
    if (deg == 1)  return   vararr[nv].alias;
    p = degnamesptr[nv];
    while (p != NULL)
@@ -174,15 +173,9 @@ static char *  writevardeg(int nv,int deg)
    p->next = degnamesptr[nv];
    degnamesptr[nv] = p;
 
-   writeF("%s=%s*%s;\n",namest,vararr[nv].alias,vararr[nv].alias);
-   for(deg0=2;2*deg0<=deg; deg0*=2)  writeF("%s*=%s;",namest,namest);
-   if(deg0<deg) 
-   {  writeF("%s*=%s",namest,vararr[nv].alias);
-      for(deg0++;deg0<deg;deg0++)  writeF("*%s",vararr[nv].alias);
-      writeF(";");
-   } 
-   writeF("\n");
-
+   writeF("%s=%s",namest,vararr[nv].alias); 
+   for(k=1;k<deg;k++) writeF("*%s",vararr[nv].alias);
+   writeF(";\n");
    return namest;
 }
 
@@ -245,9 +238,6 @@ static void*  smpl_emit(varptr ex)
    return (void*) ans; 
 }
 
-
-
-
 static void*  v_gorner(int ch,int deg,void* pmult,void* psum)
 {char b[STRSIZ];
    sprintf(b,"+%s",writevardeg(ch,deg));
@@ -269,6 +259,7 @@ void  fortwriter(char* name,varptr fortformula)
    if (tmpNameMax<tmpNameNum) tmpNameMax=tmpNameNum;   
 }
 
+
 int  write_const(void)
 {
    infoptr      i;
@@ -286,99 +277,3 @@ int  write_const(void)
 
    return constcount;
 }   /*  WriteConst  */
-
-static int VarMonomNum( int *varstr)
-{
-  int i, monom[27];
-
-  for(i=0;i<NofDP;i++)monom[i]=0;
-
-  for(i=0;varstr[i];i++) 
-  { int k;
-    sscanf(vararr[varstr[i]].alias,"DP[%d",&k);
-    monom[k]++;
-  } 
-
-  return findMomonPosition(monom);
-}
-
-
-void findPD(varptr sum)
-{
-  varptr s;
-  int n;
-  for(s=sum;s;s=s->next)
-  { n= VarMonomNum(s->vars);
-    if(n>=DPmonomSize) 
-    { int i;
-      DPmonomMap=realloc(DPmonomMap, sizeof(int)*(n+1));
-      for(i=DPmonomSize;i<n;i++)DPmonomMap[i]=0;
-      DPmonomSize=n+1;
-    }
-    DPmonomMap[n]=1;   
-  }   
-}
-
-
-int* for_write_const(varptr sum, int * Ntt, int * nCoef)
-{  int firstVarTmp = firstVar;
-   int constcount=0;
-   int TTcount=0;
-   varptr s;
-   int * posAr,*index,*inc,*reindex;
-   int N,i;
-
-   for(s=sum,N=0;s;s=s->next)N++;
-   posAr=malloc(sizeof(int)*N);
-   index=malloc(sizeof(int)*N);
-   reindex=malloc(sizeof(int)*N);
-   for(s=sum,i=0;s;s=s->next,i++) 
-   { posAr[i]=DPmonomMap[VarMonomNum(s->vars)]; 
-     index[i]=i; 
-     if(constcount<posAr[i]) constcount=posAr[i];
-   } 
-   if(constcount>2*N) 
-   {
-     for(i=0;i<N-1;)
-     {  if( posAr[index[i]] > posAr[index[i+1]]) 
-        { int in=index[i];index[i]=index[i+1];index[i+1]=in; if(i>0)i--; else i++;}
-        else i++;
-     }
-     for(i=0;i<N;i++) reindex[index[i]]=i;
-      inc=malloc(sizeof(int)*N);
-      *nCoef=N;  
-   }else  
-   { writeF("{int i; for(i=0;i<%d;i++) CC[i]=0;}\n",constcount+1);
-     inc=NULL;
-     *nCoef=constcount+1;
-   }
-   firstVar   = 1;
-   for(i=0;sum; sum=sum->next,i++) 
-   {  char name[10];
-
-      if(constcount>2*N)
-      { 
-        sprintf(name,"CC[%d]",reindex[i]);  inc[reindex[i]]=posAr[i];
-      } 
-      else sprintf(name,"CC[%d]",posAr[i]);        
-
-      if(sum->coef->nused >1)
-      {  if(sum->coef->name[0]==0)
-         { sprintf(sum->coef->name,"tt[%d]",TTcount++);             
-           fortwriter(sum->coef->name,(void*) sum->coef->const_);          
-         }
-              if(sum->ncoef==1)  writeF("%s = %s;\n",name,sum->coef->name);
-         else if(sum->ncoef==-1)writeF("%s = -%s;\n",name,sum->coef->name);
-         else writeF("%s = %" NUM_STR "*%s;\n",name,sum->ncoef,sum->coef->name); 
-      } else 
-      {
-         fortwriter(name,(void*) sum->coef->const_);
-         if(sum->ncoef!=1) writeF("%s*=%" NUM_STR ";\n",name,sum->ncoef);
-      }
-   }
-   *Ntt=TTcount;
-   
-   firstVar = firstVarTmp;
-   free(index); free(posAr); free(reindex); 
-   return inc;
-}

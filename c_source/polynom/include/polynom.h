@@ -1,6 +1,7 @@
 #ifndef __POLYNOM_
 #define __POLYNOM_
 
+#include"../../../include/VandP_size.h"
 #include"lnum.h"
 
 
@@ -27,7 +28,7 @@ typedef struct tensor_str * tensor;
 
 typedef struct  varinfo
 {
-   char  name[12];  
+   char  name[VAR_NAME_SIZE+6];  
    unsigned long maxdeg,  zerodeg;
    int  wordpos;
    int  num;

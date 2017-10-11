@@ -1,7 +1,7 @@
 #ifndef __CRT0__
 #define __CRT0__
 
-extern void  crt0_start(char * window_name, char * icon_file,char * ini_file,
+extern int  crt0_start(char * window_name, char * icon_file,char * ini_file,
                         int * colors, void(*error)(void));
 extern void  crt0_finish(void);
 extern void  crt0_puts(int xc,int yc,int tColor,int bColor,  char * s);

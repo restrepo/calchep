@@ -1,4 +1,4 @@
-1 12 51
+1 12 51 3
   CalcHEP uses the importing sampling algorithm 
 for event generator. To realize it CalcHEP 
 divides the phase volume on sub-cubes and finds 

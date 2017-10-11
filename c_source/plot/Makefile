@@ -8,14 +8,14 @@ override CFLAGS += -Iinclude $(patsubst %,-I../%/include ,$(Idir))
 
 special = view_tab.c
 
-OBJ= $(subst .c,.o,$(filter-out $(special),$(wildcard *.c)))
-
-lib = ../../lib
 bin = ../../bin
+lib = ../../lib
 
-$(bin)/plot_view:  view_tab.c $(lib)/num_c.a $(lib)/serv.a
-	$(CC) $(CFLAGS)  -o $@ $^  $(LX11) -lm
+OBJ = $(subst .c,.o,$(filter-out $(special),$(wildcard *.c)))
+ 
+$(bin)/plot_view: view_tab.c $(lib)/serv.a $(lib)/ntools.a
+	$(CC) $(CFLAGS) -o $@ $^ $(LX11) -lm
 
-$(lib)/num_c.a:$(lib)/num_c.a($(OBJ))
+$(lib)/serv.a :$(lib)/serv.a($(OBJ))
 	$(RANLIB) $@
 	@rm -f $(OBJ)

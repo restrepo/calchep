@@ -13,7 +13,7 @@ fermloopstp fermloops[maxvert];
 set         setmassindex,setmassindex0;
 int         nloop;
 int         fermmap[2*maxvert];
-char        inoutmasses[MAXINOUT][7];
+char        inoutmasses[MAXINOUT][VAR_NAME_SIZE];
 momsum      momdep[3*maxvert];
 
 int consLow=1;
@@ -287,8 +287,9 @@ static void  findinternalmoments(int indep)
       {
          m = vcs.vertlist[v-1][l-1].moment;
          if (m > 0)  
-            if (indep) standartsubst(v,l,momdep[m-1]);
-            else       optimsubst(v,l,momdep[m-1]);
+         {   if (indep) standartsubst(v,l,momdep[m-1]);
+              else       optimsubst(v,l,momdep[m-1]);
+         }
       }
    }
 }
@@ -300,5 +301,5 @@ void  preperdiagram(void)
    findfermcycles();
    setmassindex0=findmassindex();
    findinnerverts();
-   findinternalmoments(/*consLow*/ nin+nout<=5);
+   findinternalmoments(/*consLow*/   nin+nout<=5);
 }

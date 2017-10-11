@@ -7,7 +7,6 @@
 #include"parser.h"
 #include"rd_num.h"
 #include"crt_util.h"
-#include"const.h"
 #include"phys_val.h"
 #include"read_func.h"
 #include"sortarr.h"
@@ -15,7 +14,7 @@
 invcut_ invcut_1[60];
 int nCuts=0;
 table cutTab={"*** Table ***"," Cuts  ",
-                   "!|  Parameter  |> Min bound <|> Max bound <|",NULL}; 
+                   "!|  Parameter  |> Min bound <|> Max bound <|",NULL,0}; 
 
 
 static void  cutInit(void)
@@ -26,19 +25,8 @@ static void  cutInit(void)
 }
 
 
-static int addcut(int Mirr, char* title,int minonw,int maxonw,double cvminw,double cvmaxw)
-{
-  int  n,ok;
-    
-  for(n=0; n<nCuts; n++)if(!strcmp(title,invcut_1[n].title))
-  { if(minonw && ( !invcut_1[n].minon || cvminw>invcut_1[n].cvmin) )  
-       { invcut_1[n].minon=1; invcut_1[n].cvmin=cvminw;}
-    if(maxonw && ( !invcut_1[n].maxon || cvmaxw<invcut_1[n].cvmax) )  
-       { invcut_1[n].maxon=1;  invcut_1[n].cvmax=cvmaxw;} 
-    invcut_1[n].aux=Mirr;       
-    return 0;
-  } 
-     
+static int addcut(int Mirr,char* title,int minonw,int maxonw,double cvminw,double cvmaxw)
+{ int ok;    
   if(nCuts >= 60) return 2;
   if(strlen(title)>=50) return 3;
   ok=checkPhysValN(title,invcut_1[nCuts].key,&(invcut_1[nCuts].pLists));
@@ -71,8 +59,7 @@ int fillCutArray(void)
   for(ln=cutTab.strings ;ln;ln=ln->next)
   {  
     double min_=0,max_=0;
-    char lv[PLISTLEN];
-    int i,k;
+    int k;
     auxStr[0]=0;
     cutStr[0]=0;
     minStr[0]=0;
@@ -80,7 +67,7 @@ int fillCutArray(void)
     lineNum++;    
     sscanf(ln->line,"%[^|]%*c%[^|]%*c%[^|]%*c%[^|]",auxStr,cutStr,minStr,maxStr);
     trim(auxStr); trim(cutStr); trim(minStr); trim(maxStr);
-
+    
 /*================ ! ============*/
     strcpy(fieldName,"Wrong field '!'");
     switch(auxStr[0])
@@ -89,7 +76,6 @@ int fillCutArray(void)
       case '%': aux=0; break;
       default : goto errorExit;
     }  
-
 /*================ MIN bound ============*/
     strcpy(fieldName,"Wrong field 'Min. bound'");
     minOn= strlen(minStr);
@@ -106,7 +92,7 @@ int fillCutArray(void)
 
 /* =========== fill array ==========*/
 
-    if(minOn||maxOn)
+    if((minOn||maxOn)&&aux!=0)
     {  k=addcut(aux,cutStr,minOn,maxOn,min_,max_);
        switch(k)
        { case 2: strcpy(fieldName,"Too many cuts ");         goto errorExit;
@@ -117,9 +103,12 @@ int fillCutArray(void)
   } 
   return 0;
   errorExit:
-    sprintf(errorText," Error in Cut table line %d .\n%s.",lineNum,fieldName);
-    messanykey(2,10,errorText);
-    return 1;  
+  { char buff[300];
+    sprintf(buff," Error in Cut table line %d \n%s\n%s",lineNum,fieldName,errorText);
+    
+    if(blind) { printf("%s\n",buff); sortie(150);} else messanykey(2,10,buff);
+    return 1;
+  }     
 }
 
 
@@ -128,7 +117,7 @@ int rancor_(double *vmin, double *vmax, double shift, double fmult,int nn)
     static double vnew,v;
 
     if(!nn) return 0;
-    
+    if(invcut_1[nn-1].aux!=1) return 0;
     if(invcut_1[nn-1].minon && invcut_1[nn-1].key[1]!='^') 
     {  v=invcut_1[nn-1].cvmin;
        vnew = (v*v - shift) * fmult;
@@ -160,7 +149,7 @@ void  rancor_t(double * cosmax, double hsum , double fmult, double Ecm,
 
 
 
-double  calcCutFactor(void)
+double  calcCutFactor(double*V)
 {  
   int i;
   double val,valM;
@@ -169,8 +158,8 @@ double  calcCutFactor(void)
   { physValRec* pList;
     for(pList=invcut_1[i].pLists;pList;pList=pList->next)
     {  
-       val=calcPhysVal(invcut_1[i].key[0],pList->pstr);
-       if(!finite(val)) continue;
+       val=calcPhysVal(invcut_1[i].key[0],pList->pstr,V);
+       if(!isfinite(val)) continue;
        switch(invcut_1[i].key[1])
        { case '^': if(i){ if(val>valM) valM=val;}  else valM=val; break;
          case '_': if(i){ if(val<valM) valM=val;}  else valM=val; break;
@@ -179,7 +168,7 @@ double  calcCutFactor(void)
          {
            if ( invcut_1[i].minon && (val < invcut_1[i].cvmin)) return 0;
            if ( invcut_1[i].maxon && (val > invcut_1[i].cvmax)) return 0;
-         } 
+         }
          if(invcut_1[i].aux==-1)
          { 
            if(invcut_1[i].minon && invcut_1[i].maxon)
@@ -193,11 +182,11 @@ double  calcCutFactor(void)
        }
     }
     if(invcut_1[i].key[1])
-    {  if(invcut_1[i].aux==1)
+    {  if(invcut_1[i].aux==1)   
        {
          if ( invcut_1[i].minon && (valM < invcut_1[i].cvmin)) return 0;
          if ( invcut_1[i].maxon && (valM > invcut_1[i].cvmax)) return 0;
-       } 
+       }
        else  if(invcut_1[i].aux==-1)
        { 
            if(invcut_1[i].minon && invcut_1[i].maxon)

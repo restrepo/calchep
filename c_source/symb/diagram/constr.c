@@ -196,12 +196,31 @@ static int  testin(int l,decayDiagram restmp)
       {
          np = -np;
          if (np > prtclbase[np-1].anti) np = prtclbase[np-1].anti;
-         j = 1;
-         while (liminsp[j-1].who != 0 && liminsp[j-1].who != np) j++;
-         if (liminsp[j-1].who != 0)
-            if (copyins[j-1] == 1) return 0; else copyins[j-1]--;
+	 for(j=0;liminsp[j].who;j++)
+	 {
+           if (liminsp[j].who == np)
+           { if(copyins[j]>0) { if (copyins[j] == 1) return 0; else copyins[j]--;}
+	     else             { if (copyins[j]<-1) copyins[j]++;} 
+	   }  
+	 }
       }
    }
+
+   if(l==ndecay) 
+   { int nVV=0,pdg;
+     for(j=0;liminsp[j].who;j++) if(copyins[j]<-1) return 0;
+     for (i = 1; i <= 2 * (l - 1); i++)
+     { np = restmp[i-1];
+       if (np < 0)
+       {  np = -np-1;
+          pdg=prtclbase[np].N;
+          if(pdg==23 || abs(pdg)==24)nVV++;               
+       } 
+     }
+     
+     if(nVV > ZWmax || nVV < ZWmin) return 0; 
+   }
+
    return (nneed <= 0);
 }
 
@@ -331,8 +350,7 @@ static void dtc(int* incond,int l,decayDiagram restmp)
    dooutres(res);
 	goto_xy(1,24);  print("%u",n_diagram); refresh_scr();
    if (n_diagram > m_diagram)
-       if ( mess_y_n(35,15,"Continue")) m_diagram += 500;
-      else  errorcode = -1;
+      { if ( mess_y_n(35,15,"Continue")) m_diagram += 500;  else  errorcode = -1;}
 }
 
 
@@ -502,13 +520,13 @@ static void doindex(void)
       do 
       {   
          if (res[i-1] > 0) 
-         if (switch_) 
-         { 
-            addprtcl(p_list,res[i-1]); 
-            j++; 
-         } 
-         else 
-            switch_ = 1; 
+         {  if (switch_) 
+            { 
+              addprtcl(p_list,res[i-1]); 
+              j++; 
+            } 
+            else  switch_ = 1;
+         }    
          i++; 
       }  while (j <= nout); 
 
@@ -710,8 +728,7 @@ static int* prclist(long * power )
   int l=nin+nout-n_x;
   int * list;
 
-  for(i=0;i<l;i++) N*=hadrons[i].pow;
-
+  for(i=0;i<l;i++) N*=hadrons[i].len;
   list=malloc(l*N*sizeof(int));
    
   for(i=0;i<l;i++) num[i]=0;
@@ -722,7 +739,7 @@ static int* prclist(long * power )
      for(i=0;i<l;i++) list[m*l+i]=hadrons[i].parton[num[i]]; 
      for(c=l-1;c>=0;c--)
      {   num[c]++;  
-         if(num[c]==hadrons[c].pow)num[c]=0; else break;
+         if(num[c]==hadrons[c].len)num[c]=0; else break;
      }
   }
 
@@ -754,7 +771,7 @@ static int* prclist(long * power )
 /*delete copies */
   { long  n0=1,m1,k;
 
-    for(i=0;i<nin;i++)n0*=hadrons[i].pow;
+    for(i=0;i<nin;i++)n0*=hadrons[i].len;
     m1=N/n0;
     for(k=0; k<n0;k++)
     for(m=0; m<m1;m++) if(list[(k*m1+m)*l])
@@ -787,11 +804,10 @@ static int* prclist(long * power )
 
 int construct(void)
 {
-   int          i,j,ndiagram;
+   int          i,j,ndiagram,l;
    char buf_name[STRSIZ];
    int *list;
    long N,m;
-   int l;
    char format[2]={62,71};
 
    errorcode=0;   
@@ -842,6 +858,7 @@ int construct(void)
    }
    free(list);
    cleanProcList();
+   n_diagram=(ftell(diagrp))/sizeof(decayDiagram);
    fclose(diagrp);
 
    

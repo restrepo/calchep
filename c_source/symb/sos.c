@@ -1,16 +1,21 @@
 /*
  Copyright (C) 1997, Alexander Pukhov 
 */
+#include <unistd.h>
 #include "chep_crt.h"
 #include "getmem.h"
 #include "syst2.h"
 #include "s_files.h"
 #include "physics.h"
 #include "sos.h"
-#include "c_out.h"    
-#include "prepdiag.h"
+#include "c_out.h"      /* consLow */
+#include "out_serv.h"
+#include "prepdiag.h"   /* longDouble */
 #include "process.h"
 #include "cweight.h"
+#include "dynamic_cs.h"
+#include "VandP.h"
+#include "n_proc.h"
 
 int forceUG=0;
 int newCodes=0;
@@ -21,13 +26,14 @@ static void init_safe(int * exitlevel)
    for(i=0;i<MAXINOUT;i++) 
    { strcpy(hadrons[i].name,"");
      strcpy(hadrons[i].contents,"");
-     hadrons[i].pow=0;
+     hadrons[i].len=0;
    } 
    strcpy(limpch,"");
    strcpy(deloutch,"");
    n_model = 1;
    newCodes=0;
    *exitlevel = 0;
+   nPROCSS=sysconf(_SC_NPROCESSORS_ONLN);
 }
 
 void restoreent(int * exitlevel)
@@ -57,27 +63,30 @@ void restoreent(int * exitlevel)
        ||1!=fscanf(ff,"#Remove_X%[^\n]\n",deloutch)
        ||1!=fscanf(ff,"#nSubproc(ampl) %d\n", &subproc_f)
        ||1!=fscanf(ff,"#nSubproc(squared) %d\n", &subproc_sq)
-       ||1!=fscanf(ff,"#ConservationLow %d\n",&consLow) 
+/*       ||1!=fscanf(ff,"#ConservationLow %d\n",&consLow)  */
        ||1!=fscanf(ff,"#Nc==inf  %d\n",&NcInfLimit)
+       ||1!=fscanf(ff,"#NcCC==inf  %d\n",&NcInfCC)
        ||1!=fscanf(ff,"#NoColorChains %d\n",&noCChain)
        ||1!=fscanf(ff,"#NoDiagrams  %d\n", &noPict)
-       ||1!=fscanf(ff,"#T-widths    %d\n", &tWidths)
-       ||1!=fscanf(ff,"#hPrecision    %d\n", &hPrec)    
-       ||1!=fscanf(ff,"#NewCodes  %d\n", &newCodes)             
-       ||1!=fscanf(ff,"#ExitCode %d\n",exitlevel) )  init_safe(exitlevel);
-
+       ||1!=fscanf(ff,"#T-widths    %d\n", &tWidths)    
+       ||1!=fscanf(ff,"#VVdecays  %d\n", &VWdecay)
+       ||1!=fscanf(ff,"#NewCodes  %d\n", &newCodes)
+       ||1!=fscanf(ff,"#nPROCSS %d\n",&nPROCSS)   
+       ||1!=fscanf(ff,"#ExitCode %d\n",exitlevel) ) init_safe(exitlevel); 
       fclose(ff);
       trim(processch); trim(limpch); trim(deloutch);
       
    } else init_safe(exitlevel);
+   VZdecay=VWdecay;
 }
 
 
 void saveent(int  exitlevel)
-{  FILE * ff=fopen("tmp/safe","w"); 
+{  FILE * ff; 
    int i;
    int ntot=0;
-   
+   if(strcmp(outputDir,"results/")) chdir("../"); 
+   ff=fopen("tmp/safe","w");
    fprintf(ff,"#Model %d\n",n_model);
    fprintf(ff,"#ForceUG %d\n",forceUG);
    fprintf(ff,"#nIn %d\n",nin);
@@ -91,14 +100,18 @@ void saveent(int  exitlevel)
    fprintf(ff,"#Remove_X %s\n",deloutch);
    fprintf(ff,"#nSubproc(ampl) %d\n", subproc_f);
    fprintf(ff,"#nSubproc(squared) %d\n", subproc_sq);
-   fprintf(ff,"#ConservationLow %d\n",consLow); 
+/*   fprintf(ff,"#ConservationLow %d\n",consLow); */
    fprintf(ff,"#Nc==inf  %d\n",NcInfLimit);
+   fprintf(ff,"#NcCC==inf  %d\n",NcInfCC);
    fprintf(ff,"#NoColorChains %d\n",noCChain);
    fprintf(ff,"#NoDiagrams  %d\n", noPict); 
    fprintf(ff,"#T-widths    %d\n", tWidths);
-   fprintf(ff,"#hPrecision  %d\n", hPrec);
-   fprintf(ff,"#NewCodes  %d\n", newCodes);             
+   fprintf(ff,"#VVdecays    %d\n", VWdecay);
+   fprintf(ff,"#NewCodes  %d\n", newCodes);
+   fprintf(ff,"#nPROCSS %d\n",nPROCSS);         
    fprintf(ff,"#ExitCode %d\n",exitlevel);
+//   fprintf(ff,"#Model paramters:\n");
+//   { for(i=0;i<nModelVars;i++) fprintf(ff,"%s\n",varNames[i]);}
    fclose(ff);
 }
 

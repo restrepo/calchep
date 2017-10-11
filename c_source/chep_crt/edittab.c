@@ -567,7 +567,7 @@ static int s_edit(int x1,  int x2, int x0, int  y1, char * s, int show )
          printf(" s-cursor: x=%d\n",x);
 #endif 
             if( mouse_info.col==X1 && mouse_info.row==Y1-1) push_key(KB_ESC);
-            else if (rc=hbl_select(hbl/*->next*/)) push_key(rc);
+            else if((rc=hbl_select(hbl))) push_key(rc);
             else if (m_inbox(x1-1,y1-1,x2+1,y1+1)) scrCur=mouse_info.col;
             else if (m_inbox(e_box.x1,e_box.y1,e_box.x2,e_box.y2)) 
             { 
@@ -786,6 +786,7 @@ int  edittable(int xx,int yy,table * tab,int ntop,char * hlpf,int show)
   int dx,dy;   /*  Mouse */
   int rc;
   
+  if(!blind && tab->pos) ntop=tab->pos;  
   clearTypeAhead();
   initEdit(tab,xx,yy, ntop);
   e_box.x1=X1;
@@ -850,7 +851,7 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
 #endif
 
             if( mouse_info.col==X1 && mouse_info.row==Y1-1) push_key(KB_ESC);
-       else if (rc=hbl_select(hbl)) push_key(rc);						  		
+       else if((rc=hbl_select(hbl))) push_key(rc);						  		
        else if(c_tab.top &&    m_inbox(X1,Y1+1,X2,Y2) 
                && tab->format[mouse_info.col-X1+c_tab.x0-2]!=SEPR_CHAR ) 
        {  linelist ll=c_tab.edit;
@@ -934,10 +935,10 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
     	   c_tab.del=del2;								           
     	}										           
     	edit=1;
-        scrCur  = X1-c_tab.x0+2;
-        setFieldFrame(scrCur,tab->format);
-        if(scrCur<=X1 ||scrCur>=X2 )shiftL(X1-scrCur+1,tab);
-    	redrawTable(tab);                      	
+        scrCur  = X1-c_tab.x0+2;						                   
+        setFieldFrame(scrCur,tab->format);						                   
+        if(scrCur<=X1 ||scrCur>=X2 )shiftL(X1-scrCur+1,tab);				                   
+    	redrawTable(tab);
     	push_key(KB_DOWN);
         push_key(1);									                   
     	break;
@@ -1075,7 +1076,7 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
           fclose(f);
           if(k>size)
           { 
-            if(c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR)
+//            if(c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR)
             {  int min,max;
                 minmaxFSize(&min,&max);
                 if(k<=max) {spreadField(k-size); size=c_tab.x2 - c_tab.x1 +1;}
@@ -1197,14 +1198,15 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
 
     case CTRL('S'):									        
     	if (show)  break;
-    	if(c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR
-          &&	resizeField()) {edit = 1; redrawTable(tab);}				        				      	
+    	if(
+//    	c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR &&	
+    	resizeField()) {edit = 1; redrawTable(tab);}				        				      	
     	break;
     	
     case -150:   /* automatic size inclease by A.Pukhov */
         dx=pop_key();
         if(show) break;
-        if(c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR)
+//        if(c_tab.tab->format[X2XT(c_tab.x2)-1] == RESIZE_CHAR)
         {  int d,min,max; 
            int kk=c_tab.x2-c_tab.x1+1;
            
@@ -1217,7 +1219,8 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
               edit = 1;
               push_key(dx);
            } else be_be();
-        } else be_be();  
+        }
+//         else be_be();  
         break;
         
     case KB_F1: show_help(hlpf);      break;						        
@@ -1237,5 +1240,6 @@ printf(" cursor: x=%d, x1=%d, y=%d\n",c_tab.x1,c_tab.x2,c_tab.y);
   if (hbl) { hbl_close(hbl); hbl_delete(hbl);};
   scrcolor(White,Black);
   put_text(&pscr);
+  tab->pos=c_tab.y0+ (c_tab.y-Y1-2);
   return edit;
 } 

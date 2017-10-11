@@ -72,7 +72,7 @@ static void  savepoly(poly p)
 }
 
 
-void  saveanaliticresult(poly rnum,poly factn,poly factd, vcsect vcs, int nFile)
+void  saveanaliticresult(poly rnum,poly factn,poly factd, vcsect vcs, int ndiagr_abs,  int nFile)
 {catrec      cr;
  int        i;
  int m;
@@ -81,7 +81,15 @@ void  saveanaliticresult(poly rnum,poly factn,poly factd, vcsect vcs, int nFile)
 
    cr.nsub_ = nsub;
    cr.ndiagr_ = ndiagr;
-       
+   cr.ndiagr_abs=ndiagr_abs;    
+   if(!rnum) 
+   { cr.status=2;
+     cr.factpos=cr.nFile=cr.rnumpos=cr.denompos=-1;
+     FWRITE1(cr,catalog);
+     diskerror = NULL;
+     return;
+   }
+   cr.status=1;  
    cr.factpos = ftell(archiv);
    cr.nFile=nFile;
    vardef++;
@@ -94,10 +102,7 @@ void  saveanaliticresult(poly rnum,poly factn,poly factd, vcsect vcs, int nFile)
    savevardef();
    savepoly(rnum);
 
-
    cr.denompos = ftell(archiv);
-   
-
    calcdenominators(vcs );   
 
    FWRITE1(denrno,archiv);   /*  number of demominatirs  */
@@ -107,6 +112,7 @@ void  saveanaliticresult(poly rnum,poly factn,poly factd, vcsect vcs, int nFile)
        FWRITE1(denom[i].power,archiv);   /*  power  1 or 2  */
        FWRITE1(denom[i].mass,archiv);
        FWRITE1(denom[i].width,archiv);
+       FWRITE1(denom[i].pnum,archiv);
        m=0;  do FWRITE1(denom[i].momStr[m],archiv); while(denom[i].momStr[m++]);
    }
    FWRITE1(cr,catalog);

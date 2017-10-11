@@ -4,25 +4,18 @@
 #include<stdlib.h>
 #include<string.h> 
 #include<math.h>
+#include "nType.h"
 
 extern double alpha_2(double);
+typedef REAL (DNN)(double, REAL *,REAL*,double*, int *);
+typedef REAL (FNN)(double,REAL*,REAL*,COMPLEX*,REAL*,REAL*);
 
-extern  Real sqrMom(int, char*, Real*);
-extern  Real DP[]; 
-extern  Real *Q0,*Q1,*Q2;
-extern  int    prepDen(int nden, double BWrange2,   
-                       double s0max, Real * dmass,double * dwidth, Real *q);
-extern  Real*DPmonom;
-extern  void sprod_(int ntot, Real * momenta);
-
+extern  REAL Helicity[2];
 
 extern  int    CalcConst;
-extern  double Fmax;
-extern  int nMonoms;
-extern  double HelicityN[2];
 extern  int    indx_(int k,int l);
-extern double Eps;
-
-
-
+extern  void   sprod_(int ntot, REAL * momenta, REAL*DP);
+extern  int    prepDen(int nden, int nin, double BWrange2,   
+                       REAL * dmass,REAL * dwidth, char **q,REAL * mom, 
+                       REAL *Q0,COMPLEX*Q1,REAL*Q2);
 #endif

@@ -1,8 +1,16 @@
+#define _FILE_OFFSET_BITS 64 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
+#include <errno.h>
 #include "event2pyth.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
+//extern FILE *fopen64(const char *filename, const char *type);
 
 static FILE * eF=NULL;
 static double cs;
@@ -16,10 +24,16 @@ static void fName2c(char*f_name,char*c_name,int len)
 int openeventfile_(char *fname, int len)
 {
   char * cname;
+ 
   if(len<0) {eF=stdin; return 0;}
   cname=malloc(len+1);
   fName2c(fname,cname,len);
+/*  channel=open(cname,O_RDONLY);*/
+ 
+  printf("cname=|%s|\n",cname);
   eF=fopen(cname,"r");
+  printf("eF=%p\n",eF);
+/*  printf("errno=%d\n",errno); */ 
   free(cname);
   if(eF) return 0; else return 1;  
 }

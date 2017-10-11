@@ -6,16 +6,25 @@
 The Makefiles of CalcHEP uses gmake facilities. If you have not 
 'gmake' command, it means that your 'make' works like 'gmake'      
 
-2. gmake should find and check compiler option. If you would like 
-to turn these options, call
-     [g]make FLAGS
-It should create files FlagsForSh and FlagsForMake and stop.
-At this step you have a possibility to change the FlagsForSh file 
-and launch after that [g]make again  for final compilation.
+In case of success you should get a messahe 
+
+# CalcHEP has compiled successfuly and can be started.
+  ..............
+
+2. If in result of compilation you get a warning
+  # CalcHEP has compiled without X11.   
+    .......
+it means that X11 header files are  not detected on your computer and 
+CalcHEP interactive mode will not work. The problem can be solved by
+installation on your computer  one of additional packages:
+
+   libX11-devel     for  Fedora/Scientific, Darwin(MAC)                          
+   libX11-dev       for  Ubuntu/Debian                                           
+   xorg-x11-devel   for  SUSE        
 
 3. To create a directory for CalcHEP working sessions call
 
-   ./mkUsrDir < directory name> 
+   ./mkWORKDir < directory name> 
    
 It is possible to create several working directories. 
 We don't recommend to create working directories inside CalcHEP.
@@ -24,9 +33,8 @@ We don't recommend to create working directories inside CalcHEP.
 and call 
      ./calchep
 
-5. Current version  contains  only two versions of SM, one with complete 
-CKM matrix and another (SM') with diagonal CKM. In case of SM' Cabibbo angle 
-is taken into accoount by  modification of parton distributions. 
+5. By default CalcHEP   contains  only two versions of SM, one with complete 
+CKM matrix and another (CKM=1) with diagonal CKM.
    The realizations of  Beyond the  Standard  Models have to be 
 download independently. To install such models the user has to 
 a) download the corresponding <model>.tgz file. 
@@ -57,14 +65,14 @@ f) To add a new model to the list of models for your working sessions use the
 7.  You can get a help during the session by pressing the F1 and 
     F2 keys. Read CalcHEP manual to get more information about the package.
     You can find it at
-      http://www.ifh.de/~pukhov/calchep.html
       http://theory.sinp.msu.ru/~pukhov/calchep.html 
 
 In case of problem send a mail to 
-    pukhov@lapp.in2p3.fr
+     	
+    calchep@googlegroups.com
 
 8. To de-install the package call
     [g]make clean
-  this command does not erase FlagForSh file, which should be 
-  deleted separately if you are going  to recompile CalcHEP on 
-  some other  platform.  
+and 
+    [g]make clean 
+    separately in each additionally installed  model directory.

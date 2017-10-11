@@ -13,9 +13,10 @@
 #include "crt.h"
 #include "process.h"
 
+
 static char momsubst[4], indsubst[4];
 static int  r_reading0 = 0;
-
+static int maxMom=1000;
 static int forR_code;
 
 static void * bact0(char ch,void* mm1,void* mm2)
@@ -97,12 +98,13 @@ static void *  uact0(char* ch,void* mm)
    ans=(char *) m_alloc(strlen(m)+10);
 
    if (strcmp(ch,"-") == 0)
-   if (m[0] == 'M')
-   {
-      if (m[2] == '-') sprintf(ans,"M|%s",m+3);
-      else  sprintf(ans,"M|-%s",m+2);
-   }  else  sprintf(ans,"M|-(%s)",m+2);
-
+   {  if (m[0] == 'M')
+     {
+        if (m[2] == '-') sprintf(ans,"M|%s",m+3);
+        else  sprintf(ans,"M|-%s",m+2);
+     }  else  sprintf(ans,"M|-(%s)",m+2);
+   }
+   
    if (strcmp(ch,"G") == 0)
    {  if(forR_code)
       {
@@ -127,6 +129,7 @@ static void * act_rcode(char * ch, int n, void**args)
      (char*)args[2]+2,(char*)args[3]+2);
      return ans;
    }
+   return NULL;
 }
 
 
@@ -134,7 +137,7 @@ static void*  rd_rcode(char* s)
 {  char    * p;
    int  num;
 
-   p = (char *) m_alloc(12);
+   p = (char *) m_alloc(4+VAR_NAME_SIZE);
    p[0]=0;
    if (strlen(s) == 2 && s[1] > '0' && s[1] <= '9')
    {
@@ -144,8 +147,15 @@ static void*  rd_rcode(char* s)
         case 'P':
                num = s[1] - '0';
                num = momsubst[num-1];
-               if (num > 0) sprintf(p,"M|p%d",num);
-                    else    sprintf(p,"M|-p%d",-num);
+               if(num==maxMom) // for  parseOneVertex
+               { p=realloc(p,3*maxMom+10);
+                 strcpy(p,"M|(");
+                 for(int i=1;i<maxMom;i++) sprintf(p+strlen(p),"-p%d",i);
+                 strcat(p,")");
+               } else 
+               {  
+                 if(num > 0) sprintf(p,"M|p%d",num); else    sprintf(p,"M|-p%d",-num);
+               }  
             break;
 
         case 'm':
@@ -168,10 +178,10 @@ static void*  rd_rcode(char* s)
 
 char* parseVertex(int v, int forReduce)
 { 
-  int j;
+  int i,j;
   int sgn=1;
   char *pstr, *pstr2;
-
+  maxMom=1000; // To avoid substitutions P_maxMom=(-p1-p2 ...)
   for (j = 0; j < MAX(1,vcs.valence[v]); j++)
   {
       momsubst[j]=vcs.vertlist[v][vertexes[v].subst[j]-1].moment;
@@ -188,14 +198,19 @@ char* parseVertex(int v, int forReduce)
      sortie(60);
   }
   
-  if (vcs.valence[v] == 3 &&
-          prtclbase1[vcs.vertlist[v][0].partcl].cdim == 8 &&
-          prtclbase1[vcs.vertlist[v][1].partcl].cdim == 8 &&
-          prtclbase1[vcs.vertlist[v][2].partcl].cdim == 8)
+  int nc=0;
+  int cdi[MAXVALENCE],si[MAXVALENCE],rsubst[MAXVALENCE];
+  for(i=0;i<vcs.valence[v];i++) rsubst[vertexes[v].subst[i]-1]=i+1;
+  for(i=0;i<vcs.valence[v];i++)if(prtclbase1[vcs.vertlist[v][i].partcl].cdim!=1)
+  {  si[nc]=rsubst[i];
+     cdi[nc++]=prtclbase1[vcs.vertlist[v][i].partcl].cdim;
+  }
+
+  if(nc==3 && cdi[0]==cdi[1] && cdi[0]==cdi[2] && (abs(cdi[0])==3 || cdi[0]==8))
   {
-         if (vertexes[v].subst[0] > vertexes[v].subst[1]) sgn = -sgn;
-         if (vertexes[v].subst[1] > vertexes[v].subst[2]) sgn = -sgn;
-         if (vertexes[v].subst[0] > vertexes[v].subst[2]) sgn = -sgn;
+         if (si[0] > si[1]) sgn*= -1;
+         if (si[1] > si[2]) sgn*= -1;
+         if (si[0] > si[2]) sgn*= -1;
   }
    
   if(sgn==1) 
@@ -208,6 +223,60 @@ char* parseVertex(int v, int forReduce)
   free(pstr);
   return pstr2;                                                                                                                         
 }
+
+char* parseOneVertex(char*v, int * perm ,int * field)
+{ 
+  int i,j;
+  int sgn=1;
+  int val= field[3]==0? 3:4;
+  char *pstr, *pstr2;
+
+  maxMom=val;
+  
+  for(i = 0; i < val; i++)
+  {
+      momsubst[i]=perm[i];
+      indsubst[i]=perm[i];
+  }
+
+  int spin[2]={0,0};
+  for(i=0,j=0;i<val;i++) if(prtclbase1[field[i]].spin&1) spin[j++]=i;
+  
+  if(!spin[0]) r_reading0=0;
+  else r_reading0= ( perm[spin[0]]> perm[spin[1]]);
+  forR_code=0;
+                                          
+  pstr = (char *) readExpression(v,rd_rcode, act_rcode, free);
+  if(rderrcode){ finish(); sortie(60);}
+  
+  int nc=0;
+  int cdi[MAXVALENCE],si[MAXVALENCE],rsubst[MAXVALENCE];
+  for(i=0;i<val;i++) rsubst[perm[i]-1]=i+1;
+  for(i=0;i<val;i++)if(prtclbase1[field[i]].cdim!=1)
+  {  si[nc]=rsubst[i];
+     cdi[nc++]=prtclbase1[field[i]].cdim;
+  }
+
+  if(nc==3 && cdi[0]==cdi[1] && cdi[0]==cdi[2] && (abs(cdi[0])==3 || cdi[0]==8))
+  {
+         if (si[0] > si[1]) sgn*= -1;
+         if (si[1] > si[2]) sgn*= -1;
+         if (si[0] > si[2]) sgn*= -1;
+  }
+   
+  if(sgn==1) 
+  {  pstr2=m_alloc(strlen(pstr));
+     strcpy(pstr2,pstr+2);
+  } else
+  { pstr2=m_alloc(strlen(pstr)+8);   
+    sprintf(pstr2,"(-1)*(%s)",pstr+2);
+  }                                                                                                                       
+  free(pstr);
+  return pstr2;                                                                                                                         
+}
+
+
+
 
 char * fermPropagTxt(int v,int l,int forReduce)
 {  char * proptxt=(char*)malloc(30);
@@ -274,40 +343,25 @@ char * spin3_2_propagator(int v,int l,int forReduce)
   int m1=vcs.vertlist[v][l].lorentz;
   int m2=vcs.vertlist[vv][ll].lorentz;
   int P=vcs.vertlist[v][l].moment;
-  int PN=vcs.vertlist[v][l].partcl;
-  char * mass=prtclbase1[PN].massidnt;
-  int aux=prtclbase1[PN].hlp;
+  char * mass=prtclbase1[vcs.vertlist[v][l].partcl].massidnt;
 
   if(P<0) {P=-P; sgn="-";} 
   if(forReduce) Ln="ln,";
-  if(aux=='*') sprintf(txt, "-3*(%s)"
-                            "*(%s^2*m%d.m%d )"
-                            "-(G(%sm%d)*%s)"
+  sprintf(txt, "-3*(%sG(%sp%d)+%s)"
+               "*(%s^2*m%d.m%d - p%d.m%d*p%d.m%d)"
+               "-(G(%sm%d)*%s +(%sp%d.m%d))"
+               "*(%sG(%sp%d)-%s)"
+               "*(G(%sm%d)*%s+(%sp%d.m%d))"
 
-                            "*(-%s)"
-                            "*(G(%sm%d)*%s)"
+        ,sgn,Ln,P,mass
+        , mass,m1,m2,P,m1,P,m2
+       ,  Ln,m1,mass,sgn,P,m1
+     ,    sgn,Ln,P,mass,
+         Ln,m2,mass,sgn,P,m2
+         
+);   
 
-                           ,mass
-                           ,mass,m1,m2
-                           ,Ln,m1,mass
-                           ,mass
-                           ,Ln,m2,mass
-                      );
-  
-       else    sprintf(txt, "-3*(%sG(%sp%d)+%s)"
-                            "*(%s^2*m%d.m%d - p%d.m%d*p%d.m%d)"
-                            "-(G(%sm%d)*%s +(%sp%d.m%d))"
-
-                           "*(%sG(%sp%d)-%s)"
-                           "*(G(%sm%d)*%s+(%sp%d.m%d))"
-
-                          ,sgn,Ln,P,mass
-                          ,mass,m1,m2,P,m1,P,m2
-                          ,Ln,m1,mass,sgn,P,m1
-                          ,sgn,Ln,P,mass
-                          ,Ln,m2,mass,sgn,P,m2  
-                      );
-  return txt;
+return txt;
 }
 #ifdef XXX
 

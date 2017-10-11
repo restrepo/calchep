@@ -1,9 +1,10 @@
 /*
- Copyright (C) 2002-2006, Alexander Pukhov
+ Author  Alexander Pukhov
 */
 #include"interface.h"
 
 #include"cut.h"
+#include"comp.h"
 #include"kinaux.h"
 #include"kininpt.h"
 
@@ -21,21 +22,26 @@
 #include"files.h"
 #include"subproc.h"
 #include"paragraphs.h"
-#include"events.h"
-extern  double Helicity[2];
-#define NITEMS 15
+#include"num_in.h"
+#include"VandP.h"
+#include"dynamic_cs.h"
+
+#define NITEMS 19
+char *p_names[20];
+int   p_codes[20];
+static int rdErr;
 
 static int writeIntegral(FILE *f)
 {
-  fprintf(f," %.17E %.17E %.17E %d %d %d %d", integral.s0,integral.s1,integral.s2,
-  integral.n_it, integral.old, integral.nCallTot,  integral.freeze);
+  fprintf(f," %.17E %.17E %.17E %d %d %ld %d %d", integral.s0,integral.s1,integral.s2,
+  integral.n_it, integral.old,integral.nCallTot,integral.freeze,integral.tp);
   return 0;
 }
 
 static int readIntegral(FILE *f)
 {
-  fscanf(f," %lf %lf %lf %d %d %ld %d", &(integral.s0),&(integral.s1),
-  &(integral.s2),&(integral.n_it),&(integral.old),&(integral.nCallTot),&(integral.freeze));
+  fscanf(f," %lf %lf %lf %d %d %ld %d %d", &(integral.s0),&(integral.s1),
+  &(integral.s2),&(integral.n_it),&(integral.old),&(integral.nCallTot),&(integral.freeze),&(integral.tp));
   return 0;
 }
 
@@ -55,16 +61,31 @@ static int r_prc__(FILE *mode)
 }
 
 static int w_mc__(FILE *mode)
-{ fprintf(mode,"%dx%d",integral.ncall[0],integral.itmx[0]);
-  fprintf(mode," %dx%d",integral.ncall[1],integral.itmx[1]);
+{ fprintf(mode,"%ldx%d",integral.ncall[0],integral.itmx[0]);
+  fprintf(mode," %ldx%d",integral.ncall[1],integral.itmx[1]);
   return 0;
 }
 
 static int r_mc__(FILE *mode)
 { fscanf(mode,"%ldx%d",integral.ncall,integral.itmx); 
-  fscanf(mode," %ldx%d",integral.ncall+1,integral.itmx+1); 
+  fscanf(mode," %ldx%d",integral.ncall+1,integral.itmx+1);
   return 0;
 }
+
+static int  wrtNcores(FILE *mode)
+{ 
+  fprintf(mode,"  %d\n",nPROCSS);   
+  return 0;
+}
+
+static int rdNcores(FILE *mode)
+{ 
+  fscanf(mode," %d",&nPROCSS);
+  return 0;
+}
+
+
+
 
 static int w_widths(FILE *mode)
 { 
@@ -86,12 +107,17 @@ static int r_widths(FILE *mode)
      return 0;
 }                                   
 
+
+static int w_VVdecays(FILE *mode) { fprintf(mode," %d\n", VWdecay); return 0;  }
+
+static int r_VVdecays(FILE*mode)  { fscanf(mode," %d",&VWdecay);  VZdecay=VWdecay; return 0; }
+
 static int w_mdl__(FILE * mode)
 {
   int i;
 
   fprintf(mode,"\n"); 
-  for (i = 1; i <= nvar_int; ++i) fprintf(mode,"%10s = %.15E\n",varName_int[i],readVar(i));
+  for (i = 0; i < nModelVars; ++i) fprintf(mode,"%10s = %.15E\n",varNames[i],(double)varValues[i]);
   fprintf(mode,"----\n"); 
   return 0;
 }
@@ -99,55 +125,45 @@ static int w_mdl__(FILE * mode)
 static int r_mdl__(FILE * mode)
 {
   static double val;
-  int i,k;
+  int i;
   char name1[20];    
-  char * t=malloc(nvar_int+1);
-  char * mess;
 
-  for (i = 1; i <=nvar_int; ++i) t[i]=0;
   for(;;)
   { if(2!= fscanf(mode,"%s = %lf",name1,&val)) break;
-    for(i=1;i<=nvar_int;i++)if(strcmp(name1,varName_int[i])==0)
-    { t[i]=1; writeVar(i,val); break;}
-  }
-   
-  for(k=0,i=1; i<=nvar_int; ++i) if(!t[i]) k+=2+strlen(varName_int[i]);
-  if(k) 
-  {  mess=malloc(k+50);
-     k=0;
-     sprintf(mess,"The following parameters keep default values:\n");
-     for(i=1;i<=nvar_int;i++) if(!t[i])        
-     {  
-       strcat(mess,varName_int[i]);  
-       k+=1+strlen(varName_int[i]);
-       if(k>=60) {strcat(mess,"\n"); k=0;} else strcat(mess," ");
-     }
-     messanykey(5,5,mess);
-     free(mess);
-  } 
-  free(t);   
+    for(i=0;i< nModelVars;i++)if(strcmp(name1,varNames[i])==0)
+    { varValues[i] = val; break;}
+  }  
   return 0;
 } 
 
+static double hMem[2]={0,0};
+
 static int w_in__(FILE *mode)
 { 
-  if(nin_int==1)  fprintf(mode," inP1=%E\n",inP1); else
-  {
-    fprintf(mode," inP1=%E  inP2=%E\n",inP1,inP2);
-    fprintf(mode," Polarizations= { %E  %E }\n",Helicity[0],Helicity[1]);
-    wrt_sf__(mode);
-  }
+  fprintf(mode," inP1=%E  inP2=%E\n",inP1,inP2);
+
+  if(nin_int==2) {if(is_polarized(1,Nsub)) hMem[0]=Helicity[0]; if(is_polarized(2,Nsub))hMem[1]=Helicity[1];}
+  
+  fprintf(mode," Polarizations= { %E  %E }\n",hMem[0],hMem[1]);
+  
+  wrt_sf__(mode);
+
   return 0;
 }
+
 static int r_in__(FILE *mode)
 { 
-  if(nin_int==1)   fscanf(mode," inP1=%lf\n",&inP1); else
-  {
-     fscanf(mode," inP1=%lf  inP2=%lf\n",&inP1,&inP2);
-     fscanf(mode," Polarizations= { %lf  %lf }\n",Helicity,Helicity+1);
-     rd_sf__(mode);
-  }
-  return 0;
+   fscanf(mode," inP1=%lf  inP2=%lf\n",&inP1,&inP2); 
+
+   fscanf(mode," Polarizations= { %lf  %lf }\n",hMem,hMem+1);
+            
+   if(nin_int==2)
+   {
+      if(is_polarized(1,Nsub)) Helicity[0]=hMem[0];
+      if(is_polarized(2,Nsub)) Helicity[1]=hMem[1];
+   }   
+   rd_sf__(mode);
+   return 0;
 }
 
 
@@ -168,17 +184,19 @@ int wrtprc_(void) /* write process string */
 {
   int i;
   char * s=Process;
-  strcpy(s,pinf_int(Nsub,1,NULL,NULL));
+  for(i=0; i<nin_int+nout_int; i++)p_names[i]=pinf_int(Nsub,i+1,NULL,p_codes+i);
+
+  strcpy(s,p_names[0]);
   if(is_polarized(1,Nsub)) strcat(s,"%");
   if(nin_int==2) 
   { strcat(s,", ");
-    strcat(s,pinf_int(Nsub,2,NULL,NULL));
+    strcat(s,p_names[1]);
     if(is_polarized(2,Nsub)) strcat(s,"%");
   }
   strcat(s," -> ");
-  for (i=nin_int+1;i<=nin_int+nout_int ;i++)
-  {  if( i!=nin_int+1)  strcat(s,", ");
-     strcat(s, pinf_int(Nsub,i,NULL,NULL));
+  for (i=nin_int;i<nin_int+nout_int ;i++)
+  {  if( i!=nin_int)  strcat(s,", ");
+     strcat(s,p_names[i]);
   }   
   return 0;
 }
@@ -189,21 +207,25 @@ int w_sess__(FILE *mode_)
    FILE*mode;
    rw_paragraph  wrt_array[NITEMS]=
    {
-      {"Subprocess",  w_prc__},
+      {"Subprocess",      w_prc__},
       {"Session_number",  wnsess_},
-      {"Initial_state",  w_in__},
+      {"Initial_state",   w_in__},
       {"Physical_Parameters",  w_mdl__},
-      {"Breit-Wigner", w_widths}, 
+      {"Breit-Wigner",    w_widths}, 
+      {"VVdecays",        w_VVdecays},
+      {"alphaQCD",        w_alphaQCD},
+      {"QCDscales",       w_Scales},      
+      {"Composites",      wrtcomp_},
+      {"Cuts",            wrtcut_},
+      {"Parallelization", wrtNcores},
+      {"Distributions",   wrt_hist},
       {"Kinematical_scheme",  wrtkin_},
-      {"Cuts",  wrtcut_},
       {"Regularization",  wrtreg_},
-      {"QCD",  w_qcd__},
-      {"Vegas_calls",  w_mc__},
-      {"Vegas_integral", writeIntegral},
-      {"Distributions", wrt_hist},
-      {"Events",saveEventSettings},
-      {"Random", saveRandom},
-      {"VEGAS_Grid", saveVegasGrid}
+      {"Vegas_calls",     w_mc__},
+      {"Vegas_integral",  writeIntegral},
+      {"Events",          saveEventSettings},
+      {"Random",          saveRandom},
+      {"VEGAS_Grid",      saveVegasGrid}
    };
 
    if (mode_ == NULL)
@@ -214,10 +236,13 @@ int w_sess__(FILE *mode_)
    } else mode=mode_;
 
    if(mode_ == NULL)
-   {
+   {  char fname[100];
       writeParagraphs(mode,NITEMS,wrt_array);
       fclose(mode);
-   } else   writeParagraphs(mode,8,wrt_array);
+      sprintf(fname,"%saux/session.dat",outputDir);
+      mode=fopen(fname,"w");
+      if(mode) {writeParagraphs(mode,9,wrt_array+2); fclose(mode);}
+   } else   writeParagraphs(mode,10,wrt_array);
 
    return 0;
 }    
@@ -225,52 +250,41 @@ int w_sess__(FILE *mode_)
 int r_sess__(FILE *mode_)
 {
   FILE*mode;
-  
+  rdErr=0;
  rw_paragraph  rd_array[NITEMS]=
  {
-   {"Subprocess",  r_prc__},
+   {"Subprocess",      r_prc__},
    {"Session_number",  rnsess_},
-   {"Initial_state",  r_in__},
+   {"Initial_state",   r_in__},
    {"Physical_Parameters",  r_mdl__},
-   {"Breit-Wigner", r_widths},
-   {"Kinematical_scheme",  rdrkin_},
-   {"Cuts",  rdrcut_},
+   {"Breit-Wigner",    r_widths},
+   {"VVdecays",        r_VVdecays}, 
+   {"alphaQCD",        r_alphaQCD},
+   {"QCDscales",       r_Scales},          
+   {"Composites",      rdrcomp_},
+   {"Cuts",            rdrcut_},
+   {"Parallelization", rdNcores}, 
+   {"Distributions",   rdr_hist},
    {"Regularization",  rdrreg_},
-   {"QCD",  r_qcd__},
-   {"Distributions", rdr_hist},
-   {"Vegas_integral", readIntegral},
-   {"Vegas_calls",  r_mc__},  
-   {"Events", readEventSettings},
-   {"Random", readRandom},
-   {"VEGAS_Grid",readVegasGrid}
+   {"Kinematical_scheme",  rdrkin_},
+   {"Vegas_integral",  readIntegral},
+   {"Vegas_calls",     r_mc__},  
+   {"Events",          readEventSettings},
+   {"Random",          readRandom},
+   {"VEGAS_Grid",      readVegasGrid}
  };
                        
                          
  if (mode_ == NULL) 
  { 
-   mode=fopen("session.dat","r"); 
-   if (mode ==NULL) return 0;
+    mode=fopen("session.dat","r"); 
+    if (mode ==NULL)
+    { mode=fopen("aux/session.dat","r");
+      if(mode==NULL) return -1;
+    }
  }else mode=mode_;
- readParagraphs(mode, NITEMS,rd_array); 
- 
+ readParagraphs(mode, NITEMS,rd_array);  
  if (mode_ == NULL) fclose(mode); 
  wrtprc_();
- return 0;
-} /* r_sess__ */
-
-
-/*
-void  inipar_(void)
-{
- Nsub=1;
- wrtprc_();
-
- stdkin_();
- i_qcd();
- nSess = 1;
- *rwidth_int=0;
- *gwidth_int=0; 
- *twidth_int=0;
- if(nin_int==1) inP1=0;
-} 
-*/
+ return rdErr;;
+}

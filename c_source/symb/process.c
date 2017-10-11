@@ -9,29 +9,14 @@
 #include "read_mdl.h"
 #include "process.h"
 
-whohow     liminsp;
+whohow     liminsp, LimQ;
 whohow     limout;
 
-
-static void allNewPrtcls(int mSM,char * list)
-{ int i,j, ok;
-  int sm[18]={1,2,3,4,5,6,11,12,13,14,15,16,21,22,23,24,81,83};
-  list[0]=0;
-  for(i=0;i<nparticles;i++) 
-  { 
-    if(pseudop(i+1) || i+1 !=ghostmother(i+1) || i+1 > prtclbase[i].anti 
-    ||strcmp(prtclbase[i].massidnt,"0")==0    ||  prtclbase[i].N==0  ) 
-    ok=0; else ok=1;
-
-    if(mSM)for(j=0;ok&&j<18;j++) if(abs(prtclbase[i].N)==sm[j]) ok=0;
-    if(ok)sprintf(list+strlen(list),"%s,",prtclbase[i].name);                    
-  }
-  if(list[0])list[strlen(list)-1]=0;   
-}
-
+int ZWmax=1000, ZWmin=-1000;
 
 int  nin, nout, n_x;   /* Number of X-particles */
-shortstr processch="", limpch="", deloutch="";
+shortstr  processch="";
+char limpch[STRSIZ]="", deloutch[STRSIZ]="";
 
 hadron hadrons[MAXINOUT];
 
@@ -63,8 +48,12 @@ static void  addlim(whohow p_list,int j,int k, int anti)
 
    for (i = 0; i < whohowMAX-1; i++) 
    { 
-      if (p_list[i].who == j) return;
-      if (p_list[i].who == 0) 
+      if (p_list[i].who == j)
+      { if(  ( k>0 && p_list[i].how>0 && k<p_list[i].how) 
+           ||( k<0 && p_list[i].how<0 && k>p_list[i].how)  
+          ) { p_list[i].how=k; return; }
+      }
+      if(p_list[i].who == 0) 
       {  p_list[i].who = j; 
          p_list[i].how = k; 
          p_list[i+1].who = 0; 
@@ -170,9 +159,8 @@ static void  prtcllist(int  key)
 }
 
 
-
-
 static char * errTxt=NULL;
+static char err_Txt[40];
 
 static int input(int y0, char*hlp, char*directive, char*text, int cur, int lim)
 {
@@ -209,11 +197,10 @@ static int input(int y0, char*hlp, char*directive, char*text, int cur, int lim)
 static int enter_h(int * y,char* name,int num,int scat)
 { int      i,m,j=0;
   int      redres;
-  shortstr hadrch;  
+  char     hadrch[STRSIZ];  
 
   char ** items;
   char * errpos=NULL;
-
   locateinbase(name,&j);
   if(j)
   { 
@@ -221,7 +208,7 @@ static int enter_h(int * y,char* name,int num,int scat)
     strcpy(hadrons[num].name,name);
     strcpy(hadrons[num].contents,name); 
     hadrons[num].parton[0] = j; 
-    hadrons[num].pow = 1;
+    hadrons[num].len = 1;
     if(!scat && num==0 && strcmp(prtclbase1[j].massidnt,"0")==0) 
     { errTxt="Decay of massless particle.";
       return -1;
@@ -243,8 +230,8 @@ static int enter_h(int * y,char* name,int num,int scat)
   if(!strcmp(hadrons[i].name,name))
   {  strcpy(hadrons[num].name,name);
      strcpy(hadrons[num].contents,hadrons[i].contents);
-     hadrons[num].pow=hadrons[i].pow;
-     for(j=0;j<hadrons[num].pow;j++)
+     hadrons[num].len=hadrons[i].len;
+     for(j=0;j<hadrons[num].len;j++)
      { hadrons[num].parton[j]=hadrons[i].parton[j];  
        if(nout) hadrons[num].polarized[j]=0;
        else hadrons[num].polarized[j]=hadrons[i].polarized[j];
@@ -267,11 +254,20 @@ static int enter_h(int * y,char* name,int num,int scat)
      m=errpos? errpos-hadrch+1: 0;
   
      do 
-     {  char direction[100];
-        sprintf(direction,"composit '%s'  consists of: ",name);
-        if(strcmp(name,"allNew!")==0 && strlen(hadrch)==0) allNewPrtcls(1,hadrch); 
-        if(strcmp(name,"allDec!")==0 && strlen(hadrch)==0) allNewPrtcls(0,hadrch); 
-        redres=input(*y, "s_ent_2", direction,  hadrch, m , SSTRLEN-1);
+     {  char composite[500];
+        sprintf(composite,"composite '%s'  consists of: ",name);
+        if(hadrch[0]==0 &&  strcmp(name,"p*")==0)
+        { int pdg[11]={21,1,-1,2,-2,3,-3,4,-4,5,-5};
+          int k;
+          for(k=0;k<11;k++) for(i=0;i<nparticles;i++) 
+          if(!strchr("*fcCtT",prtclbase[i].hlp) && prtclbase[i].N==pdg[k])
+          { if(hadrch[0]) strcat(hadrch,",");
+             strcat(hadrch,prtclbase[i].name);
+             break;
+          }
+          m=strlen(hadrch)+1;
+        }
+        redres=input(*y, "s_ent_2", composite,  hadrch, m , STRSIZ-1);
         if(redres==KB_ESC) return 1;               
      }  while (redres!=KB_ENTER && redres!=KB_ESC);
 
@@ -279,9 +275,9 @@ static int enter_h(int * y,char* name,int num,int scat)
   
       
      items=stritems(" ,",hadrch);
-     for(m=0,hadrons[num].pow=0; items[m]; m++) 
+     for(m=0,hadrons[num].len=0; items[m]; m++) 
      { char  name[100];
-       if(hadrons[num].pow>=100) {errTxt="too many partons";break;}   
+       if(hadrons[num].len>=100) {errTxt="too many partons";break;}   
        sscanf(items[m],"%[^ ,]",name);
        locateinbase(name,&j);  
        if (j==0 || pseudop(j)) 
@@ -299,15 +295,15 @@ static int enter_h(int * y,char* name,int num,int scat)
            ) 
          { errTxt="This particle can not be polarized";   
               break;
-         } else  hadrons[num].polarized[hadrons[num].pow]=1; 
-       } else hadrons[num].polarized[hadrons[num].pow]=0; 
-       hadrons[num].parton[hadrons[num].pow++]=j;
+         } else  hadrons[num].polarized[hadrons[num].len]=1; 
+       } else hadrons[num].polarized[hadrons[num].len]=0; 
+       hadrons[num].parton[hadrons[num].len++]=j;
      }
 
      errpos=items[m]; 
      if(!errpos)
-     {  for(i=0;i<hadrons[num].pow;i++)
-        for(j=i+1;j<hadrons[num].pow;j++)
+     {  for(i=0;i<hadrons[num].len;i++)
+        for(j=i+1;j<hadrons[num].len;j++)
         if(hadrons[num].parton[i]==hadrons[num].parton[j])
         {  errpos=items[j];
            errTxt="duplicate parton";
@@ -326,7 +322,7 @@ static int restrict_p(int y0, int anti, char * mess, char * hlp,
 char *  inputstr, whohow  liminsp)
 { 
    int m, j, k;
-   int ntot;
+   int ntot,ntotQ,forQ;
 
    char ** items;   
    char *errpos=NULL;
@@ -336,33 +332,60 @@ char *  inputstr, whohow  liminsp)
 do{
     for(r=1;r!=KB_ENTER;) 
     { 
-       r=input(y0, hlp,  mess,inputstr, errpos? 1+errpos-inputstr:1,SSTRLEN-1);
+       r=input(y0, hlp,  mess,inputstr, errpos? 1+errpos-inputstr:1,STRSIZ-1);
        if(r==KB_ESC) return 1;
     }
     trim(inputstr);
     nilprtcl(liminsp);
+    nilprtcl(LimQ);
     ntot=0;
-
+    ntotQ=0;
     items=stritems(",",inputstr);
     for(m=0 ; items[m]; m++)
     {  char frgm[100];
        char *n;
-      sscanf(items[m],"%[^,]",frgm);       
-      n=strchr(frgm,'>');
-      if(n)  
-      { n[0]=0; k=0; sscanf(n+1,"%d",&k); 
-        if(k<1) { errTxt="wrong number"; break;}
-      } else k=1;
+       forQ=0;
+       sscanf(items[m],"%[^,]",frgm);
+             
+      if((n=strstr(frgm,"!=")))       
+      { if(!anti) {errTxt="wrong restriction"; break;}
+        if(sscanf(n+2,"%d",&k)!=1) {errTxt="wrong number"; break;}
+        else  { n[0]=0; k++; forQ=1;}
+      }
+      else if((n=strstr(frgm,"<")))
+      { if(!anti) {errTxt="wrong restriction"; break;}
+        if(sscanf(n+1,"%d",&k)!=1) {errTxt="wrong number"; break;}
+        else {n[0]=0; k=-k-1;}
+      }
+      else if((n=strstr(frgm,">")))
+      {
+        if(sscanf(n+1,"%d",&k)!=1) {errTxt="wrong number"; break;}
+        else {n[0]=0;k++;}
+      }
+      else k=1;
       trim(frgm);
 
+      if(strcmp(frgm,"%Z+W")==0)
+      {  
+         if(k>0) ZWmax=k-1;
+         if(k<0) ZWmin=-k-1;
+         continue;
+      }
+                                             
       locateinbase(frgm,&j);
-      if ((j == 0) || (pseudop(j)&& prtclbase1[j].hlp!='*' ))
+      if ((j == 0) || (!anti&&pseudop(j)))
       {  errTxt="wrong limit statement";
          break;
       }
-      ntot++;
-      if(ntot>=whohowMAX) { errTxt="Too many items"; break;}
-      addlim(liminsp,j,k,anti);
+      if(forQ) 
+      { ntotQ++; 
+        if(ntotQ>=whohowMAX) { errTxt="Too many items"; break;}
+        addlim(LimQ,j,k,anti);
+      }else  
+      { ntot++;
+        if(ntot>=whohowMAX) { errTxt="Too many items"; break;}
+        addlim(liminsp,j,k,anti);
+      }  
     }
     errpos=items[m];
     free(items);
@@ -373,7 +396,8 @@ do{
 
 int enter(void)
 {   
-   int  i, y0,scat;
+   int  i, y0;
+   int scat;
    int  redres;
 
    char ** items=NULL;
@@ -382,6 +406,8 @@ int enter(void)
 
    int curh=0;
 
+   ZWmax= 1000;
+   ZWmin=-1000;
 
    prtcllist(0);
    scrcolor(Red,BGmain);
@@ -408,11 +434,11 @@ label_1:
    arrpos=strstr(processch,"->");
    if(arrpos)  strncpy(arrpos,", ",2); 
    else { errTxt="'->' is absent "; goto label_1; }
-   if( strchr(processch,',')<arrpos ) scat=1; else scat=0;
-   
+ 
    if(items) free(items);
    items=stritems(" ,",processch);
-
+   if( items[0] && items[1] &&items[1] <arrpos ) scat=1; else scat=0;
+    
    for(i=0,nin=0,nout=0,n_x=0,curh=0; items[i]; i++)   
    {  char name[100];
 
@@ -427,17 +453,21 @@ label_1:
         if(curh==MAXINOUT-1){errTxt="Too many particles"; break;}
         if(items[i]>arrpos) nout++; else nin++; 
         if(nin>2){errTxt="Too many incoming particles"; break;}                  
-        if(enter_h(&y0,name,curh,scat)) break;  
+        if(enter_h(&y0,name,curh,scat)) break;
+ 
         curh++;
       }
    }
    
-   errpos=items[i];
+   errpos=items[i]; 
    free(items); items=NULL;
-   
+   if(errpos && !errTxt) 
+   { sprintf(err_Txt,"wrong definition of %d-th particle",i+1);
+      errTxt=err_Txt;
+   }   
    if(errTxt) goto label_1;    
-   if(nout<2)
-   {  errTxt="The number of outgoing particles should  exceed 1";
+   if(nout+nin<3)
+   {  errTxt="The total number of particles should  exceed 2";
       goto label_1;
    }
    if(nin<1)
@@ -453,6 +483,8 @@ label_1:
 
    if(restrict_p(y0,1, "Exclude diagrams with ","s_ent_4",limpch,liminsp)
      ) goto label_1;
+
+   for( i=0;LimQ[i].who;i++)  addlim(liminsp,LimQ[i].who, LimQ[i].how,0);
 
    y0++;
    if(y0>=maxRow()-1) {y0=maxRow()-1; goto_xy(1,y0); clr_eol();} 

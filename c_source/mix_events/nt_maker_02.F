@@ -21,7 +21,6 @@
      &IDWTUP,NPRUP,XSECUP(MAXPUP),XERRUP(MAXPUP),XMAXUP(MAXPUP),
      &LPRUP(MAXPUP)
       INTEGER I,NEVENT
-      SAVE
 
 #ifdef NEW
       INTEGER ERR
@@ -34,24 +33,45 @@ ccccccccccccccccccccccccccccccccccccc
       COMMON/QUEST/IQUEST(100)
       COMMON/PAWC/PAW(NWPAWC)
       INTEGER IQUEST
-      INTEGER*4 NPRT,IKF(100),ISTA(100)
-      REAL*4     XPUP(100),YPUP(100),ZPUP(100),EPUP(100)
-      COMMON/NTVAR/ NPRT,IKF,ISTA,XPUP,YPUP,ZPUP,EPUP 
-      character*100 NAME
+      INTEGER*4 NPRT,IKF(100),ISTA(100),IPAR(100)
+      REAL*4    CS,XPUP(100),YPUP(100),ZPUP(100),EPUP(100)
+      COMMON/NTVAR/ NPRT,IKF,IPAR,ISTA,CS,XPUP,YPUP,ZPUP,EPUP 
+      character*20 NAME
+
+      SAVE
                  
       NUMBER=0
       NQUANT=50000
       CALL HLIMIT(NWPAWC)    
       
-  1   NUMBER=NUMBER+1 
-      WRITE (NAME, *), NUMBER
-       
-      CALL HROPEN(10,'calcnt',
-     &            'event_mixer_'//NAME(2:LEN_TRIM(NAME))//'.nt',
-     &            'N',1024,ISTAT)
+  1   NUMBER=NUMBER+1 !number of ntuples for a givent QUANT
+c      WRITE (NAME, '(I10)') NUMBER
+c      name=adjustl(name)
+
+      IF(NUMBER.lt.10) THEN
+        WRITE (NAME,fmt='(A12,I1,A3)')  'event_mixer_',NUMBER,'.nt'
+      ELSEIF (NUMBER.lt.100) THEN
+        WRITE (NAME,fmt='(A12,I2,A3)')  'event_mixer_',NUMBER,'.nt'
+      ELSEIF (NUMBER.lt.1000) THEN
+        WRITE (NAME,fmt='(A12,I3,A3)')  'event_mixer_',NUMBER,'.nt'
+      ELSEIF (NUMBER.lt.10000) THEN
+         WRITE (NAME,fmt='(A12,I4,A3)')  'event_mixer_',NUMBER,'.nt'
+      ELSE
+         WRITE (NAME,*)  'event_mixer_',NUMBER,'.nt'
+      ENDIF
+      
+      CALL HROPEN(10,'calcnt',NAME, 'N',1024,ISTAT)
+
+c      CALL HROPEN(10,'calcnt',
+c     &            'event_mixer_'//NAME(2:LEN_TRIM(NAME))//'.nt',
+c     &            'N',1024,ISTAT)
+
+c      print *, LEN_TRIM(NAME), name,NUMBER
+c      print *,'**',trim(name),'***',name
       CALL HBNT(10,'calcnt hbnt',' ')
       CALL HBNAME(10,'data',NPRT,'NPRT[0,100],
-     >IKF(NPRT),ISTA(NPRT),XPUP(NPRT),YPUP(NPRT),ZPUP(NPRT),EPUP(NPRT)')
+     >IKF(NPRT),IPAR(NPRT),ISTA(NPRT),CS,XPUP(NPRT),
+     >YPUP(NPRT),ZPUP(NPRT),EPUP(NPRT)')
 ccccccccccccccccccccccccccccccccccccc 
       
       IF(NUMBER.gt.1) goto 20
@@ -158,9 +178,11 @@ c      OPEN(89,FILE='paw_input.out'  ,STATUS='UNKNOWN')
 #endif 
 ccccc fill ntuple cccccccccccccccc
       NPRT=NUP
+      CS=XSECUP(1)
       DO I=1,NUP
 c---------------------              
 	  IKF(I)=IDUP(I)
+	  IPAR(I)=MOTHUP(1,I)
 	  ISTA(I)=ISTUP(I)
 	  XPUP(I)=PUP(1,I)
 	  YPUP(I)=PUP(2,I)

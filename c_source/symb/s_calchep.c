@@ -1,6 +1,4 @@
-/*
- Copyright (C) 1997, Alexander Pukhov, e-mail: pukhov@theory.npi.msu.su
-*/
+#include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -28,58 +26,65 @@
 
 #include "saveres.h"
 #include "out_serv.h"
-
+#include "fcompare.h"
+#include "numcheck.h"
+#include "../../include/version.h"
+#include "dynamic_cs.h"
+#include "n_proc.h"
 
 static int errorcode=0;
-static void*sv_screen=NULL;
 
 static void xw_error(void) { sortie(80);}
+int    menulevel;
 
-static int     width2calc=0;
-static char *  inkey2=NULL;
-static int     blind2=0;
-
-static char* Plus12code(void)
-{
-   int l,cont=0;
-   char * p=malloc(nparticles);
-   char * str=NULL;
-   catrec cr;
-   int ArcNum=0;
-   
-   for(l=0; l<nparticles; l++) p[l]=0;  
-   catalog=fopen(CATALOG_NAME,"rb");
-   while(FREAD1(cr,catalog))
-   { char archiveName[40];
-     if(ArcNum!=cr.nFile)
-     { if(ArcNum!=0) fclose(archiv);
-       ArcNum=cr.nFile;
-       sprintf(archiveName,ARCHIV_NAME,ArcNum);
-       archiv=fopen(archiveName,"rb");
-     }  
-     fseek(archiv,cr.denompos,SEEK_SET);
-     
-     readDenominators();
-     for(l=0;l< denrno;l++) if(denom[l].width)
-     { int np= modelvars[denom[l].width].pwidth;
-       if(!np) continue;
-       np=ghostmother(np);
-       if(p[np-1]==0) {p[np-1]=1; cont++;}
+static  int checkAuxDir( int nmod)
+{  char  n1[50],n2[50];
+   char *fList[5]= {"vars","prtcls","extlib","func","lgrng",};   
+   int i;
+   for(i=0;i<5;i++)
+   { sprintf(n1,"models/%s%d.mdl",fList[i],nmod); 
+     sprintf(n2,"results/aux/models/%s1.mdl",fList[i]);
+     if(fcompare(n1,n2)) break;
+   }   
+   if(i!=5)
+   { 
+     int dirStat=checkDir("results");
+     if(dirStat)
+     {  messanykey( 10,10,"There are files in directory 'results/'.\n"  
+                          "To continue you has to clean or rename this directory.");
+        viewresults();
+        if(checkDir("results")!=0)  return 1;                   
      }
+     delAllLib();
+     system("if(test -d results/aux) then\n"
+            "rm  -r results/aux\n"
+            "fi\n"
+            "mkdir results/aux; cd results/aux;\n"
+            " mkdir models tmp results so_generated");
+     for(i=0;i<5;i++)
+     { char command[100];
+       sprintf(command,"cp models/%s%d.mdl results/aux/models/%s1.mdl", fList[i],nmod,fList[i]);
+       system(command); 
+     } 
    }
- 
-   fclose(catalog); 
-   if(ArcNum)fclose(archiv);
-   if(cont) 
-   { str=malloc(30+cont*4);
-     strcpy(str,"}}{wildPrt->2*x{");
-     for(l=0;l<nparticles;l++) 
-          if(p[l])sprintf(str+strlen(str),"%s,",prtclbase[l].name);
-     sprintf(str+strlen(str)-1,"{ { {[{[{"); 
+   if(!compDir)
+   {
+      int err,size=100;
+     
+      for(;;)
+      {  compDir=realloc(compDir,size+20);
+         if(getcwd(compDir,size)) break; else size*=2;
+      }
+      modelDir="models";
+      modelNum=1; 
+      strcat(compDir,"/results/aux");
+      libDir=malloc(strlen(compDir)+20);
+      sprintf(libDir,"%s/so_generated",compDir); 
+      calchepDir=pathtocalchep; 
    }
-   free(p);
-   return str;
-}
+   
+   return 0;
+}  
 
 
 int main(int argc,char** argv)
@@ -104,10 +109,25 @@ int main(int argc,char** argv)
   int pid=0;
   char LOCKtxt[]="Directory 'results/' contains the .lock file created by n_calchep.\n"
                  "To continue you may a)Close the n_calchep session, or b)Rename 'results/',\n";
+
+
   blind=0;
-  strcpy(pathtocomphep,argv[0]);
-  for(n=strlen(pathtocomphep)-1; n && pathtocomphep[n]!=f_slash; n--);
-  pathtocomphep[n-3]=0;                                         
+  strcpy(pathtocalchep,argv[0]);
+  for(n=strlen(pathtocalchep)-1; n && pathtocalchep[n]!=f_slash; n--);
+  pathtocalchep[n-3]=0;
+  if(pathtocalchep[0]!='/')
+  { int size=100;
+    char*buff=NULL;
+    for(;;)
+    {  buff=realloc(buff,size+strlen(pathtocalchep)+10);
+       if(getcwd(buff,size)) break; else size*=2;
+    }
+    strcat(buff,"/");
+    strcat(buff,pathtocalchep);
+    strcpy(pathtocalchep,buff);
+    free(buff);                         
+  }
+                                           
      
    for ( n=1;n<argc;n++) 
    { if (strcmp(argv[n],"-blind")==0 && n<argc-1 )
@@ -115,15 +135,34 @@ int main(int argc,char** argv)
         inkeyString=argv[++n];
      }
      if (strcmp(argv[n],"+blind")==0 )  blind=2;                                     
+     if (strcmp(argv[n],"--version")==0 ) { printf("%s\n", VERSION_); exit(0);}
    }    
 
-   
+   if(!writeLockFile(".lock")) 
+   { fprintf(stderr,"locked by other s_calchep. See .lock file\n");
+      exit(100);
+   }
    strcpy(pathtouser,"");  
-   sprintf(pathtohelp,"%shelp%c",pathtocomphep,f_slash);
+   sprintf(pathtohelp,"%shelp%c",pathtocalchep,f_slash);
    outputDir="results/";        
-   { char * icon=(char *) malloc(strlen(pathtocomphep)+10);
-     sprintf(icon,"%sicon",pathtocomphep);
-     start1("CalcHEP/symb",icon,"calchep.ini",&xw_error);
+   { char * icon=(char *) malloc(strlen(pathtocalchep)+20);
+     char  title[30];
+     int err;
+     sprintf(icon,"%s/include/icon",pathtocalchep);
+     sprintf(title,"CalcHEP_%s/symb", VERSION);
+     err=start1(title,icon,"calchep.ini",&xw_error);
+     if(err && blind==0)
+     { printf("Error:You have launched interactive session for version compiled  without X11 library.\n");
+       printf(" Presumably X11 development package is not installed in your computer.\n");
+       printf(" In this case directory /usr/include/X11/ is empty.\n");       
+       printf("Options: a) Use blind session; b) Update Linux and recompile CalcHEP \n");
+       printf("Name of needed package\n");
+       printf("     libX11-devel      Fedora/Scientific Linux/CYGWIN/Darwin(MAC)\n");
+       printf("     libX11-dev        Ubuntu/Debian\n");
+       printf("     xorg-x11-devel    SUSE\n");
+
+       exit(66);
+     }      
      free(icon);
    }
    fillModelMenu();
@@ -139,7 +178,6 @@ int main(int argc,char** argv)
 
    restoreent(&menulevel);
 
-
    if(!blind && menulevel<2) cheplabel(); 
 
    switch (menulevel)
@@ -148,14 +186,16 @@ int main(int argc,char** argv)
       case 6:
       case 5: 
       case 4:
-      case 3: readModelFiles("models",n_model); 
+      case 3: readModelFiles("./models",n_model); 
               modelinfo();
               loadModel(0,forceUG);
               processinfo();
               diagramsinfo();
+              k1=n_model;
+              break;
       case 2: k1=n_model;
-
-      case 1: break;
+              readModelFiles("./models",n_model);
+              break; 
    }
 
    switch (menulevel)
@@ -180,38 +220,45 @@ label_10:   /*   Menu2(ModelMenu): */
       showheap();
       k1=n_model;
       menu1(56,4,"",modelmenu,"s_1",&pscr1,&k1);
-      n_model=k1;
-      if(n_model == 0)
-      {
-	if( mess_y_n(56,4,"Quit session")) {  saveent(menulevel); goto exi; }         
+      if(k1 == 0)
+      {  
+	if( mess_y_n(56,4,"Quit session")) {n_model=0;   saveent(menulevel); goto exi; }         
       }
-      else  if(n_model == maxmodel+1)
+      else  if(k1 == maxmodel+1)
       {
          clrbox(1,4,55,18);
          makenewmodel();
          menuhelp();
       }
-      else if (n_model > 0)
-      { 
-	put_text(&pscr1);
-	goto label_20;
+      else if (k1 > 0)
+      { int err=0;
+        put_text(&pscr1);
+        if(k1!=n_model || ldModelStatus==0) { err=readModelFiles("./models",k1);}
+        n_model=k1;
+        if(err){ if(blind) sortie(133); else  goto label_10;} else goto label_20;
       }
    }
+   
 
 label_20:   /*  Menu3:Enter Process  */
+   if(checkAuxDir(n_model))  goto label_10;
+
    f3_key[0]=NULL; 
    f3_key[1]=NULL; 
 
    menulevel = 2;
    saveent(menulevel);
-   readModelFiles("models",n_model);
+   
    modelinfo();
    k2 = 1;
+   
    do
    {  char strmen[]="\026"
         " Enter Process        "
-        " Force Unit.Gauge OFF "
+        " Force Unit.Gauge= OFF"
         " Edit model           "
+        " Numerical Evaluation "
+        "======================"
         " Delete model         ";
 
       if(forceUG)improveStr(strmen,"OFF","ON");
@@ -220,26 +267,29 @@ label_20:   /*  Menu3:Enter Process  */
       {
          case 0:  goto_xy(1,1); clr_eol(); goto label_10;
          case 2:  forceUG=!forceUG;   modelinfo(); break;
-	 case 3:  editModel(1); break;
-         case 4: 
-	    if ( deletemodel(n_model) )
+	 case 3:  editModel(1); for(;checkAuxDir(n_model);) continue;  break;
+	 case 4:  numcheck();   
+	 case 5:  break;
+         case 6: 
+	    if(deletemodel(n_model))
             {
                goto_xy(1,1);
                clr_eol();
                n_model=1;
+               ldModelStatus=0;
                fillModelMenu();
                goto label_10;
             }
-            else   readModelFiles("models",n_model);
       }
    }  while (k2 != 1);
 
-   loadModel(0,forceUG);
+   if(!loadModel(0,forceUG)) goto  label_20;
+   
 label_21:
 
    f3_key[0]=NULL; 
    f3_key[1]=NULL; 
-
+   
    menulevel=2;
    errorcode=enter();   /*  Enter a process  */
    newCodes=0;
@@ -248,9 +298,8 @@ label_21:
    errorcode=construct();          /*  unSquared diagrams  */
    if (errorcode) 
    {  if(blind)
-      {  if(width2calc) goto absent12;else
-         { printf("Processes of this type are absent\n"); sortie(111);}
-      } else 
+      {  printf("Processes of this type are absent\n"); sortie(111); } 
+      else 
       { messanykey(5,22,"Processes of this type are absent");  
         clrbox(1,19,80,24); 
         goto label_21;
@@ -269,7 +318,7 @@ label_21:
      processinfo();
      diagramsinfo();
      goto label_31;	
-   }
+   } else cleanResults();
    
 label_30: /*  Menu4: Squaring,...*/
    clr_scr(FGmain,BGmain);
@@ -288,7 +337,7 @@ label_31:
       menu1(56,4,"","\026"
          " View diagrams        "
 /*         " Amplitude calculation" */
-         " Squaring technique   "
+         " Square diagrams      "
          " Write down processes ","s_squa_*",&pscr3,&k3);
       switch (k3)
       {
@@ -308,8 +357,8 @@ label_31:
                    fclose(f);
                    fclose(menup);
                     messanykey(20,14,"See file 'results/list_prc.txt'");
-
-                 } break;
+ 
+                 } break; 
 
 /*       case 2: messanykey(10,10,"Not implemented yet"); Amplitudes(); */
       }
@@ -339,7 +388,6 @@ label_40:   /*  Menu5: View squared diagrams.....   */
    pscr4=NULL;
    for(;;)   
    {  int res;
-      static char* key2str=NULL;
       menu1(56,4,"","\026"
          " View squared diagrams"
          " Symbolic calculations"
@@ -349,6 +397,11 @@ label_40:   /*  Menu5: View squared diagrams.....   */
          ,"s_calc_*",&pscr4,&k4);
 
       res=checkDir("results");
+      if(res==1)
+      {
+        int  n_calchep_id=setLockFile("results/.lock");
+        if(n_calchep_id) unLockFile(n_calchep_id); else res=2;                          
+      }
       switch (k4)
       {  case 0:
             if (mess_y_n(50,3,"Return to previous menu?"))goto label_30;
@@ -363,50 +416,106 @@ restart2:
             f3_key[1]=f4_key_prog; 
 
             menulevel=4;
-            calcallproc();
+                        
+            if(!nPROCSS || nin+nout<4 ) calcallproc(); else 
+            { int nPROCSS2=2*nPROCSS;
+              int *pids=malloc(sizeof(int)*nPROCSS);
+              int *pow=malloc(sizeof(int)*nPROCSS);
+              int *pipes=malloc(2*sizeof(int)*nPROCSS);
+              int **qd=malloc(sizeof(int*)*nPROCSS2);
+              int totD=sqDiagList(qd, nPROCSS2);
+              int totC=0,nProc=0;
+              int k,K2=0;
+              int abort=0;
+              int procActive;
+//printf("totD=%d\n", totD);
+              system("rm -f tmp/catalog.tp_*"); 
+              infoLine(0.);
+              for(k=0;k<nPROCSS;k++) pids[k]=0;
+              while( nProc< nPROCSS2)
+              {
+                for(k=0;k<nPROCSS;k++) if(pids[k]==0 && K2<nPROCSS2 && abort==0)
+                { int* kpipe=pipes+2*k;
+                  int i;
+                  while(K2<nPROCSS2 && qd[K2][0]<0 ) {K2++; nProc++;}
+                  if(K2==nPROCSS2) break;
+                  pow[k]=0;
+                  for(i=0;qd[K2][i]>=0;i++) pow[k]++;
+//printf("K2=%d pow=%d\n",K2,pow[k]);
+                  fflush(NULL);
+                  pipe(kpipe);
+                  pids[k]=fork();
+                  if(pids[k]==0)
+                  {
+                    close(kpipe[0]);
+                    if(blind<=0) {blind=1;finish();}
+                    calcWithFork(K2,qd[K2],kpipe[1]);
+                    exit(0);
+                  } else { close(kpipe[1]); K2++; }
+                }
+                
+                for(procActive=0,k=0;k<nPROCSS;k++) if(pids[k])                                                          
+                {                                                                                                        
+                  int one;                                                                                               
+                  if(waitpid(pids[k],NULL,WNOHANG)!=0) {nProc++; totC+=pow[k]; close(pipes[2*k]);  pids[k]=0; /*printf("End of %d\n",k);*/  }          
+                  else                                                                                                   
+                  {                                                                                                      
+                     procActive++;                                                                                       
+       //              if(blind<=0 && read(pipes[2*k],&one,sizeof(int))== sizeof(int)) { totC++; pow[k]-=1;}                           
+                  }                                                                                                      
+                }                                                                                                        
+
+                if(blind<=0)
+                { 
+//                printf(" %d %d\n", totC, totD);
+                 
+                  if(abort==0 && infoLine((double)totC/(double)totD))                                                         
+                  {                                                                                                        
+                     abort=1;                                                                                             
+                     for(k=0;k<nPROCSS;k++) if(pids[k])kill(pids[k],SIGUSR1);                                              
+                  }                                                                                                         
+                  if(abort&& procActive==0) break;
+                } //else sleep(2);                                                                           
+             
+              }
+            
+              infoLine(2);        
+              for(k=0;k<nPROCSS2;k++)
+              { char ctlgName[100];
+                char command[200];
+                sprintf(ctlgName,"%s_%d",CATALOG_NAME,k);
+                if(access(ctlgName,R_OK)==0)
+                { sprintf(command," cat %s >> %s", ctlgName,CATALOG_NAME);
+                  system(command);
+                  unlink(ctlgName);   
+                }
+              }
+              if(totC)  newCodes=1;  
+                          
+              free(pow);
+              free(pids);   
+              free(pipes);
+              for(k=0;k<nPROCSS2;k++) free(qd[k]);
+              free(qd);   
+            }
+            updateMenuQ(); 
             sq_diagramsinfo();
 
-            if(!continuetest()) break;            
-            if(width2calc==0 &&  nin+nout>3 )
-            { 
-               key2str=Plus12code(); 
-               if(key2str==NULL) break;  
-               saveent(menulevel);
-               system("cd tmp; rm -f *2; all=`ls`; mkdir  tmp; mv $all tmp;");
-               inkey2=inkeyString;
-               blind2=blind;
-               inkeyString=key2str;
-               width2calc=1;
-               blind=1;                  
-               get_text(1,1, maxCol(),maxRow(),&sv_screen);
-               continue;          
-            } else  if(width2calc)
-            { 
-               system("for FILE in tmp/* ;do if(test ! -d $FILE) then mv  $FILE $FILE'2' ;fi;done;");
-absent12:      k4=2;         
-               system("mv tmp/tmp/* tmp; rmdir tmp/tmp;");
-               restoreent(&menulevel);
-               if(key2str){ free(key2str);key2str=NULL;}
-               width2calc=0;
-               blind=blind2;
-               inkeyString=inkey2;
-               clr_scr(FGmain,BGmain);
-               if(sv_screen)put_text(&sv_screen);
-            }
+            if(!continuetest()) break; 
             showheap();  
             put_text(&pscr4);
          break;
          case 3:
             { static char keystr[12]="]{{[{";
-              inkeyString=keystr;
+              if(res==2) messanykey(3,10,LOCKtxt); else inkeyString=keystr;
             }
             break;
          case 4:
-            { 
-              FILE *f=fopen("results/EXTLIB","w");
-              fprintf(f,"EXTLIB=\"%s\"\nexport EXTLIB\n",EXTLIB);
-              fclose(f); 
+            if(res==2) messanykey(3,10,LOCKtxt); else
+            { char command[100];
               saveent(menulevel);
+              chdir("results");
+              makeVandP(0,"../models",n_model,2,pathtocalchep);
               finish();
               sortie(22);
             }
@@ -420,9 +529,10 @@ label_50:
    pscr5=NULL;
    menulevel=5;
    saveent(menulevel);
-   
+   sq_diagramsinfo();
+      
    for(;;)  
-   {   
+   {  int n_calchep_id;   
       menu1(56,4,"","\026"
          " C code               "
          "     C-compiler       "
@@ -431,8 +541,8 @@ label_50:
          " MATHEMATICA code     "
          " FORM code            "
          " Enter new process    " ,"s_out_*",&pscr5,&k5);
-
-      if((k5==0|| k5==1||k5==2 || k5==7 )&&pid) 
+          
+      if((k5==1||k5==2)&&pid) 
       { int epid=waitpid(pid,NULL,WNOHANG);
         if(epid) pid=0; else
         { 
@@ -440,36 +550,52 @@ label_50:
           continue;
         }
       }  
-      
+
       switch (k5)
       {  case 0: goto label_40;  break;
          case 1:
            c_prog(); newCodes=0; saveent(menulevel);
            break;
-         case 2:   
-           if(newCodes) { c_prog(); newCodes=0; saveent(menulevel);} 
-           pid=fork();
-           if(pid==0)
-           { 
-             char * command;
-             {  
-               command=(char*)malloc(strlen(pathtocomphep)+strlen(EXTLIB)+100);
-               sprintf(command,"EXTLIB=\"%s\"\n"
-                               "export EXTLIB\n"
-                               "cd results\n"
-                               "xterm -e %s/make__n_calchep",
-                               EXTLIB,pathtocomphep);                                 
-               system(command);
-               sprintf(command,"cd results; ./n_calchep"); 
-               system(command); 
-               free(command);
+         case 2:
+           if(newCodes) { c_prog(); newCodes=0; saveent(menulevel);}
+          n_calchep_id=setLockFile("results/.lock"); 
+           if(n_calchep_id)
+           {
+             if(nPROCSS)
+             { chdir("results"); 
+                makeVandP(0,"../models",n_model,2,pathtocalchep);
+               pCompile();
+               if(access("./n_calchep",X_OK)==0)
+               { 
+                  fflush(NULL); 
+                  pid=fork();   
+                  if(pid==0) 
+                  {
+                    system("./n_calchep");
+                    exit(0);
+                  }    
+               } else messanykey(15,15,"n_calchep is not generated");
+               chdir("../");
+             } else                       
+             { fflush(NULL); 
+               pid=fork();
+               if(pid==0)
+               {  if(chdir("results")==0)
+                  {   char*command=malloc(150+strlen(pathtocalchep));
+                      makeVandP(0,"../models",n_model,2,pathtocalchep); 
+                      sprintf(command,"command=\"%s/sbin/make__n_calchep %d\"; xterm=`which xterm`; if(test -n \"$xterm\") then   $xterm -e $command; else $command; fi", pathtocalchep,n_model);                                 
+                      system(command);
+                      free(command);
+                      system("./n_calchep");                     
+                   }
+                   exit(0);    
+               }
              }
-             exit(0);
-           }
+             unLockFile(n_calchep_id); 
+           } 
            break;
-         case 3: if(edittable(1,1,&modelTab[4],1,"s_mdl_5",0))
+         case 3: if(edittable(1,1,&modelTab[4],1," ",0))
                  {  char fName[STRSIZ];
-                    readEXTLIB();
                     sprintf(fName,"%smodels%c%s%d.mdl",pathtouser,f_slash,mdFls[4],n_model);
                     writetable( &modelTab[4],fName); 
                  }
@@ -491,3 +617,5 @@ exi:
    sortie(0);
    return 0;
 }
+
+

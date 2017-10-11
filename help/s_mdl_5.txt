@@ -1,4 +1,4 @@
-   External functions.
+2 5 76    External functions.
 I) The lines of this table which start with the word 'extern' are
    treated as declaration of prototypes of external functions which
    are included in the "Constraints" table. If missing, CalcHEP will

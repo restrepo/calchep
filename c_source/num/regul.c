@@ -8,9 +8,13 @@
 #include"read_func.h"
 #include"rd_num.h"
 #include"regul.h"
+/*
+#include"VandP.h"
+#include"dynamic_cs.h"
+*/
 
 table regTab={"*** Table ***"," Regularization ",
-" Momentum    |> Mass  <|> Width <| Power|",NULL};
+" Momentum    |> Mass  <|> Width <| Power|",NULL,0};
 
 invreg_ invreg_1[200];
 
@@ -116,4 +120,3 @@ int getreg_(int *nsing, sing_struct *singar,
    }
    return 0;
 } /* getreg_ */
-

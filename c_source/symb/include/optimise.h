@@ -10,9 +10,8 @@ typedef struct var_rec
    {
       varptr      next;
       int         sgn;
-      NUM_TYPE    ncoef;   /* new */
       infoptr     coef;
-      int         vars[STRSIZ];
+      int       vars[STRSIZ];
    }  var_rec;
 #undef varptr
 #undef infoptr
@@ -24,7 +23,6 @@ typedef struct inforec
    {
       infoptr    next;
       unsigned   count;
-      int        nused;   /* new */
       char       name[20];
       enum{numb,expr,rnumb} consttype;
       varptr     const_;

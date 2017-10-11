@@ -25,7 +25,8 @@ typedef struct csdiagram
       unsigned          del; 
       char          status;   /* -2-outOfMemory,-1-deleted,
                                  0-Rest, 1-calculated,2-Zero  */
-      int nsub;                           
+      int nsub;
+      int ndiagr;  
    }  csdiagram;
 
 #define maxvert (MAXINOUT - 2)
@@ -85,4 +86,6 @@ extern void proccessName(decayDiagram a, char * txt );
 
 extern void  decompose( vcsect vcs,  vampl *left,  vampl * right);
 
+extern void printDiagram(vampl * vlist);
+extern void printCsDiagram(vcsect * vlist);
 #endif

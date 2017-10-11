@@ -19,7 +19,7 @@ extern int  fColor,bColor;
 
 
 extern   int print(char * format, ... );
-extern void  start1(char * window_name,char * icon_file, char * ini_file, 
+extern int  start1(char * window_name,char * icon_file, char * ini_file, 
                     void(*error)(void));
 extern void  finish(void);
 extern void  goto_xy(int x,int y);

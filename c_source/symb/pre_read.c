@@ -61,7 +61,11 @@ void * rd_pre(char* s)
  preres     m;
  long    li;
  char rest[100];
-   if (isdigit(s[0]))
+ 
+   if(s[0]=='"')
+   {  rderrcode=unexpectedcharacter;
+      return NULL;
+   }else if(isdigit(s[0]))
    {  
       if(1!=sscanf(s,"%ld%s",&li,rest)    ) rderrcode = toolargenumber; else
       {  newrecord(&m);
@@ -71,7 +75,7 @@ void * rd_pre(char* s)
    }
    else
    {
-      if (strlen(s) > 6)  rderrcode = toolongidentifier;
+      if (strlen(s) >= VAR_NAME_SIZE)  rderrcode = toolongidentifier;
       else
       {
          newrecord(&m);
@@ -128,7 +132,7 @@ static void * uact(char* ch,void * mm)
 {preres   m;
 
    m = (preres)mm;
-   if (strcmp(ch,"G") == 0 || strcmp(ch,"g") == 0)
+   if(strcmp(ch,"G") == 0)
    {
       if(m->tp!=vectortp && m->tp!=indextp)
       {
@@ -149,26 +153,6 @@ static void * uact(char* ch,void * mm)
    } else rderrcode=unexpectedoperation;
    return mm;
 }
-
-static int sum_perm[7][7]={
-/* n p r t s v i  */
-  {1,1,1,0,1,0,0},
-  {1,1,1,0,1,0,0}, 
-  {1,1,1,0,0,0,0}, 
-  {0,0,0,1,1,0,0},
-  {1,1,0,1,1,0,0},
-  {0,0,0,0,0,1,0},
-  {0,0,0,0,0,0,0}         };
-
-static int mult_perm[7][7]={
-/* n p r t s v i  */
-  {1,1,1,1,1,1,0},
-  {1,1,1,1,1,1,0},
-  {1,1,1,0,0,0,0},
-  {1,1,0,1,1,0,0},
-  {1,1,0,1,1,0,0},
-  {1,1,0,0,0,1,0},
-  {0,0,0,0,0,0,0},           };
 
 
 static void *  bact(char ch,void * mm1,void * mm2)
@@ -243,6 +227,11 @@ static void *  bact(char ch,void * mm1,void * mm2)
             return NULL;
          }
 */
+         if(m1->tp > m2->tp &&  m2->tp ==rationtp) 
+         {  rderrcode = unexpectedoperation;
+            return 0;
+         }
+
          m1->num *= m2->num;
          m1->maxp = MAX(m1->maxp,m2->maxp);
          m1->degp += m2->degp;
@@ -268,8 +257,14 @@ static void *  bact(char ch,void * mm1,void * mm2)
       break;
 
       case '^':
+         if (m2->tp != numbertp )
+         {
+            rderrcode =  unexpectedoperation;
+            return NULL;
+         }
+      
          d = m2->num;
-         if (m2->tp != numbertp || d <= 0 || d > 255)
+         if( d <= 0 || d > 255)
          {
             rderrcode = rangecheckerror;
             return NULL;
@@ -277,7 +272,7 @@ static void *  bact(char ch,void * mm1,void * mm2)
 
          if (m1->tp > rationtp)
          {
-            rderrcode = typemismatch;
+            rderrcode = unexpectedoperation;
             return NULL;
          }
 

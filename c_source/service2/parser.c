@@ -3,7 +3,7 @@
 */
 
 #define ILEN 200
-#define MAXFUN 50
+#define MAXFUN 200
 #include "parser.h"
 #include<stdio.h>
 #include <ctype.h>
@@ -56,17 +56,18 @@ static void * readSmplTerm(void)
    void * s_res=NULL;
    int n=0;                                                                      
    void * tmp_arg[MAXFUN];                                                       
-
+   char ch;
+   
    skip();
    if(source[count] == '(') 
    { 
       count++;
-      if(s_res=readSum())
+      if((s_res=readSum()))
       {if(source[count] != ')')  rderrcode = braketexpected; else count++;}
       return s_res;
    }
-    
-   if(!isalnum(source[count])&& source[count]!='"') {rderrcode=unexpectedcharacter; return NULL;}
+   ch=source[count]; 
+   if(!isalnum(ch)&& ch!='_'  && ch!='"') {rderrcode=unexpectedcharacter; return NULL;}
 
    m1 = count; 
    if(isdigit(source[count]))
@@ -82,11 +83,10 @@ static void * readSmplTerm(void)
         }
         else do count++; while (isdigit(source[count]));
       }
-   } 
+   }                 
    else if(source[count]=='"') 
    {count++; while(count-m1<=ILEN &&  (source[count]!='"' || source[count-1]=='\\') ) count++; count++;} 
-   else {count++; while(isalnum(source[count])) count++;}
-
+   else {count++; while(isalnum(source[count])||source[count]=='_'||source[count]=='`') count++;}
    len=count-m1;
    if(len>ILEN) {rderrcode=toolongidentifier; return NULL;} 
    else         sprintf(tmp,"%*.*s",len,len,source+m1); 
@@ -95,10 +95,11 @@ static void * readSmplTerm(void)
    { rderrcode=unexpectedcharacter; return NULL;}
    
    if(isdigit(tmp[0])|| tmp[0]=='"' ||source[count] != '(') return rd(tmp);
+
    do                                                                            
-   { count++;  skip();  if(source[count]==')')break;                                                                  
+   { count++;  skip(); if(source[count]==')')break;                                                                   
      if(n==MAXFUN) {rderrcode=toomanyagruments; break;}                          
-     if(!(tmp_arg[n]=readSum()))  break; 
+     if(!(tmp_arg[n]=readSum()))  break;                                                      
      n++;                                                                        
    } while (source[count]==',');                                                 
    if(!rderrcode) 
@@ -125,7 +126,7 @@ static void * readMonom(int level)
    char com[2]="?";
    skip();
    m_res= level ? readMonom(level-1):readSmplTermPlus(); 
-
+   
    if(m_res)
    {
       while(!strchr(keyChar+1+level,source[count]))
@@ -175,7 +176,7 @@ static void *  readSum()
 
 void* readExpression(char* source1,rdelement rd1,operation act1,clear del1)
 {  void*  rslt;
-   source=source1;
+   source=source1; 
    act0=act1,
    rd0=rd1;
    delFlag=(del1!=NULL);
@@ -184,16 +185,17 @@ void* readExpression(char* source1,rdelement rd1,operation act1,clear del1)
    count=0;
    rderrpos=0;
    rderrcode=0;
-
    rslt= readSum();
    if(rderrcode==0 && ( source[count]==',' || source[count]==')') ) 
    {rslt=NULL; rderrcode=unexpectedcharacter;}
     
    if(!rslt && !rderrpos) rderrpos=count+1;
-   
+
    if(delFlag)
-   {  while(--nDel>=0) if(toDel[nDel]!=rslt) del1(toDel[nDel]);
-      free(toDel);
+   {
+   
+     while(--nDel>=0) if(toDel[nDel]!=rslt) del1(toDel[nDel]);
+      free(toDel); 
    }
    return  rslt;
 }

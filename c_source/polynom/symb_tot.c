@@ -70,10 +70,16 @@ symb_data symb_imult(symb_data S,int del,int factor)
 
 symb_data symb_mult(symb_data S1, int del1, symb_data S2, int del2)
 {
-  symb_data ans={NULL,errortp};
+  symb_data ans={{NULL},errortp};
   
   if(S1.type==errortp || S2.type==errortp ||
      S1.type==indextp || S2.type==indextp) return ans;
+
+  if(S1.expr.p==NULL)
+  { if(del2) symb_clean(S2); S1.type=numbertp;  return  S1;}
+
+  if(S2.expr.p==NULL)
+  { if(del1) symb_clean(S1); S2.type=numbertp;  return  S2;}
 
  
   if(S1.type==S2.type)
@@ -107,9 +113,10 @@ symb_data symb_mult(symb_data S1, int del1, symb_data S2, int del2)
      S1=S2; S2=S;
      del1=del2; del2=del;
   }
-  
+
   if(S2.type==numbertp)
-  { long L=S2.expr.p->num;
+  { 
+    long L=S2.expr.p->num;
     ans=symb_imult(S1,del1,L);
     if(del2) symb_clean(S2);
     return ans;
@@ -118,7 +125,7 @@ symb_data symb_mult(symb_data S1, int del1, symb_data S2, int del2)
   if(S2.type==vectortp||S2.type==spintp) return ans;
   
   if(del1) ans=S1; else ans=symb_copy(S1);
-     
+  
   switch(S1.type)
   {      
      case vectortp : 
@@ -144,7 +151,7 @@ symb_data symb_mult(symb_data S1, int del1, symb_data S2, int del2)
 
 symb_data  symb_typeUp(symb_data S, int del,int type)
 {
-   symb_data ans={NULL,errortp};
+   symb_data ans={{NULL},errortp};
    
    if(S.type==errortp || type<S.type) return ans;
 
@@ -218,7 +225,7 @@ static set symb_index(symb_data S)
 } 
 
 
- int symb_testindex(symb_data S)
+int symb_testindex(symb_data S)
 {
   set index=set_constr(_E);
   tensor t; SpinTensor s; Etens e;
@@ -264,7 +271,8 @@ static set symb_index(symb_data S)
        first=0;
     } return 0;   
       
-  }   
+  }
+  return 1;   
 } 
 
 
@@ -272,7 +280,7 @@ static set symb_index(symb_data S)
 
 symb_data symb_sum(symb_data S1, int del1, symb_data S2, int del2)
 {
-  symb_data ans={NULL,errortp}, s1,s2;
+  symb_data ans={{NULL},errortp}, s1,s2;
   set index1,index2;
     
   if( S1.type==errortp || S2.type==errortp  
@@ -287,10 +295,6 @@ symb_data symb_sum(symb_data S1, int del1, symb_data S2, int del2)
  
   index1= symb_index(S1);
   index2= symb_index(S2); 
-
- 
-
-
   
   if(!set_eq(index1,index2)) 
   {  
