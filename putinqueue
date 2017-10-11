@@ -1,5 +1,0 @@
-
- $1 -c $CFLAGS $3
- rm $3
- ar r $2_proclib_$5.a $4
- rm $4
